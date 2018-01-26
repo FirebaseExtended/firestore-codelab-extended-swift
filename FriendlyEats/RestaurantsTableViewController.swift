@@ -127,7 +127,7 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
       UIColor(red: 0x3d/0xff, green: 0x5a/0xff, blue: 0xfe/0xff, alpha: 1.0)
     navigationController?.navigationBar.isTranslucent = false
     navigationController?.navigationBar.titleTextAttributes =
-      [ NSForegroundColorAttributeName: UIColor.white ]
+      [ NSAttributedStringKey.foregroundColor: UIColor.white ]
 
     tableView.dataSource = self
     tableView.delegate = self
