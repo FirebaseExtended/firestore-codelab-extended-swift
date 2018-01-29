@@ -52,11 +52,12 @@ class NewReviewViewController: UIViewController, UITextFieldDelegate {
   }
 
   @IBAction func doneButtonPressed(_ sender: Any) {
-    let review = Review(rating: ratingView.rating!,
-                        userID: Auth.auth().currentUser!.uid,
-                        username: Auth.auth().currentUser?.displayName ?? "Anonymous",
-                        text: reviewTextField.text!, date: Date())
-    delegate?.reviewController(self, didSubmitFormWithReview: review)
+    // TODO(morganchen): Re-write this with new data types.
+//    let review = Review(rating: ratingView.rating!,
+//                        userID: Auth.auth().currentUser!.uid,
+//                        username: Auth.auth().currentUser?.displayName ?? "Anonymous",
+//                        text: reviewTextField.text!, date: Date())
+//    delegate?.reviewController(self, didSubmitFormWithReview: review)
   }
 
   @objc func ratingDidChange(_ sender: Any) {

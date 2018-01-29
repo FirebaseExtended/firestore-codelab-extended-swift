@@ -16,23 +16,48 @@
 
 import Foundation
 
+/// A restaurant, created by a user.
 struct Restaurant {
 
+  /// The ID of the restaurant, generated using UUID.
+  var restaurantID: String
+
+  /// The restaurant owner's uid. Corresponds to a user object in the top-level Users collection.
+  var ownerID: String
+
+  /// The name of the restaurant.
   var name: String
-  var category: String // Could become an enum
+
+  /// The category of the restaurant.
+  var category: String
+
+  /// The city the restaurant is located in.
   var city: String
-  var price: Int // from 1-3; could also be an enum
-  var ratingCount: Int // numRatings
+
+  /// The price category of the restaurant. Values are clamped between 1 and 3 (inclusive).
+  var price: Int
+
+  /// The number of reviews that have been left for this restaurant.
+  var reviewCount: Int
+
+  /// The average rating of all the restaurant's reviews.
   var averageRating: Float
 
+  /// The restaurant's photo URL.
+  var photoURL: URL
+
+  /// The dictionary representation of the restaurant for uploading to Firestore.
   var dictionary: [String: Any] {
     return [
+      "restaurantID": restaurantID,
+      "ownerID": ownerID,
       "name": name,
       "category": category,
       "city": city,
       "price": price,
-      "numRatings": ratingCount,
-      "avgRating": averageRating,
+      "reviewCount": reviewCount,
+      "averageRating": averageRating,
+      "photoURL": photoURL
     ]
   }
 
@@ -40,6 +65,8 @@ struct Restaurant {
 
 extension Restaurant: DocumentSerializable {
 
+  // TODO(morganchen): For non-US audiences, we may want to localize these to non-US cities.
+  // This is a smaller part of the larger codelab localization discussion.
   static let cities = [
     "Albuquerque",
     "Arlington",
@@ -96,53 +123,27 @@ extension Restaurant: DocumentSerializable {
   ]
 
   init?(dictionary: [String : Any]) {
-    guard let name = dictionary["name"] as? String,
+    guard let restaurantID = dictionary["restaurantID"] as? String,
+        let ownerID = dictionary["ownerID"] as? String,
+        let name = dictionary["name"] as? String,
         let category = dictionary["category"] as? String,
         let city = dictionary["city"] as? String,
         let price = dictionary["price"] as? Int,
-        let ratingCount = dictionary["numRatings"] as? Int,
-        let averageRating = dictionary["avgRating"] as? Float else { return nil }
+        let reviewCount = dictionary["reviewCount"] as? Int,
+        let averageRating = dictionary["averageRating"] as? Float,
+        let photoURLString = dictionary["photoURL"] as? String else { return nil }
 
-    self.init(name: name,
+    guard let photoURL = URL(string: photoURLString) else { return nil }
+
+    self.init(restaurantID: restaurantID,
+              ownerID: ownerID,
+              name: name,
               category: category,
               city: city,
               price: price,
-              ratingCount: ratingCount,
-              averageRating: averageRating)
-  }
-
-}
-
-struct Review {
-
-  var rating: Int // Can also be enum
-  var userID: String
-  var username: String
-  var text: String
-  var date: Date
-
-  var dictionary: [String: Any] {
-    return [
-      "rating": rating,
-      "userId": userID,
-      "userName": username,
-      "text": text,
-      "timestamp": date
-    ]
-  }
-
-}
-
-extension Review: DocumentSerializable {
-
-  init?(dictionary: [String : Any]) {
-    guard let rating = dictionary["rating"] as? Int,
-        let userID = dictionary["userId"] as? String,
-        let username = dictionary["userName"] as? String,
-        let text = dictionary["text"] as? String,
-        let date = dictionary["timestamp"] as? Date else { return nil }
-    
-    self.init(rating: rating, userID: userID, username: username, text: text, date: date)
+              reviewCount: reviewCount,
+              averageRating: averageRating,
+              photoURL: photoURL)
   }
 
 }

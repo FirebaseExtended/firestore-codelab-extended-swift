@@ -154,12 +154,12 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
 
       // Update the restaurant's rating and rating count and post the new review at the
       // same time.
-      let newAverage = (Float(restaurant.ratingCount) * restaurant.averageRating + Float(review.rating))
-        / Float(restaurant.ratingCount + 1)
+      let newAverage = (Float(restaurant.reviewCount) * restaurant.averageRating + Float(review.rating))
+        / Float(restaurant.reviewCount + 1)
 
       transaction.setData(review.dictionary, forDocument: newReviewReference)
       transaction.updateData([
-        "numRatings": restaurant.ratingCount + 1,
+        "numRatings": restaurant.reviewCount + 1,
         "avgRating": newAverage
         ], forDocument: reference)
       return nil
@@ -236,7 +236,7 @@ class ReviewTableViewCell: UITableViewCell {
   @IBOutlet var starsView: ImmutableStarsView!
 
   func populate(review: Review) {
-    usernameLabel.text = review.username
+    usernameLabel.text = review.userInfo.name
     reviewContentsLabel.text = review.text
     starsView.rating = review.rating
   }
