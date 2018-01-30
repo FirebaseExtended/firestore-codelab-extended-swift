@@ -159,7 +159,7 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
   }
 
   @IBAction func didTapPopulateButton(_ sender: Any) {
-    // TODO(morganchen): write new populate function.
+    Firestore.firestore().prepopulate()
   }
 
   @IBAction func didTapClearButton(_ sender: Any) {

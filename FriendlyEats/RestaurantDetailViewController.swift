@@ -124,56 +124,7 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
   // MARK: - NewReviewViewControllerDelegate
 
   func reviewController(_ controller: NewReviewViewController, didSubmitFormWithReview review: Review) {
-    guard let reference = restaurantReference else { return }
-    let reviewsCollection = reference.collection("ratings")
-    let newReviewReference = reviewsCollection.document()
-
-    // Writing data in a transaction
-
-    let firestore = Firestore.firestore()
-    firestore.runTransaction({ (transaction, errorPointer) -> Any? in
-
-      // Read data from Firestore inside the transaction, so we don't accidentally
-      // update using staled client data. Error if we're unable to read here.
-      let restaurantSnapshot: DocumentSnapshot
-      do {
-        try restaurantSnapshot = transaction.getDocument(reference)
-      } catch let error as NSError {
-        errorPointer?.pointee = error
-        return nil
-      }
-
-      // Error if the restaurant data in Firestore has somehow changed or is malformed.
-      guard let restaurant = Restaurant(dictionary: restaurantSnapshot.data()!) else {
-        let error = NSError(domain: "FriendlyEatsErrorDomain", code: 0, userInfo: [
-          NSLocalizedDescriptionKey: "Unable to write to restaurant at Firestore path: \(reference.path)"
-          ])
-        errorPointer?.pointee = error
-        return nil
-      }
-
-      // Update the restaurant's rating and rating count and post the new review at the
-      // same time.
-      let newAverage = (Float(restaurant.reviewCount) * restaurant.averageRating + Float(review.rating))
-        / Float(restaurant.reviewCount + 1)
-
-      transaction.setData(review.dictionary, forDocument: newReviewReference)
-      transaction.updateData([
-        "numRatings": restaurant.reviewCount + 1,
-        "avgRating": newAverage
-        ], forDocument: reference)
-      return nil
-    }) { (object, error) in
-      if let error = error {
-        print(error)
-      } else {
-        // Pop the review controller on success
-        if self.navigationController?.topViewController?.isKind(of: NewReviewViewController.self) ?? false {
-          self.navigationController?.popViewController(animated: true)
-        }
-      }
-    }
-
+    // TODO: write transaction logic for creating new review.
   }
 
 }
@@ -218,11 +169,7 @@ class RestaurantTitleView: UIView {
   }
 
   func populate(restaurant: Restaurant) {
-    nameLabel.text = restaurant.name
-    starsView.rating = Int(restaurant.averageRating.rounded())
-    categoryLabel.text = restaurant.category
-    cityLabel.text = restaurant.city
-    priceLabel.text = priceString(from: restaurant.price)
+    // TODO: Write logic for populating this view with a Restaurant struct.
   }
 
 }
@@ -236,9 +183,7 @@ class ReviewTableViewCell: UITableViewCell {
   @IBOutlet var starsView: ImmutableStarsView!
 
   func populate(review: Review) {
-    usernameLabel.text = review.userInfo.name
-    reviewContentsLabel.text = review.text
-    starsView.rating = review.rating
+    // TODO: Write logic for populating this view with a Review struct.
   }
 
 }

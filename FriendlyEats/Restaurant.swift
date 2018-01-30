@@ -65,6 +65,40 @@ struct Restaurant {
 
 extension Restaurant: DocumentSerializable {
 
+  init?(dictionary: [String : Any]) {
+    guard let restaurantID = dictionary["restaurantID"] as? String,
+        let ownerID = dictionary["ownerID"] as? String,
+        let name = dictionary["name"] as? String,
+        let category = dictionary["category"] as? String,
+        let city = dictionary["city"] as? String,
+        let price = dictionary["price"] as? Int,
+        let reviewCount = dictionary["reviewCount"] as? Int,
+        let averageRating = dictionary["averageRating"] as? Float,
+        let photoURLString = dictionary["photoURL"] as? String else { return nil }
+
+    guard let photoURL = URL(string: photoURLString) else { return nil }
+
+    self.init(restaurantID: restaurantID,
+              ownerID: ownerID,
+              name: name,
+              category: category,
+              city: city,
+              price: price,
+              reviewCount: reviewCount,
+              averageRating: averageRating,
+              photoURL: photoURL)
+  }
+
+}
+
+/// A wrapper of arc4random_uniform, to avoid lots of casting.
+func RandomUniform(_ upperBound: Int) -> Int {
+  return Int(arc4random_uniform(UInt32(upperBound)))
+}
+
+/// A helper for restaurant generation.
+extension Restaurant {
+
   // TODO(morganchen): For non-US audiences, we may want to localize these to non-US cities.
   // This is a smaller part of the larger codelab localization discussion.
   static let cities = [
@@ -122,28 +156,29 @@ extension Restaurant: DocumentSerializable {
     "Mediterranean", "Mexican", "Pizza", "Ramen", "Sushi"
   ]
 
-  init?(dictionary: [String : Any]) {
-    guard let restaurantID = dictionary["restaurantID"] as? String,
-        let ownerID = dictionary["ownerID"] as? String,
-        let name = dictionary["name"] as? String,
-        let category = dictionary["category"] as? String,
-        let city = dictionary["city"] as? String,
-        let price = dictionary["price"] as? Int,
-        let reviewCount = dictionary["reviewCount"] as? Int,
-        let averageRating = dictionary["averageRating"] as? Float,
-        let photoURLString = dictionary["photoURL"] as? String else { return nil }
+  static func randomName() -> String {
+    let words = ["Bar", "Fire", "Grill", "Drive Thru", "Place", "Best", "Spot", "Prime", "Eatin'"]
+    let randomIndexes = (RandomUniform(words.count), RandomUniform(words.count))
+    return words[randomIndexes.0] + " " + words[randomIndexes.1]
+  }
 
-    guard let photoURL = URL(string: photoURLString) else { return nil }
+  static func randomCategory() -> String {
+    return Restaurant.categories[RandomUniform(Restaurant.categories.count)]
+  }
 
-    self.init(restaurantID: restaurantID,
-              ownerID: ownerID,
-              name: name,
-              category: category,
-              city: city,
-              price: price,
-              reviewCount: reviewCount,
-              averageRating: averageRating,
-              photoURL: photoURL)
+  static func randomCity() -> String {
+    return Restaurant.cities[RandomUniform(Restaurant.cities.count)]
+  }
+
+  static func randomPrice() -> Int {
+    return RandomUniform(3) + 1
+  }
+
+  static func randomPhotoURL() -> URL {
+    let number = RandomUniform(22) + 1
+    let URLString =
+        "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_\(number).png"
+    return URL(string: URLString)!
   }
 
 }

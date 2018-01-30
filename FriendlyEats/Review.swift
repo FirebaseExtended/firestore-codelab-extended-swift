@@ -25,7 +25,7 @@ struct Review {
   /// The restaurant that this review is reviewing.
   var restaurantID: String
 
-  /// The rating given to the restaurant.
+  /// The rating given to the restaurant. Values range between 1 and 5.
   var rating: Int
 
   /// User information duplicated in the review object.
