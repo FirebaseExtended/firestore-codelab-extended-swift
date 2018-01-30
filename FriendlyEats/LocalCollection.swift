@@ -16,9 +16,23 @@
 
 import FirebaseFirestore
 
-// A type that can be initialized from a Firestore document.
-protocol DocumentSerializable {
-  init?(dictionary: [String: Any])
+/// A type that can be initialized from a Firestore document.
+public protocol DocumentSerializable {
+
+  /// Initializes an instance from a Firestore document. May fail if the
+  /// document is missing required fields.
+  init?(document: QueryDocumentSnapshot)
+
+  /// Initializes an instance from a Firestore document. May fail if the
+  /// document does not exist or is missing required fields.
+  init?(document: DocumentSnapshot)
+
+  /// The documentID of the object in Firestore.
+  var documentID: String { get }
+
+  /// The representation of a document-serializable object in Firestore.
+  var documentData: [String: Any] { get }
+
 }
 
 final class LocalCollection<T: DocumentSerializable> {
@@ -67,7 +81,7 @@ final class LocalCollection<T: DocumentSerializable> {
         return
       }
       let models = snapshot.documents.map { (document) -> T in
-        if let model = T(dictionary: document.data()) {
+        if let model = T(document: document) {
           return model
         } else {
           // handle error

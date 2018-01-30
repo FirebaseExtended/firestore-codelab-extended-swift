@@ -14,7 +14,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import FirebaseFirestore
 import FirebaseAuth
 
 /// A user corresponding to a Firebase user. Additional metadata for each user is stored in
@@ -35,17 +35,46 @@ struct User {
 
 extension User: DocumentSerializable {
 
-  /// The default URL for profile images. This is a local URL, not a URL hosted on the web.
+  /// All users are stored by their userIDs for easier querying later.
+  var documentID: String {
+    return userID
+  }
+
+  /// The default URL for profile images.
   static let defaultPhotoURL =
       URL(string: "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_1.png")!
 
-  /// Initializes a User from a dictionary.
-  public init?(dictionary: [String : Any]) {
+  /// Initializes a User from document snapshot data.
+  private init?(documentID: String, dictionary: [String : Any]) {
+    guard let userID = dictionary["userID"] as? String else { return nil }
+
+    // This is something that should be verified on the server using a security rule.
+    // In order to maintain a consistent database, all users must be stored in the top-level
+    // users collection by their userID. Some queries are dependent on this consistency.
+    precondition(userID == documentID)
+
+    self.init(dictionary: dictionary)
+  }
+
+  /// A convenience initializer for user data that won't be written to the Users collection
+  /// in Firestore. Unlike the other data types, users aren't dependent on Firestore to
+  /// generate unique identifiers, since they come with unique identifiers for free.
+  public init?(dictionary: [String: Any]) {
     guard let name = dictionary["name"] as? String,
-        let userID = dictionary["userID"] as? String,
-        let photoURLString = dictionary["photoURL"] as? String else { return nil }
+      let userID = dictionary["userID"] as? String,
+      let photoURLString = dictionary["photoURL"] as? String else { return nil }
     guard let photoURL = URL(string: photoURLString) else { return nil }
+
     self.init(userID: userID, name: name, photoURL: photoURL)
+  }
+
+  public init?(document: QueryDocumentSnapshot) {
+    self.init(documentID: document.documentID, dictionary: document.data())
+  }
+
+  public init?(document: DocumentSnapshot) {
+    guard let data = document.data() else { return nil }
+    self.init(documentID: document.documentID, dictionary: data)
   }
 
   /// Initializes a new User from a Firebase user object.
@@ -72,7 +101,7 @@ extension User: DocumentSerializable {
   }
 
   /// A user object's representation in Firestore.
-  public var dictionary: [String: Any] {
+  public var documentData: [String: Any] {
     return [
       "userID": userID,
       "name": name,

@@ -14,10 +14,13 @@
 //  limitations under the License.
 //
 
-import Foundation
+import FirebaseFirestore
 
 /// A struct corresponding to a 'like' on social media.
 struct Yum {
+
+  /// The documentID of the yum.
+  var documentID: String
 
   /// The user that created the yum/like.
   var userID: String
@@ -27,18 +30,34 @@ struct Yum {
 
 }
 
+// MARK: - Firestore interoperability
+
 extension Yum: DocumentSerializable {
 
-  /// Initializes a Yum from a Firestore document or dictionary.
-  public init?(dictionary: [String : Any]) {
+  public init(userID: String, reviewID: String) {
+    let document = Firestore.firestore().yums.document()
+    self.init(documentID: document.documentID, userID: userID, reviewID: reviewID)
+  }
+
+  /// Initializes a Yum from Firestore document data.
+  public init?(documentID: String, dictionary: [String : Any]) {
     guard let userID = dictionary["userID"] as? String,
       let reviewID = dictionary["reviewID"] as? String else { return nil }
 
-    self.init(userID: userID, reviewID: reviewID)
+    self.init(documentID: documentID, userID: userID, reviewID: reviewID)
+  }
+
+  public init?(document: DocumentSnapshot) {
+    guard let data = document.data() else { return nil }
+    self.init(documentID: document.documentID, dictionary: data)
+  }
+
+  public init?(document: QueryDocumentSnapshot) {
+    self.init(documentID: document.documentID, dictionary: document.data())
   }
 
   /// Returns a dictionary representation of a Yum.
-  public var dictionary: [String: Any] {
+  public var documentData: [String: Any] {
     return [
       "userID": userID,
       "reviewID": reviewID,
