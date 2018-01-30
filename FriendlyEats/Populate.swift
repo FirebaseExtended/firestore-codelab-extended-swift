@@ -40,13 +40,16 @@ extension Firestore {
 
   /// Returns a tuple of arrays containing sample data to populate the app.
   func sampleData() -> (users: [User], restaurants: [Restaurant], reviews: [Review], yums: [Yum]) {
-    let userCount = 20
-    let restaurantCount = 20
-    let reviewCountPerRestaurant = 20
-    let maxYumCountPerReview = 20 // This must be less than or equal to the number of users,
+    let userCount = 15
+    let restaurantCount = 15
+    let reviewCountPerRestaurant = 3
+
+    // This must be less than or equal to the number of users,
     // since yums are unique per user per review. If this number
     // exceeds the number of users, the code will likely crash
     // when generating likes.
+    let maxYumCountPerReview = 3
+
 
     // Users must be created first, since Restaurants have dependencies on users,
     // Reviews depend on both Users and Restaurants, and Yums depend on Reviews and Users.
@@ -74,8 +77,8 @@ extension Firestore {
                         city: city,
                         price: price,
                         reviewCount: 0,   // This is modified later when generating reviews.
-        averageRating: 0, // This is modified later when generating reviews.
-        photoURL: photoURL)
+                        averageRating: 0, // This is modified later when generating reviews.
+                        photoURL: photoURL)
     }
 
     var reviews: [Review] = []
@@ -107,8 +110,8 @@ extension Firestore {
         // Compute the new average after the review is created. This adds side effects to the map
         // statement, angering programmers all over the world
         restaurant.averageRating =
-          (restaurant.averageRating * Float(restaurant.reviewCount) + Float(rating))
-          / (restaurant.averageRating + 1)
+          (restaurant.averageRating * Double(restaurant.reviewCount) + Double(rating))
+          / Double(restaurant.reviewCount + 1)
         restaurant.reviewCount += 1
 
         // Since everything here is value types, we need to explicitly write back to the array.
@@ -184,6 +187,8 @@ extension Firestore {
     batch.commit { error in
       if let error = error {
         print("Error populating Firestore: \(error)")
+      } else {
+        print("Batch committed!")
       }
     }
   }

@@ -41,9 +41,9 @@ struct Restaurant {
   var reviewCount: Int
 
   /// The average rating of all the restaurant's reviews.
-  var averageRating: Float
+  var averageRating: Double
 
-  /// The restaurant's photo URL.
+  /// The restaurant's photo URL. These are stored as strings in Firestore.
   var photoURL: URL
 
   /// The dictionary representation of the restaurant for uploading to Firestore.
@@ -57,7 +57,7 @@ struct Restaurant {
       "price": price,
       "reviewCount": reviewCount,
       "averageRating": averageRating,
-      "photoURL": photoURL
+      "photoURL": photoURL.absoluteString
     ]
   }
 
@@ -73,7 +73,7 @@ extension Restaurant: DocumentSerializable {
         let city = dictionary["city"] as? String,
         let price = dictionary["price"] as? Int,
         let reviewCount = dictionary["reviewCount"] as? Int,
-        let averageRating = dictionary["averageRating"] as? Float,
+        let averageRating = dictionary["averageRating"] as? Double,
         let photoURLString = dictionary["photoURL"] as? String else { return nil }
 
     guard let photoURL = URL(string: photoURLString) else { return nil }

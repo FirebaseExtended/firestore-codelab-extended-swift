@@ -37,7 +37,7 @@ extension User: DocumentSerializable {
 
   /// The default URL for profile images. This is a local URL, not a URL hosted on the web.
   static let defaultPhotoURL =
-      Bundle.main.url(forResource: "pizza-monster", withExtension: "png")!
+      URL(string: "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_1.png")!
 
   /// Initializes a User from a dictionary.
   public init?(dictionary: [String : Any]) {
@@ -76,7 +76,7 @@ extension User: DocumentSerializable {
     return [
       "userID": userID,
       "name": name,
-      "photoURL": photoURL
+      "photoURL": photoURL.absoluteString
     ]
   }
 
