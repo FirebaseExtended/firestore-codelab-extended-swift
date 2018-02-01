@@ -81,7 +81,7 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
         return
       }
       let models = snapshot.documents.map { (document) -> Restaurant in
-        if let model = Restaurant(dictionary: document.data()) {
+        if let model = Restaurant(document: document) {
           return model
         } else {
           // Don't use fatalError here in a real app.
@@ -159,55 +159,7 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
   }
 
   @IBAction func didTapPopulateButton(_ sender: Any) {
-    let words = ["Bar", "Fire", "Grill", "Drive Thru", "Place", "Best", "Spot", "Prime", "Eatin'"]
-
-    let cities = Restaurant.cities
-    let categories = Restaurant.categories
-
-    for _ in 0 ..< 20 {
-      let randomIndexes = (Int(arc4random_uniform(UInt32(words.count))),
-                           Int(arc4random_uniform(UInt32(words.count))))
-      let name = words[randomIndexes.0] + " " + words[randomIndexes.1]
-      let category = categories[Int(arc4random_uniform(UInt32(categories.count)))]
-      let city = cities[Int(arc4random_uniform(UInt32(cities.count)))]
-      let price = Int(arc4random_uniform(3)) + 1
-
-      // Basic writes
-
-      let collection = Firestore.firestore().collection("restaurants")
-
-      let restaurant = Restaurant(
-        name: name,
-        category: category,
-        city: city,
-        price: price,
-        ratingCount: 10,
-        averageRating: 0
-      )
-
-      let restaurantRef = collection.addDocument(data: restaurant.dictionary)
-
-      let batch = Firestore.firestore().batch()
-      guard let user = Auth.auth().currentUser else { continue }
-      var average: Float = 0
-      for _ in 0 ..< 10 {
-        let rating = Int(arc4random_uniform(5) + 1)
-        average += Float(rating) / 10
-        let text = rating > 3 ? "good" : "food was too spicy"
-        let review = Review(rating: rating,
-                            userID: user.uid,
-                            username: user.displayName ?? "Anonymous",
-                            text: text,
-                            date: Date())
-        let ratingRef = restaurantRef.collection("ratings").document()
-        batch.setData(review.dictionary, forDocument: ratingRef)
-      }
-      batch.updateData(["avgRating": average], forDocument: restaurantRef)
-      batch.commit(completion: { (error) in
-        guard let error = error else { return }
-        print("Error generating reviews: \(error). Check your Firestore permissions.")
-      })
-    }
+    Firestore.firestore().prepopulate()
   }
 
   @IBAction func didTapClearButton(_ sender: Any) {
