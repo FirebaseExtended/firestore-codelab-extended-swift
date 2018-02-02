@@ -159,7 +159,16 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
   }
 
   @IBAction func didTapPopulateButton(_ sender: Any) {
-    Firestore.firestore().prepopulate()
+    // Let's confirm that we want to do this
+    let confirmationBox = UIAlertController(title: "Populate the database",
+      message: "This will add populate the database with several new restaurants and reviews. Would you like to proceed?",
+      preferredStyle: .alert)
+    confirmationBox.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+    confirmationBox.addAction(UIAlertAction(title: "Yes", style: .default, handler: { _ in
+      Firestore.firestore().prepopulate()
+    }))
+    present(confirmationBox, animated: true)
+
   }
 
   @IBAction func didTapClearButton(_ sender: Any) {
