@@ -152,22 +152,43 @@ extension Firestore {
       var restaurant = restaurants[i]
       reviews += (0 ..< reviewCountPerRestaurant).map { _ in
         let rating = RandomUniform(5) + 1
+        let reviewNum = RandomUniform(3) + 1
         let userInfo = randomUser()
         let text: String
         let date = Date()
         let restaurantID = restaurant.documentID
 
-        switch rating {
-        case 5:
+        switch (rating, reviewNum) {
+        case (5, 3):
           text = "Amazing!!"
-        case 4:
+        case (5, 2):
+          text = "This was my favorite meal ever!!"
+        case (5, 1):
+          text = "Great service, great food. This is my new favorite restaurant !"
+        case (4, 3):
           text = "Tasty restaurant, would recommend"
-        case 3:
+        case (4, 2):
+          text = "Really good food for the price"
+        case (4, 1):
+          text = "I'd come back here again."
+        case (3, 3):
           text = "Food was good but the service was slow"
-        case 2:
+        case (3, 2):
+          text = "Pretty average. Nothing to write home about."
+        case (3, 1):
+          text = "It was a decent meal, but nothing too memorable."
+        case (2, 3):
           text = "The ketchup was too spicy"
-        case 1:
-          text = "There is a bug in my soup"
+        case (2, 2):
+          text = "The food was cold when it came out"
+        case (2, 1):
+          text = "The service was rude."
+        case (1, 3):
+          text = "There was a bug in my soup"
+        case (1, 2):
+          text = "I'd rather eat a shoe than another meal here."
+        case (1, 1):
+          text = "Food was bad, service was slow, place was too loud."
         case _:
           fatalError("Unreachable code. If the app breaks here, check the call to RandomUniform above.")
         }
