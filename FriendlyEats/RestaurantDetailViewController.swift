@@ -35,7 +35,8 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
 
   @IBOutlet var tableView: UITableView!
   @IBOutlet var titleView: RestaurantTitleView!
-
+  @IBOutlet weak var editButton: UIButton!
+    
   let backgroundView = UIImageView()
 
   override func viewDidLoad() {
@@ -53,6 +54,12 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
     tableView.dataSource = self
     tableView.rowHeight = UITableViewAutomaticDimension
     tableView.estimatedRowHeight = 140
+    
+    // enable edit button if owner of restaurant
+    editButton.isHidden = true
+    if restaurant?.ownerID == FirebaseAuth.Auth.auth().currentUser?.uid {
+        editButton.isHidden = false
+    }
 
     let query = restaurantReference!.collection("ratings")
     localCollection = LocalCollection(query: query) { [unowned self] (changes) in
@@ -92,7 +99,7 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
   }
-
+    
   override var preferredStatusBarStyle: UIStatusBarStyle {
     set {}
     get {
@@ -105,6 +112,14 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
     controller.delegate = self
     self.navigationController?.pushViewController(controller, animated: true)
   }
+    
+    @IBAction func didTapEditButton(_ sender: Any) {
+        let controller =
+            EditRestaurantViewController.fromStoryboard()
+        controller.restaurant = self.restaurant
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
 
   // MARK: - UITableViewDataSource
 

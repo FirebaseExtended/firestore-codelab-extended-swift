@@ -22,17 +22,23 @@ class EditRestaurantViewController: UIViewController {
     @IBOutlet weak var cuisineTextField: UITextField!
     @IBOutlet weak var priceTextField: UITextField!
     
+    static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> EditRestaurantViewController {
+        let controller = storyboard.instantiateViewController(withIdentifier: "EditRestaurantViewController") as! EditRestaurantViewController
+        return controller
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        if let _ = restaurant {
+            populateRestaurant()
+        }
     }
 
     func populateRestaurant() {
         restaurantNameTextField.text = restaurant?.name
         locationTextField.text = restaurant?.city
         cuisineTextField.text = restaurant?.category
-        priceTextField.text = restaurant?.price
+        priceTextField.text = restaurant?.price.description
         restaurantImageView.sd_setImage(with: restaurant?.photoURL)
     }
 
