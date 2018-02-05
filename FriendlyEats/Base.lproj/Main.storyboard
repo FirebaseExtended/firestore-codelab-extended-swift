@@ -605,6 +605,9 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wJI-Ic-3x7">
                                 <rect key="frame" x="16" y="275" width="100" height="30"/>
                                 <state key="normal" title="Save Changes"/>
+                                <connections>
+                                    <action selector="didSelectSaveChanges:" destination="HEh-GC-pG7" eventType="touchUpInside" id="w8R-Dz-SVq"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
