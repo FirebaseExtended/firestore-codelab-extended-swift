@@ -122,7 +122,7 @@ class FiltersViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     return pickerView
   }()
 
-  private let sortByOptions = ["name", "category", "city", "price", "avgRating"]
+  private let sortByOptions = ["name", "category", "city", "price", "averageRating"]
   private let priceOptions = ["$", "$$", "$$$"]
   private let cityOptions = Restaurant.cities
   private let categoryOptions = Restaurant.categories

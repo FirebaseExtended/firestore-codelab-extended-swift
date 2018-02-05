@@ -22,6 +22,7 @@ import FirebaseAuthUI
 
 class RestaurantDetailViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, NewReviewViewControllerDelegate {
 
+  // These are optional because we can't do initializer-level dependency injection with storyboards.
   var titleImageURL: URL?
   var restaurant: Restaurant?
   var restaurantReference: DocumentReference?
@@ -54,7 +55,8 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
     tableView.rowHeight = UITableViewAutomaticDimension
     tableView.estimatedRowHeight = 140
 
-    let query = restaurantReference!.collection("ratings")
+    let query = Firestore.firestore().reviews.whereField("restaurantID",
+                                                         isEqualTo: restaurant!.documentID)
     localCollection = LocalCollection(query: query) { [unowned self] (changes) in
       if self.localCollection.count == 0 {
         self.tableView.backgroundView = self.backgroundView
@@ -169,7 +171,12 @@ class RestaurantTitleView: UIView {
   }
 
   func populate(restaurant: Restaurant) {
-    // TODO: Write logic for populating this view with a Restaurant struct.
+    nameLabel.text = restaurant.name
+    categoryLabel.text = restaurant.category
+    cityLabel.text = restaurant.city
+    priceLabel.text = priceString(from: restaurant.price)
+    starsView.rating = Int(restaurant.averageRating.rounded())
+    populateImage(url: restaurant.photoURL)
   }
 
 }
@@ -177,13 +184,13 @@ class RestaurantTitleView: UIView {
 class ReviewTableViewCell: UITableViewCell {
 
   @IBOutlet var usernameLabel: UILabel!
-
   @IBOutlet var reviewContentsLabel: UILabel!
-
   @IBOutlet var starsView: ImmutableStarsView!
 
   func populate(review: Review) {
-    // TODO: Write logic for populating this view with a Review struct.
+    usernameLabel.text = review.userInfo.name
+    starsView.rating = review.rating
+    reviewContentsLabel.text = review.text
   }
 
 }
