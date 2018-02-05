@@ -189,9 +189,10 @@ extension Restaurant {
   ]
 
   static func randomName() -> String {
-    let words = ["Bar", "Fire", "Grill", "Drive Thru", "Place", "Best", "Spot", "Prime", "Eatin'"]
-    let randomIndexes = (RandomUniform(words.count), RandomUniform(words.count))
-    return words[randomIndexes.0] + " " + words[randomIndexes.1]
+    let prefixes = ["Morgan's", "Jen's", "Todd's", "Best", "Mom's", "Down home", "Fire", "Tasty", "Spicy", "Delish", "Divine", "Scrumptious"]
+    let suffixes = ["Bar", "House", "Grill", "Drive Thru", "Place", "Spot", "Inn", "Joint", "Diner", "Cafe", "Hideaway"]
+    let randomIndexes = (RandomUniform(prefixes.count), RandomUniform(suffixes.count))
+    return prefixes[randomIndexes.0] + " " + suffixes[randomIndexes.1]
   }
 
   static func randomCategory() -> String {
