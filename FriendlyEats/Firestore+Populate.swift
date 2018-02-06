@@ -225,12 +225,12 @@ extension Firestore {
         // Use an index here instead of a random users so users don't
         // double-like restaurants, since that's supposed to be illegal.
         let userID = users[index].userID
-        let userName = users[index].name
+        let username = users[index].name
 
         review.yumCount += 1
         reviews[i] = review
 
-        return (reviewID, Yum(documentID: userID, userName: userName))
+        return (reviewID, Yum(documentID: userID, username: username))
       }
     }
 

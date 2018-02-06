@@ -27,7 +27,7 @@ struct Yum {
   /// The name of the user who yummed this review. Although this is out of the
   /// scope of this sample app, this could be used to build a "This review was yummed by
   /// Bob Smith, Alex Avery, and 3 others" kind of message
-  var userName: String
+  var username: String
 
 
 }
@@ -38,8 +38,8 @@ extension Yum: DocumentSerializable {
 
   /// Initializes a Yum from Firestore document data.
   public init?(documentAndUserID: String, dictionary: [String : Any]) {
-    guard let userName = dictionary["userName"] as? String else { return nil }
-    self.init(documentID: documentAndUserID,  userName: userName)
+    guard let username = dictionary["username"] as? String else { return nil }
+    self.init(documentID: documentAndUserID,  username: username)
   }
 
   public init?(document: DocumentSnapshot) {
@@ -54,7 +54,7 @@ extension Yum: DocumentSerializable {
   /// Returns a dictionary representation of a Yum.
   public var documentData: [String: Any] {
     return [
-      "userName": userName,
+      "username": username,
     ]
   }
 
