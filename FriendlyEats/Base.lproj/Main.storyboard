@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="e54-7U-CFe">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="zfS-ct-jiF">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -114,10 +114,11 @@
             </objects>
             <point key="canvasLocation" x="952.79999999999995" y="-1365.0674662668666"/>
         </scene>
-        <!--Friendly Eats-->
+
+        <!--Restaurants-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="RestaurantsTableViewController" customModule="FriendlyEats" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Restaurants" automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="RestaurantsTableViewController" customModule="FriendlyEats" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -127,7 +128,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="108" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="IIg-Tk-0wa">
-                                <rect key="frame" x="0.0" y="108" width="375" height="559"/>
+                                <rect key="frame" x="0.0" y="108" width="375" height="510"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="RestaurantTableViewCell" id="x1u-Lj-wgb" customClass="RestaurantTableViewCell" customModule="FriendlyEats" customModuleProvider="target">
@@ -283,7 +284,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="957.60000000000002" y="-645.42728635682158"/>
+            <point key="canvasLocation" x="1296.8" y="-645.42728635682158"/>
         </scene>
         <!--Restaurant-->
         <scene sceneID="gFA-Wg-uRD">
@@ -448,7 +449,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="R5H-3P-Fha" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1858" y="-645"/>
+            <point key="canvasLocation" x="2196" y="-645.42728635682158"/>
         </scene>
         <!--Write a Review-->
         <scene sceneID="b05-1K-tRE">
@@ -508,12 +509,32 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rIV-JB-b44" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2691" y="-643"/>
+            <point key="canvasLocation" x="3029.5999999999999" y="-643.62818590704649"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--User Profile-->
+        <scene sceneID="0qx-6I-ToX">
+            <objects>
+                <viewController title="Profile" id="SHW-NA-Ovv" userLabel="User Profile" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="paj-e3-06c"/>
+                        <viewControllerLayoutGuide type="bottom" id="E59-Td-sCU"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="ab9-r7-eye">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Profile" id="P0L-me-4ZD"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="G8L-P3-jS2" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="703.20000000000005" y="-1345.2773613193403"/>
+        </scene>
+        <!--Restaurants-->
         <scene sceneID="Ihz-oT-jZj">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="e54-7U-CFe" sceneMemberID="viewController">
+                <navigationController title="Restaurants" automaticallyAdjustsScrollViewInsets="NO" id="e54-7U-CFe" userLabel="Restaurants" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Restaurants" id="0zk-H7-4FD"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="kyk-CK-Ncr">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
@@ -526,7 +547,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xob-9B-GJR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="29.600000000000001" y="-644.52773613193403"/>
+            <point key="canvasLocation" x="368.80000000000001" y="-644.52773613193403"/>
         </scene>
         <!--Filter-->
         <scene sceneID="rAU-5n-rOd">
@@ -636,6 +657,43 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qxt-Q8-ruU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="21.600000000000001" y="69.715142428785612"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="Exq-mA-mUI">
+            <objects>
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="zfS-ct-jiF" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="xSl-3q-VCk">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="W0I-RW-T34" kind="relationship" relationship="viewControllers" id="dBZ-PJ-Qi9"/>
+                        <segue destination="e54-7U-CFe" kind="relationship" relationship="viewControllers" id="3PE-ib-kHV"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="JmZ-O6-SGb" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-561" y="-644"/>
+        </scene>
+        <!--Profile-->
+        <scene sceneID="Vg3-Xy-4F6">
+            <objects>
+                <navigationController title="Profile" automaticallyAdjustsScrollViewInsets="NO" id="W0I-RW-T34" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Profile" id="bT8-Mg-7xO"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="xbV-jX-Jcq">
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="SHW-NA-Ovv" kind="relationship" relationship="rootViewController" id="KYp-7B-dwe"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="duu-GY-fwR" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-225" y="-1345"/>
         </scene>
     </scenes>
 </document>
