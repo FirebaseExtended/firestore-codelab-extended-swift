@@ -33,9 +33,9 @@ extension Firestore {
     return self.collection("reviews")
   }
 
-  /// Returns a reference to the top-level yums collection.
-  var yums: CollectionReference {
-    return self.collection("yums")
+  /// Returns a reference to the yums collection for a specific restaurant.
+  func yums(forReview reviewID: String) -> CollectionReference {
+    return self.collection("reviews/\(reviewID)/yums")
   }
 
 }
@@ -62,9 +62,9 @@ extension Firestore {
     self.reviews.document(review.documentID).setData(review.documentData)
   }
 
-  /// Writes a yum to the yums collection.
-  func add(yum: Yum) {
-    self.yums.document(yum.documentID).setData(yum.documentData)
+  /// Writes a yum to the yums subcollection for a specific review.
+  func add(yum: Yum, forReview reviewID: String) {
+    self.yums(forReview: reviewID).document(yum.documentID).setData(yum.documentData)
   }
 
 }
@@ -92,9 +92,9 @@ extension WriteBatch {
     self.setData(review.documentData, forDocument: document)
   }
 
-  /// Writes a yum to the yums collection.
-  func add(yum: Yum) {
-    let document = Firestore.firestore().yums.document(yum.documentID)
+  /// Writes a yum to the yums subcollection for a specific review.
+  func add(yum: Yum, toReview: String) {
+    let document = Firestore.firestore().reviews.document(toReview).collection("yums").document(yum.documentID)
     self.setData(yum.documentData, forDocument: document)
   }
 
@@ -105,7 +105,7 @@ extension WriteBatch {
 extension Firestore {
 
   /// Returns a tuple of arrays containing sample data to populate the app.
-  func sampleData() -> (users: [User], restaurants: [Restaurant], reviews: [Review], yums: [Yum]) {
+  func sampleData() -> (users: [User], restaurants: [Restaurant], reviews: [Review], yums: [(String, Yum)]) {
     let userCount = 15
     let restaurantCount = 15
     let reviewCountPerRestaurant = 3
@@ -212,7 +212,7 @@ extension Firestore {
       }
     }
 
-    var yums: [Yum] = []
+    var yums: [(String, Yum)] = []
     for i in 0 ..< reviews.count {
       var review = reviews[i]
       let numYums = RandomUniform(maxYumCountPerReview)
@@ -225,11 +225,12 @@ extension Firestore {
         // Use an index here instead of a random users so users don't
         // double-like restaurants, since that's supposed to be illegal.
         let userID = users[index].userID
+        let userName = users[index].name
 
         review.yumCount += 1
         reviews[i] = review
 
-        return Yum(userID: userID, reviewID: reviewID)
+        return (reviewID, Yum(documentID: userID, userName: userName))
       }
     }
 
@@ -242,13 +243,17 @@ extension Firestore {
   }
 
   // Writes data directly to the Firestore root. Useful for populating the app with sample data.
-  func prepopulate(users: [User], restaurants: [Restaurant], reviews: [Review], yums: [Yum]) {
+  func prepopulate(users: [User], restaurants: [Restaurant], reviews: [Review], yums: [(String, Yum)]) {
     let batch = self.batch()
 
     users.forEach { batch.add(user: $0) }
     restaurants.forEach { batch.add(restaurant: $0) }
     reviews.forEach { batch.add(review: $0) }
-    yums.forEach { batch.add(yum: $0) }
+    yums.forEach { tuple in
+      let restaurantID = tuple.0
+      let yum = tuple.1
+      batch.add(yum: yum, toReview: restaurantID)
+    }
 
     batch.commit { error in
       if let error = error {
