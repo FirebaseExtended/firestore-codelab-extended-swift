@@ -129,6 +129,10 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
     activeFiltersStackView.isHidden = true
 
     self.navigationController?.navigationBar.barStyle = .black
+
+    // Uncomment these two lines to enable SECRET HACKER PAGE!!!
+    let omgHAX = UIBarButtonItem(barButtonSystemItem: .bookmarks, target: self, action: #selector(goToHackPage))
+    navigationItem.rightBarButtonItems?.append(omgHAX)
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -172,6 +176,12 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
   @IBAction func didTapFilterButton(_ sender: Any) {
     present(filters.navigationController, animated: true, completion: nil)
   }
+
+  @objc func goToHackPage(_ sender: Any) {
+    let hackPage = HackPageViewController.fromStoryboard()
+    self.navigationController?.pushViewController(hackPage, animated: true)
+  }
+
 
   override var preferredStatusBarStyle: UIStatusBarStyle {
     set {}
