@@ -22,68 +22,97 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Secret Hacker Page!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A4Z-5N-kto">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Secret Hacker Page!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A4Z-5N-kto">
                                 <rect key="frame" x="109" y="20" width="157" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HpQ-0F-lw6">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HpQ-0F-lw6">
                                 <rect key="frame" x="87" y="69" width="201" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Edit Another Person's Review"/>
+                                <connections>
+                                    <action selector="editReviewWasTapped:" destination="ONf-7Z-SIp" eventType="touchUpInside" id="hjJ-Cg-U9d"/>
+                                </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Hack status" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QIo-1j-vOc">
-                                <rect key="frame" x="142" y="183" width="91" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QIo-1j-vOc">
+                                <rect key="frame" x="180.5" y="180" width="14" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cfh-ya-kgX">
-                                <rect key="frame" x="69" y="152" width="237" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cfh-ya-kgX">
+                                <rect key="frame" x="69" y="149" width="237" height="30"/>
                                 <state key="normal" title="Change another restaurant's name"/>
+                                <connections>
+                                    <action selector="changeRestNameWasTapped:" destination="ONf-7Z-SIp" eventType="touchUpInside" id="aFY-Ag-VZv"/>
+                                </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Hack status" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Cg3-U1-5iP">
-                                <rect key="frame" x="142" y="264" width="91" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Cg3-U1-5iP">
+                                <rect key="frame" x="180.5" y="260" width="14" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wYs-JM-Aeb">
-                                <rect key="frame" x="84" y="233" width="207" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wYs-JM-Aeb">
+                                <rect key="frame" x="84" y="229" width="207" height="30"/>
                                 <state key="normal" title="Change another user's picture"/>
+                                <connections>
+                                    <action selector="changeUserPicWasTapped:" destination="ONf-7Z-SIp" eventType="touchUpInside" id="7TB-0x-MhF"/>
+                                </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Hack status" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jed-qF-vDM">
-                                <rect key="frame" x="139" y="350" width="91" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aP2-Y2-sl4">
+                                <rect key="frame" x="127" y="309" width="121" height="30"/>
+                                <state key="normal" title="Add a fake review"/>
+                                <connections>
+                                    <action selector="addFakeReviewWasTapped:" destination="ONf-7Z-SIp" eventType="touchUpInside" id="CLw-sV-B8g"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZEJ-QF-FH0">
+                                <rect key="frame" x="180.5" y="100" width="14" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aP2-Y2-sl4">
-                                <rect key="frame" x="125" y="319" width="121" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Add a fake review"/>
-                            </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Hack status" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZEJ-QF-FH0">
-                                <rect key="frame" x="142" y="100" width="91" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jed-qF-vDM">
+                                <rect key="frame" x="180.5" y="340" width="14" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="A4Z-5N-kto" firstAttribute="top" secondItem="yey-nT-T9d" secondAttribute="bottom" id="5lV-nB-0ID"/>
+                            <constraint firstItem="cfh-ya-kgX" firstAttribute="top" secondItem="ZEJ-QF-FH0" secondAttribute="bottom" constant="28" id="8eH-aK-Nae"/>
+                            <constraint firstItem="Cg3-U1-5iP" firstAttribute="top" secondItem="wYs-JM-Aeb" secondAttribute="bottom" constant="1" id="AbK-xj-vDm"/>
+                            <constraint firstItem="QIo-1j-vOc" firstAttribute="top" secondItem="cfh-ya-kgX" secondAttribute="bottom" constant="1" id="AkG-w6-igO"/>
+                            <constraint firstItem="aP2-Y2-sl4" firstAttribute="top" secondItem="Cg3-U1-5iP" secondAttribute="bottom" constant="28" id="FgG-PD-A5s"/>
+                            <constraint firstItem="aP2-Y2-sl4" firstAttribute="centerX" secondItem="Cg3-U1-5iP" secondAttribute="centerX" id="GSP-G9-bQQ"/>
+                            <constraint firstItem="HpQ-0F-lw6" firstAttribute="top" secondItem="A4Z-5N-kto" secondAttribute="bottom" constant="28" id="O01-a9-aFc"/>
+                            <constraint firstItem="A4Z-5N-kto" firstAttribute="centerX" secondItem="K2a-px-FyQ" secondAttribute="centerX" id="Smy-3p-9ca"/>
+                            <constraint firstItem="ZEJ-QF-FH0" firstAttribute="centerX" secondItem="HpQ-0F-lw6" secondAttribute="centerX" id="Va3-WE-16f"/>
+                            <constraint firstItem="ZEJ-QF-FH0" firstAttribute="top" secondItem="HpQ-0F-lw6" secondAttribute="bottom" constant="1" id="Vtr-tH-olI"/>
+                            <constraint firstItem="Jed-qF-vDM" firstAttribute="centerX" secondItem="aP2-Y2-sl4" secondAttribute="centerX" id="eU2-w0-uci"/>
+                            <constraint firstItem="wYs-JM-Aeb" firstAttribute="centerX" secondItem="QIo-1j-vOc" secondAttribute="centerX" id="foq-RJ-jax"/>
+                            <constraint firstItem="cfh-ya-kgX" firstAttribute="centerX" secondItem="ZEJ-QF-FH0" secondAttribute="centerX" id="gxl-6h-dlb"/>
+                            <constraint firstItem="HpQ-0F-lw6" firstAttribute="centerX" secondItem="A4Z-5N-kto" secondAttribute="centerX" id="mpZ-wI-aVi"/>
+                            <constraint firstItem="wYs-JM-Aeb" firstAttribute="top" secondItem="QIo-1j-vOc" secondAttribute="bottom" constant="28" id="nDr-WV-u1P"/>
+                            <constraint firstItem="Jed-qF-vDM" firstAttribute="top" secondItem="aP2-Y2-sl4" secondAttribute="bottom" constant="1" id="qqh-J2-0KZ"/>
+                            <constraint firstItem="QIo-1j-vOc" firstAttribute="centerX" secondItem="cfh-ya-kgX" secondAttribute="centerX" id="sP9-bZ-ZZi"/>
+                            <constraint firstItem="Cg3-U1-5iP" firstAttribute="centerX" secondItem="wYs-JM-Aeb" secondAttribute="centerX" id="viV-f4-WIj"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="addFakeReviewStatus" destination="Jed-qF-vDM" id="oBF-Bx-bjU"/>
+                        <outlet property="changeRestNameStatus" destination="QIo-1j-vOc" id="DiC-DP-2Nt"/>
+                        <outlet property="changeUserPicStatus" destination="Cg3-U1-5iP" id="sL7-ki-FQd"/>
+                        <outlet property="editReviewStatus" destination="ZEJ-QF-FH0" id="rkL-fM-Hct"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="w9n-Tv-ici" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="953" y="-1365"/>
+            <point key="canvasLocation" x="952.79999999999995" y="-1365.0674662668666"/>
         </scene>
         <!--Friendly Eats-->
         <scene sceneID="tne-QT-ifu">
