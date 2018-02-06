@@ -177,8 +177,7 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
     present(filters.navigationController, animated: true, completion: nil)
   }
 
-  @objc
-  func goToHackPage(_ sender: Any) {
+  @objc func goToHackPage(_ sender: Any) {
     let hackPage = HackPageViewController.fromStoryboard()
     self.navigationController?.pushViewController(hackPage, animated: true)
   }

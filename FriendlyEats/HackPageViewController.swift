@@ -1,9 +1,17 @@
 //
-//  HackPageViewController.swift
-//  FriendlyEats
+//  Copyright (c) 2018 Google Inc.
 //
-//  Created by Todd Kerpelman on 2/6/18.
-//  Copyright © 2018 Firebase. All rights reserved.
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 //
 
 import UIKit
@@ -49,14 +57,14 @@ class HackPageViewController: UIViewController {
     hackedReview.yumCount = 99
     hackedReview.userInfo.name = "ANONYMOUS"
     let documentRef = Firestore.firestore().collection("reviews").document(hackedReview.documentID)
-    documentRef.updateData(hackedReview.documentData, completion: { (error) in
+    documentRef.updateData(hackedReview.documentData) { (error) in
       if let error = error {
         print("Could not update review: \(error)")
         self.editReviewStatus.text = "Hack failed!"
       } else {
         self.editReviewStatus.text = "Mischief Managed"
       }
-    })
+    }
   }
 
 
@@ -70,10 +78,8 @@ class HackPageViewController: UIViewController {
   }
 
   override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
+    super.viewDidLoad()
+  }
 
 
 }
