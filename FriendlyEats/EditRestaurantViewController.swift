@@ -8,13 +8,16 @@
 
 import UIKit
 import Firebase
+import FirebaseStorage
 
-class EditRestaurantViewController: UIViewController {
+class EditRestaurantViewController: UIViewController, UINavigationControllerDelegate {
 
     // MARK: Properties
     
     var restaurant: Restaurant?
     var imagePicker = UIImagePickerController()
+    var downloadUrl: String?
+    
     
     // MARK: Outlets
     
@@ -31,9 +34,11 @@ class EditRestaurantViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        hideKeyboardWhenTappedAround()
         if let _ = restaurant {
             populateRestaurant()
         }
+        //imagePicker.delegate = self as? UIImagePickerControllerDelegate & UINavigationControllerDelegate
     }
 
     // populate restaurant with current data
@@ -46,60 +51,161 @@ class EditRestaurantViewController: UIViewController {
     }
     
     func saveChanges() {
-        let data = [
+        var data = [
             "name": restaurantNameTextField.text,
             "city": locationTextField.text,
             "category": cuisineTextField.text,
             "price": Int(priceTextField.text!)
             //"photoURL": dostuffhere
             ] as [String : Any]
+        // if photo was changed, add the new url
+        if let downloadUrl = downloadUrl {
+            data["photoURL"] = downloadUrl
+        }
         Firestore.firestore().collection("restaurants").document((restaurant?.documentID)!).updateData(data){ err in
             if let err = err {
                 print("Error writing document: \(err)")
             } else {
-                self.handleAlert(isSaving: false)
+                self.didSaveAlert()
             }
         }
     }
-
-    func handleAlert(isSaving: Bool) {
-        var message = "Are you sure you want to save changes to this restaurant?"
-        if !isSaving {
-            message = "Successfully saved!"
+    
+    // MARK: Alert Messages
+    
+    func didSaveAlert() {
+        var message = "Successfully saved!"
+        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default) { action in
+            self.navigationController?.popViewController(animated: true)
         }
+        alertController.addAction(okAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    func willSaveAlert() {
+        var message = "Are you sure you want to save changes to this restaurant?"
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         let saveAction = UIAlertAction(title: "Save", style: .default) { action in
             self.saveChanges()
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        let okAction = UIAlertAction(title: "OK", style: .default) { action in
-            self.navigationController?.popViewController(animated: true)
-        }
-        if isSaving {
-            alertController.addAction(saveAction)
-            alertController.addAction(cancelAction)
-        } else {
-            alertController.addAction(okAction)
-        }
+        alertController.addAction(saveAction)
+        alertController.addAction(cancelAction)
+
         self.present(alertController, animated: true, completion: nil)
     }
+    
+    // If data in text fields isn't valid, give an alert
+    func invalidDataAlert(message: String) {
+        var title = "Invalid Input"
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .cancel, handler: nil)
+        alertController.addAction(okAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    func saveImage(photoData: Data) {
+        Storage.storage().reference(withPath: (restaurant?.documentID)!).putData(photoData, metadata: nil) { (metadata, error) in
+            if let error = error {
+                print(error)
+            }
+            guard let metadata = metadata else {
+                return
+            }
+            self.downloadUrl = metadata.downloadURL()?.absoluteString
+        }
+        
+    }
+    
+    @objc func inputToolbarDonePressed() {
+        resignFirstResponder()
+    }
+    
+    @objc func keyboardNextButton() {
+        if locationTextField.isFirstResponder {
+            cuisineTextField.becomeFirstResponder()
+        } else if cuisineTextField.isFirstResponder {
+            priceTextField.becomeFirstResponder()
+        } else if restaurantNameTextField.isFirstResponder {
+           locationTextField.becomeFirstResponder()
+        } else {
+            resignFirstResponder()
+        }
+    }
+    
+    @objc func keyboardPreviousButton() {
+        if locationTextField.isFirstResponder {
+            restaurantNameTextField.becomeFirstResponder()
+        } else if cuisineTextField.isFirstResponder {
+            locationTextField.becomeFirstResponder()
+        } else if priceTextField.isFirstResponder {
+            cuisineTextField.becomeFirstResponder()
+        } else {
+            resignFirstResponder()
+        }
+    }
+    
+    lazy var inputToolbar: UIToolbar = {
+        var toolbar = UIToolbar()
+        toolbar.barStyle = .default
+        toolbar.isTranslucent = true
+        toolbar.sizeToFit()
+        
+        var doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(self.inputToolbarDonePressed))
+        var flexibleSpaceButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        var fixedSpaceButton = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
+        
+        var nextButton  = UIBarButtonItem(image: #imageLiteral(resourceName: "ic_keyboard_arrow_left"), style: .plain, target: self, action: #selector(self.keyboardPreviousButton))
+        nextButton.width = 50.0
+        var previousButton  = UIBarButtonItem(image: #imageLiteral(resourceName: "ic_keyboard_arrow_right"), style: .plain, target: self, action: #selector(self.keyboardNextButton))
+        
+        toolbar.setItems([fixedSpaceButton, nextButton, fixedSpaceButton, previousButton, flexibleSpaceButton, doneButton], animated: false)
+        toolbar.isUserInteractionEnabled = true
+        
+        return toolbar
+    }()
     
     @IBAction func selectNewImage(_ sender: Any) {
         selectImage()
     }
     
     @IBAction func didSelectSaveChanges(_ sender: Any) {
-        handleAlert(isSaving: true)
+        willSaveAlert()
     }
     
+}
+
+extension EditRestaurantViewController: UITextFieldDelegate {
+    
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        textField.inputAccessoryView = inputToolbar
+        return true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if textField == priceTextField {
+            if textField.text != "1" && textField.text != "2" && textField.text != "3" {
+                // return to previous text
+                textField.text = restaurant?.price.description
+                invalidDataAlert(message: "Invalid price. Please enter a number from 1 to 3.")
+                return
+            }
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
 }
 
 extension EditRestaurantViewController: UIImagePickerControllerDelegate {
     
     func selectImage() {
+    imagePicker.delegate = self as? UIImagePickerControllerDelegate & UINavigationControllerDelegate
         if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum){
             
-            imagePicker.delegate = self as? UIImagePickerControllerDelegate & UINavigationControllerDelegate
             imagePicker.sourceType = .savedPhotosAlbum;
             imagePicker.allowsEditing = false
             
@@ -107,9 +213,23 @@ extension EditRestaurantViewController: UIImagePickerControllerDelegate {
         }
     }
     
-    func imagePickerController(picker: UIImagePickerController!, didFinishPickingImage image: UIImage!, editingInfo: NSDictionary!){
-        self.dismiss(animated: true, completion: { () -> Void in
-            // save image
-        })
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        
+        if let photo = info[UIImagePickerControllerOriginalImage] as? UIImage, let photoData = UIImageJPEGRepresentation(photo, 0.8) {
+            saveImage(photoData: photoData)
+        }
+        self.dismiss(animated: true, completion: nil)
+    }
+}
+
+extension UIViewController {
+    func hideKeyboardWhenTappedAround() {
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
 }
