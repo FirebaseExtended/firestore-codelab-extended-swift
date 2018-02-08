@@ -17,25 +17,39 @@
 import UIKit
 import FirebaseAuth
 import FirebaseAuthUI
+import FirebaseFirestore
 import SDWebImage
 
 class ProfileViewController: UIViewController {
 
-  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> ProfileViewController {
-    return storyboard.instantiateViewController(withIdentifier: "ProfileViewController") as! ProfileViewController
+  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil))
+      -> ProfileViewController {
+    return storyboard.instantiateViewController(withIdentifier: "ProfileViewController")
+        as! ProfileViewController
   }
 
   /// The current user displayed by the controller. Setting this property has side effects.
   fileprivate var user: User? = nil {
     didSet {
+      populate(user: user)
       if let user = user {
-        populate(user: user)
+        populateReviews(forUser: user)
       } else {
-        print("not logged in!")
+        dataSource?.reviews.stopListening()
+        dataSource = nil
+        tableView.backgroundView = tableBackgroundLabel
+        tableView.reloadData()
       }
     }
   }
 
+  lazy private var tableBackgroundLabel: UILabel = {
+    let label = UILabel(frame: tableView.frame)
+    label.textAlignment = .center
+    return label
+  }()
+
+  private var dataSource: ReviewTableViewDataSource? = nil
   private var authListener: AuthStateDidChangeListenerHandle? = nil
   
   @IBOutlet private var tableView: UITableView!
@@ -45,8 +59,9 @@ class ProfileViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    tableView.dataSource = self
     tableView.delegate = self
+    tableBackgroundLabel.text = "There aren't any reviews here."
+    tableView.backgroundView = tableBackgroundLabel
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -79,10 +94,30 @@ class ProfileViewController: UIViewController {
     }
   }
 
-  fileprivate func populate(user: User) {
-    profileImageView.sd_setImage(with: user.photoURL)
-    print(user.photoURL)
-    usernameLabel.text = user.name
+  fileprivate func populate(user: User?) {
+    if let user = user {
+      profileImageView.sd_setImage(with: user.photoURL)
+      usernameLabel.text = user.name
+    } else {
+      profileImageView.image = nil
+      usernameLabel.text = "Not logged in"
+      // TODO disable view my restaurants button
+    }
+  }
+
+  fileprivate func populateReviews(forUser user: User) {
+    let query = Firestore.firestore().reviews.whereField("userInfo.userID", isEqualTo: user.userID)
+    dataSource = ReviewTableViewDataSource(query: query) { [weak self] (changes) in
+      self?.tableView.reloadData()
+      guard let reviews = self?.dataSource?.reviews else { return }
+      if reviews.count > 0 {
+        self?.tableView.backgroundView = nil
+      } else {
+        self?.tableView.backgroundView = self?.tableBackgroundLabel
+      }
+    }
+    dataSource?.reviews.listen()
+    tableView.dataSource = dataSource
   }
 
   fileprivate func presentLoginController() {
@@ -109,32 +144,12 @@ class ProfileViewController: UIViewController {
   }
 }
 
-// MARK: - UITableViewDataSource
-
-extension ProfileViewController: UITableViewDataSource {
-
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    guard let user = user else {
-      return 0
-    }
-    return 0 // TODO: Populate this table view with reviews. Can borrow stuff from the reviews
-             // displayed in RestaurantDetailViewController.
-  }
-
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "ReviewTableViewCell", for: indexPath)
-    // TODO: Populate this table view with reviews.
-    return cell
-  }
-
-}
-
 // MARK: - UITableViewDelegate
 
 extension ProfileViewController: UITableViewDelegate {
 
   func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    return 128
+    return 0
   }
 
 }

@@ -595,13 +595,49 @@
                                     </constraints>
                                 </view>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ReviewTableViewCell" id="avj-gO-dqN">
-                                        <rect key="frame" x="0.0" y="183.5" width="375" height="44"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ReviewTableViewCell" rowHeight="120" id="Srp-bj-7Dp" customClass="ReviewTableViewCell" customModule="FriendlyEats" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="183.5" width="375" height="120"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="avj-gO-dqN" id="4pW-nJ-Gq4">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Srp-bj-7Dp" id="US6-51-Kbe">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="119.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="1000" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Y1j-sx-ZjR">
+                                                    <rect key="frame" x="23" y="11" width="45" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Review contents" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KgT-BY-HFQ">
+                                                    <rect key="frame" x="23" y="40" width="113" height="53"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Z91-fI-lUm" customClass="ImmutableStarsView" customModule="FriendlyEats" customModuleProvider="target">
+                                                    <rect key="frame" x="260" y="11" width="100" height="20"/>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="20" id="FnW-FU-aQU"/>
+                                                        <constraint firstAttribute="width" constant="100" id="LmS-KY-GRI"/>
+                                                    </constraints>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Z91-fI-lUm" firstAttribute="top" secondItem="US6-51-Kbe" secondAttribute="topMargin" id="1Vl-Rd-fYY"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="KgT-BY-HFQ" secondAttribute="bottom" constant="16" id="4Oy-ZA-fMV"/>
+                                                <constraint firstItem="Y1j-sx-ZjR" firstAttribute="top" secondItem="US6-51-Kbe" secondAttribute="topMargin" id="CNh-Zf-ST2"/>
+                                                <constraint firstItem="KgT-BY-HFQ" firstAttribute="top" secondItem="Y1j-sx-ZjR" secondAttribute="bottom" constant="8" id="Red-Xd-7Kg"/>
+                                                <constraint firstItem="KgT-BY-HFQ" firstAttribute="leading" secondItem="US6-51-Kbe" secondAttribute="leadingMargin" constant="8" id="hSf-nE-EZT"/>
+                                                <constraint firstItem="Y1j-sx-ZjR" firstAttribute="leading" secondItem="US6-51-Kbe" secondAttribute="leadingMargin" constant="8" id="iyD-1O-2eF"/>
+                                                <constraint firstItem="Z91-fI-lUm" firstAttribute="trailing" secondItem="US6-51-Kbe" secondAttribute="trailingMargin" id="lOb-iK-Rx7"/>
+                                            </constraints>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="reviewContentsLabel" destination="KgT-BY-HFQ" id="DYT-Q2-3qE"/>
+                                            <outlet property="starsView" destination="Z91-fI-lUm" id="FmY-Pz-VKA"/>
+                                            <outlet property="usernameLabel" destination="Y1j-sx-ZjR" id="XFu-EE-wbB"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>

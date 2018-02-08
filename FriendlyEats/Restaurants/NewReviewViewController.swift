@@ -20,12 +20,15 @@ import FirebaseAuth
 
 class NewReviewViewController: UIViewController, UITextFieldDelegate {
 
-  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> NewReviewViewController {
+  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil),
+                             forRestaurant restaurant: Restaurant) -> NewReviewViewController {
     let controller = storyboard.instantiateViewController(withIdentifier: "NewReviewViewController") as! NewReviewViewController
+    controller.restaurant = restaurant
     return controller
   }
 
-  weak var delegate: NewReviewViewControllerDelegate?
+  /// The restaurant being reviewed. This must be set when the controller is created.
+  private var restaurant: Restaurant!
 
   @IBOutlet var doneButton: UIBarButtonItem!
 
@@ -52,7 +55,64 @@ class NewReviewViewController: UIViewController, UITextFieldDelegate {
   }
 
   @IBAction func doneButtonPressed(_ sender: Any) {
-    // TODO: Re-write this with new data types.
+    // TODO: handle user not logged in.
+    guard let user = Auth.auth().currentUser.flatMap(User.init) else { return }
+    let review = Review(restaurantID: restaurant.documentID,
+                        rating: ratingView.rating!,
+                        userInfo: user,
+                        text: reviewTextField.text!,
+                        date: Date(),
+                        yumCount: 0)
+    let firestore = Firestore.firestore()
+    let restaurantReference = firestore.restaurants.document(restaurant.documentID)
+    let newReviewReference = firestore.reviews.document(review.documentID)
+
+    firestore.runTransaction({ (transaction, errorPointer) -> Any? in
+      // Read data from Firestore inside the transaction, so we don't accidentally
+      // update using staled client data. Error if we're unable to read here.
+      let restaurantSnapshot: DocumentSnapshot
+      do {
+        try restaurantSnapshot = transaction.getDocument(restaurantReference)
+      } catch let error as NSError {
+        errorPointer?.pointee = error
+        return nil
+      }
+
+      // Error if the restaurant data in Firestore has somehow changed or is malformed.
+      guard let restaurant = Restaurant(document: restaurantSnapshot) else {
+        let error = NSError(
+          domain: "FriendlyEatsErrorDomain",
+          code: 0,
+          userInfo: [
+            NSLocalizedDescriptionKey: "Unable to write to restaurant at Firestore path: \(restaurantReference.path)"
+          ]
+        )
+        errorPointer?.pointee = error
+        return nil
+      }
+
+      // Update the restaurant's rating and rating count and post the new review at the
+      // same time.
+      let newAverage =
+          (Double(restaurant.reviewCount) * restaurant.averageRating + Double(review.rating))
+          / Double(restaurant.reviewCount + 1)
+
+      transaction.setData(review.documentData, forDocument: newReviewReference)
+      transaction.updateData([
+        "reviewCount": restaurant.reviewCount + 1,
+        "averageRating": newAverage
+        ], forDocument: restaurantReference)
+      return nil
+    }) { (_, error) in
+      if let error = error {
+        print(error)
+      } else {
+        // Pop the review controller on success
+        if self.navigationController?.topViewController?.isKind(of: NewReviewViewController.self) ?? false {
+          self.navigationController?.popViewController(animated: true)
+        }
+      }
+    }
   }
 
   @objc func ratingDidChange(_ sender: Any) {
@@ -73,9 +133,3 @@ class NewReviewViewController: UIViewController, UITextFieldDelegate {
   }
 
 }
-
-protocol NewReviewViewControllerDelegate: NSObjectProtocol {
-  func reviewController(_ controller: NewReviewViewController, didSubmitFormWithReview review: Review)
-}
-
-

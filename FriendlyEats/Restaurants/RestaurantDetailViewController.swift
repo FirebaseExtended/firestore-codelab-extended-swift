@@ -20,15 +20,18 @@ import FirebaseFirestore
 import Firebase
 import FirebaseAuthUI
 
-class RestaurantDetailViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, NewReviewViewControllerDelegate {
+class RestaurantDetailViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
   // These are optional because we can't do initializer-level dependency injection with storyboards.
   var titleImageURL: URL?
   var restaurant: Restaurant?  
   var localCollection: LocalCollection<Review>!
-  
-  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> RestaurantDetailViewController {
-    let controller = storyboard.instantiateViewController(withIdentifier: "RestaurantDetailViewController") as! RestaurantDetailViewController
+
+  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil))
+      -> RestaurantDetailViewController {
+    let controller =
+        storyboard.instantiateViewController(withIdentifier: "RestaurantDetailViewController")
+        as! RestaurantDetailViewController
     return controller
   }
   
@@ -108,8 +111,7 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
   }
   
   @IBAction func didTapAddButton(_ sender: Any) {
-    let controller = NewReviewViewController.fromStoryboard()
-    controller.delegate = self
+    let controller = NewReviewViewController.fromStoryboard(forRestaurant: self.restaurant!)
     self.navigationController?.pushViewController(controller, animated: true)
   }
   
@@ -135,13 +137,7 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
     cell.populate(review: review)
     return cell
   }
-  
-  // MARK: - NewReviewViewControllerDelegate
-  
-  func reviewController(_ controller: NewReviewViewController, didSubmitFormWithReview review: Review) {
-    // TODO: write transaction logic for creating new review.
-  }
-  
+
 }
 
 class RestaurantTitleView: UIView {
@@ -163,7 +159,8 @@ class RestaurantTitleView: UIView {
   @IBOutlet var titleImageView: UIImageView! {
     didSet {
       let gradient = CAGradientLayer()
-      gradient.colors = [UIColor(red: 0, green: 0, blue: 0, alpha: 0.6).cgColor, UIColor.clear.cgColor]
+      gradient.colors =
+          [UIColor(red: 0, green: 0, blue: 0, alpha: 0.6).cgColor, UIColor.clear.cgColor]
       gradient.locations = [0.0, 1.0]
       
       gradient.startPoint = CGPoint(x: 0, y: 1)
