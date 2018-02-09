@@ -80,11 +80,25 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uKR-hV-8EJ">
+                                <rect key="frame" x="180" y="420" width="14" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TWY-VL-cCX">
+                                <rect key="frame" x="132" y="389" width="111" height="30"/>
+                                <state key="normal" title="Add invalid Data"/>
+                                <connections>
+                                    <action selector="addInvalidResturantData:" destination="ONf-7Z-SIp" eventType="touchUpInside" id="hDH-ua-7dd"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="A4Z-5N-kto" firstAttribute="top" secondItem="yey-nT-T9d" secondAttribute="bottom" id="5lV-nB-0ID"/>
                             <constraint firstItem="cfh-ya-kgX" firstAttribute="top" secondItem="ZEJ-QF-FH0" secondAttribute="bottom" constant="28" id="8eH-aK-Nae"/>
+                            <constraint firstItem="TWY-VL-cCX" firstAttribute="top" secondItem="Jed-qF-vDM" secondAttribute="bottom" constant="28" id="8pg-JK-r0O"/>
                             <constraint firstItem="Cg3-U1-5iP" firstAttribute="top" secondItem="wYs-JM-Aeb" secondAttribute="bottom" constant="1" id="AbK-xj-vDm"/>
                             <constraint firstItem="QIo-1j-vOc" firstAttribute="top" secondItem="cfh-ya-kgX" secondAttribute="bottom" constant="1" id="AkG-w6-igO"/>
                             <constraint firstItem="aP2-Y2-sl4" firstAttribute="top" secondItem="Cg3-U1-5iP" secondAttribute="bottom" constant="28" id="FgG-PD-A5s"/>
@@ -93,17 +107,21 @@
                             <constraint firstItem="A4Z-5N-kto" firstAttribute="centerX" secondItem="K2a-px-FyQ" secondAttribute="centerX" id="Smy-3p-9ca"/>
                             <constraint firstItem="ZEJ-QF-FH0" firstAttribute="centerX" secondItem="HpQ-0F-lw6" secondAttribute="centerX" id="Va3-WE-16f"/>
                             <constraint firstItem="ZEJ-QF-FH0" firstAttribute="top" secondItem="HpQ-0F-lw6" secondAttribute="bottom" constant="1" id="Vtr-tH-olI"/>
+                            <constraint firstItem="uKR-hV-8EJ" firstAttribute="centerX" secondItem="TWY-VL-cCX" secondAttribute="centerX" id="dXl-iW-xE3"/>
                             <constraint firstItem="Jed-qF-vDM" firstAttribute="centerX" secondItem="aP2-Y2-sl4" secondAttribute="centerX" id="eU2-w0-uci"/>
                             <constraint firstItem="wYs-JM-Aeb" firstAttribute="centerX" secondItem="QIo-1j-vOc" secondAttribute="centerX" id="foq-RJ-jax"/>
                             <constraint firstItem="cfh-ya-kgX" firstAttribute="centerX" secondItem="ZEJ-QF-FH0" secondAttribute="centerX" id="gxl-6h-dlb"/>
                             <constraint firstItem="HpQ-0F-lw6" firstAttribute="centerX" secondItem="A4Z-5N-kto" secondAttribute="centerX" id="mpZ-wI-aVi"/>
                             <constraint firstItem="wYs-JM-Aeb" firstAttribute="top" secondItem="QIo-1j-vOc" secondAttribute="bottom" constant="28" id="nDr-WV-u1P"/>
                             <constraint firstItem="Jed-qF-vDM" firstAttribute="top" secondItem="aP2-Y2-sl4" secondAttribute="bottom" constant="1" id="qqh-J2-0KZ"/>
+                            <constraint firstItem="TWY-VL-cCX" firstAttribute="centerX" secondItem="Jed-qF-vDM" secondAttribute="centerX" id="rDh-FP-rd4"/>
                             <constraint firstItem="QIo-1j-vOc" firstAttribute="centerX" secondItem="cfh-ya-kgX" secondAttribute="centerX" id="sP9-bZ-ZZi"/>
+                            <constraint firstItem="uKR-hV-8EJ" firstAttribute="top" secondItem="TWY-VL-cCX" secondAttribute="bottom" constant="1" id="u6D-E4-e4L"/>
                             <constraint firstItem="Cg3-U1-5iP" firstAttribute="centerX" secondItem="wYs-JM-Aeb" secondAttribute="centerX" id="viV-f4-WIj"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="addBadDataStatus" destination="uKR-hV-8EJ" id="mwF-MX-6X0"/>
                         <outlet property="addFakeReviewStatus" destination="Jed-qF-vDM" id="oBF-Bx-bjU"/>
                         <outlet property="changeRestNameStatus" destination="QIo-1j-vOc" id="DiC-DP-2Nt"/>
                         <outlet property="changeUserPicStatus" destination="Cg3-U1-5iP" id="sL7-ki-FQd"/>
@@ -112,9 +130,8 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="w9n-Tv-ici" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="952.79999999999995" y="-1365.0674662668666"/>
+            <point key="canvasLocation" x="1433" y="-1345"/>
         </scene>
-
         <!--Restaurants-->
         <scene sceneID="tne-QT-ifu">
             <objects>
@@ -217,13 +234,13 @@
                                 <rect key="frame" x="8" y="64" width="359" height="44"/>
                                 <subviews>
                                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="San Francisco" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qz3-be-flj">
-                                        <rect key="frame" x="-8" y="12" width="0.0" height="20.5"/>
+                                        <rect key="frame" x="-32" y="12" width="0.0" height="20.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="1000" verticalHuggingPriority="251" text="Burgers" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YLJ-1I-oz6">
-                                        <rect key="frame" x="16" y="12" width="0.0" height="20.5"/>
+                                        <rect key="frame" x="-8" y="12" width="0.0" height="20.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -664,6 +681,7 @@
                 <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="zfS-ct-jiF" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="xSl-3q-VCk">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
