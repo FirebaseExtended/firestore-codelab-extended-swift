@@ -19,14 +19,16 @@ import FirebaseFirestore
 /// A struct corresponding to a 'like' on social media.
 struct Yum {
 
-  /// The documentID of the yum.
+  /// The document ID for this particular yum. This will serve double-duty as
+  /// the userID of the user who left the review as well, which will help guarantee
+  /// only one yum per user per review.
   var documentID: String
 
-  /// The user that created the yum/like.
-  var userID: String
+  /// The name of the user who yummed this review. Although this is out of the
+  /// scope of this sample app, this could be used to build a "This review was yummed by
+  /// Bob Smith, Alex Avery, and 3 others" kind of message
+  var username: String
 
-  /// The review that was yum'd/liked.
-  var reviewID: String
 
 }
 
@@ -34,33 +36,25 @@ struct Yum {
 
 extension Yum: DocumentSerializable {
 
-  public init(userID: String, reviewID: String) {
-    let document = Firestore.firestore().yums.document()
-    self.init(documentID: document.documentID, userID: userID, reviewID: reviewID)
-  }
-
   /// Initializes a Yum from Firestore document data.
-  public init?(documentID: String, dictionary: [String : Any]) {
-    guard let userID = dictionary["userID"] as? String,
-      let reviewID = dictionary["reviewID"] as? String else { return nil }
-
-    self.init(documentID: documentID, userID: userID, reviewID: reviewID)
+  public init?(documentAndUserID: String, dictionary: [String : Any]) {
+    guard let username = dictionary["username"] as? String else { return nil }
+    self.init(documentID: documentAndUserID,  username: username)
   }
 
   public init?(document: DocumentSnapshot) {
     guard let data = document.data() else { return nil }
-    self.init(documentID: document.documentID, dictionary: data)
+    self.init(documentAndUserID: document.documentID, dictionary: data)
   }
 
   public init?(document: QueryDocumentSnapshot) {
-    self.init(documentID: document.documentID, dictionary: document.data())
+    self.init(documentAndUserID: document.documentID, dictionary: document.data())
   }
 
   /// Returns a dictionary representation of a Yum.
   public var documentData: [String: Any] {
     return [
-      "userID": userID,
-      "reviewID": reviewID,
+      "username": username,
     ]
   }
 

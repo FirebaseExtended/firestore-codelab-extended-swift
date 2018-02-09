@@ -36,13 +36,6 @@ func priceString(from price: Int) -> String {
   return priceText
 }
 
-private func imageURL(from string: String) -> URL {
-  let number = (abs(string.hashValue) % 22) + 1
-  let URLString =
-      "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_\(number).png"
-  return URL(string: URLString)!
-}
-
 class RestaurantsTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
   @IBOutlet var tableView: UITableView!
@@ -106,7 +99,7 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
   }
 
   fileprivate func baseQuery() -> Query {
-    return Firestore.firestore().collection("restaurants").limit(to: 50)
+    return Firestore.firestore().restaurants.limit(to: 50)
   }
 
   lazy private var filters: (navigationController: UINavigationController,
@@ -136,6 +129,10 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
     activeFiltersStackView.isHidden = true
 
     self.navigationController?.navigationBar.barStyle = .black
+
+    // Uncomment these two lines to enable SECRET HACKER PAGE!!!
+    let omgHAX = UIBarButtonItem(barButtonSystemItem: .bookmarks, target: self, action: #selector(goToHackPage))
+    navigationItem.rightBarButtonItems?.append(omgHAX)
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -180,6 +177,12 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
     present(filters.navigationController, animated: true, completion: nil)
   }
 
+  @objc func goToHackPage(_ sender: Any) {
+    let hackPage = HackPageViewController.fromStoryboard()
+    self.navigationController?.pushViewController(hackPage, animated: true)
+  }
+
+
   override var preferredStatusBarStyle: UIStatusBarStyle {
     set {}
     get {
@@ -210,7 +213,7 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
     let controller = RestaurantDetailViewController.fromStoryboard()
-    controller.titleImageURL = imageURL(from: restaurants[indexPath.row].name)
+    controller.titleImageURL = restaurants[indexPath.row].photoURL
     controller.restaurant = restaurants[indexPath.row]
     controller.restaurantReference = documents[indexPath.row].reference
     self.navigationController?.pushViewController(controller, animated: true)
@@ -301,16 +304,13 @@ class RestaurantTableViewCell: UITableViewCell {
   @IBOutlet private var priceLabel: UILabel!
 
   func populate(restaurant: Restaurant) {
-
-    // Displaying data, part two
-
     nameLabel.text = restaurant.name
     cityLabel.text = restaurant.city
     categoryLabel.text = restaurant.category
     starsView.rating = Int(restaurant.averageRating.rounded())
     priceLabel.text = priceString(from: restaurant.price)
 
-    let image = imageURL(from: restaurant.name)
+    let image = restaurant.photoURL
     thumbnailView.sd_setImage(with: image)
   }
 

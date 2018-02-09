@@ -11,6 +11,7 @@
 		36BB298A2024F2D8003687EC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 36BB29892024F2D8003687EC /* GoogleService-Info.plist */; };
 		4F87AEDBC2F79553944A09BF /* Pods_FriendlyEats.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153B09CA710EB0F1DC88BF2C /* Pods_FriendlyEats.framework */; };
 		859E506396BFE3BE6DADE73D /* Pods_FriendlyEatsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82B9832C162981F74401ADC2 /* Pods_FriendlyEatsTests.framework */; };
+		49C24867202A237000D6008A /* HackPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C24866202A237000D6008A /* HackPageViewController.swift */; };
 		8D004D2D1EE879B5004DEF35 /* FiltersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D004D2C1EE879B5004DEF35 /* FiltersViewController.swift */; };
 		8D5DF7021F7EF3BA00B0D24F /* NewReviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5DF7011F7EF3BA00B0D24F /* NewReviewViewController.swift */; };
 		8D70C1BA201FECE2007D3082 /* Firestore+Populate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D70C1B9201FECE2007D3082 /* Firestore+Populate.swift */; };
@@ -48,6 +49,7 @@
 		36BB29892024F2D8003687EC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		51BBC729DDBF869BF0E6D55E /* Pods-FriendlyEats.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FriendlyEats.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FriendlyEats/Pods-FriendlyEats.debug.xcconfig"; sourceTree = "<group>"; };
 		82B9832C162981F74401ADC2 /* Pods_FriendlyEatsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FriendlyEatsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		49C24866202A237000D6008A /* HackPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackPageViewController.swift; sourceTree = "<group>"; };
 		8D004D2C1EE879B5004DEF35 /* FiltersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiltersViewController.swift; sourceTree = "<group>"; };
 		8D5DF7011F7EF3BA00B0D24F /* NewReviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewReviewViewController.swift; sourceTree = "<group>"; };
 		8D70C1B9201FECE2007D3082 /* Firestore+Populate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Firestore+Populate.swift"; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 			children = (
 				36BB29892024F2D8003687EC /* GoogleService-Info.plist */,
 				8D9BBC301EE2200900194E9A /* AppDelegate.swift */,
+				49C24866202A237000D6008A /* HackPageViewController.swift */,
 				8D9BBC321EE2200900194E9A /* RestaurantsTableViewController.swift */,
 				8DF77E191EEB45E500CB2330 /* RestaurantDetailViewController.swift */,
 				8D5DF7011F7EF3BA00B0D24F /* NewReviewViewController.swift */,
@@ -415,6 +418,7 @@
 				8D82F5C1201FCE2500107172 /* Review.swift in Sources */,
 				8DF1E3151EE72C4600192CDE /* LocalCollection.swift in Sources */,
 				8D5DF7021F7EF3BA00B0D24F /* NewReviewViewController.swift in Sources */,
+				49C24867202A237000D6008A /* HackPageViewController.swift in Sources */,
 				8DF1E3131EE5CFF900192CDE /* Restaurant.swift in Sources */,
 				8DF77E1A1EEB45E500CB2330 /* RestaurantDetailViewController.swift in Sources */,
 				8D70C1BA201FECE2007D3082 /* Firestore+Populate.swift in Sources */,
