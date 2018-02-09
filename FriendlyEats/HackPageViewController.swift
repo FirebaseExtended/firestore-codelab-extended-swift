@@ -119,7 +119,7 @@ class HackPageViewController: UIViewController {
                                              "photoURL": "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_3.png",
                                              "price": "expensive",
                                              "reviewCount": -3]
-    Firestore.firestore().collection("restaurants").addDocument(data: badRestaurantData) { (error) in
+    Firestore.firestore().collection("restaurants").document("zzzzzzz-BADDATA").setData(badRestaurantData) { (error) in
       if let error = error {
         print("Could not update restaurant: \(error)")
         self.addBadDataStatus.text = "Hack failed!"
