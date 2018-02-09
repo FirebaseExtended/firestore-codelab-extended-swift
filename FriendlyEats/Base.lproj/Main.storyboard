@@ -366,12 +366,23 @@
                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ojs-Kq-qFI">
+                                            <rect key="frame" x="229" y="99.5" width="130" height="30"/>
+                                            <state key="normal" title="Edit My Restaurant">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="didTapEditButton:" destination="yyz-cR-dIw" eventType="touchUpInside" id="rET-6C-cbh"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <constraints>
                                         <constraint firstItem="ZNQ-b3-Wfl" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" id="01q-H9-Ysv"/>
+                                        <constraint firstItem="Ojs-Kq-qFI" firstAttribute="trailing" secondItem="13p-IC-WyC" secondAttribute="trailing" id="0T7-dO-SXJ"/>
                                         <constraint firstItem="DBM-Cn-nJI" firstAttribute="top" secondItem="N5p-cL-L2M" secondAttribute="bottom" constant="8" id="6I1-bW-m9B"/>
                                         <constraint firstAttribute="bottom" secondItem="P0j-uF-Lec" secondAttribute="bottom" constant="16" id="Az9-vO-lcA"/>
+                                        <constraint firstItem="Ojs-Kq-qFI" firstAttribute="leading" secondItem="PPW-8S-SIQ" secondAttribute="trailing" constant="65.5" id="CuC-f2-Jqm"/>
                                         <constraint firstAttribute="bottom" secondItem="PPW-8S-SIQ" secondAttribute="bottom" constant="16" id="Hfu-Ml-mlr"/>
                                         <constraint firstItem="DBM-Cn-nJI" firstAttribute="leading" secondItem="P0j-uF-Lec" secondAttribute="trailing" constant="4" id="IdA-gT-Ha8"/>
                                         <constraint firstItem="P0j-uF-Lec" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" constant="16" id="RUo-TK-uIk"/>
@@ -385,6 +396,7 @@
                                         <constraint firstAttribute="bottom" secondItem="ZNQ-b3-Wfl" secondAttribute="bottom" id="hEn-w5-9M0"/>
                                         <constraint firstItem="ZNQ-b3-Wfl" firstAttribute="top" secondItem="Qev-tW-OCy" secondAttribute="top" id="ni3-HG-af6"/>
                                         <constraint firstAttribute="bottom" secondItem="DBM-Cn-nJI" secondAttribute="bottom" constant="16" id="q5J-Vb-4XQ"/>
+                                        <constraint firstItem="Ojs-Kq-qFI" firstAttribute="centerY" secondItem="PPW-8S-SIQ" secondAttribute="centerY" id="vT9-KR-bYw"/>
                                     </constraints>
                                     <connections>
                                         <outlet property="categoryLabel" destination="P0j-uF-Lec" id="3XH-4a-tSm"/>
@@ -452,6 +464,7 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Restaurant" id="0ZQ-zC-e2B">
+                        <barButtonItem key="backBarButtonItem" title="Cancel" id="sVU-61-CHw"/>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="k6a-WV-DSJ">
                             <connections>
                                 <action selector="didTapAddButton:" destination="yyz-cR-dIw" id="mYs-0v-Gzd"/>
@@ -460,6 +473,7 @@
                     </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
+                        <outlet property="editButton" destination="Ojs-Kq-qFI" id="xDW-nN-4Bz"/>
                         <outlet property="tableView" destination="FPu-IJ-I0V" id="rH7-m0-GVn"/>
                         <outlet property="titleView" destination="Qev-tW-OCy" id="L4W-ch-HXI"/>
                     </connections>
@@ -656,6 +670,125 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BP1-jZ-qGe" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="958" y="70"/>
+        </scene>
+        <!--Edit Restaurant View Controller-->
+        <scene sceneID="cfy-nH-qiP">
+            <objects>
+                <viewController storyboardIdentifier="EditRestaurantViewController" id="HEh-GC-pG7" customClass="EditRestaurantViewController" customModule="FriendlyEats" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="k5n-Ho-vB4"/>
+                        <viewControllerLayoutGuide type="bottom" id="qtT-uq-FjP"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Cg1-Fm-1DG">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Restaurant Name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="aOa-CE-zRb">
+                                <rect key="frame" x="16" y="76" width="343" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="22J-yb-pgM"/>
+                                </constraints>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="words" autocorrectionType="no"/>
+                                <connections>
+                                    <outlet property="delegate" destination="HEh-GC-pG7" id="NXo-ks-riu"/>
+                                </connections>
+                            </textField>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1ei-aa-raU">
+                                <rect key="frame" x="16" y="143" width="100" height="100"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="100" id="7RE-pR-8en"/>
+                                    <constraint firstAttribute="height" constant="100" id="MU2-nU-vzs"/>
+                                </constraints>
+                            </imageView>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Location" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="lgw-Bb-CZR">
+                                <rect key="frame" x="143" y="143" width="216" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="KYm-Vc-pYX"/>
+                                </constraints>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="words" textContentType="address-level2"/>
+                                <connections>
+                                    <outlet property="delegate" destination="HEh-GC-pG7" id="i9A-jv-vRV"/>
+                                </connections>
+                            </textField>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Cuisine" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Smk-bU-gvH">
+                                <rect key="frame" x="143" y="203" width="216" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="cK1-LP-xRa"/>
+                                </constraints>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="words" autocorrectionType="no"/>
+                                <connections>
+                                    <outlet property="delegate" destination="HEh-GC-pG7" id="oPo-hz-bmG"/>
+                                </connections>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="imZ-yW-HcX">
+                                <rect key="frame" x="16" y="143" width="100" height="100"/>
+                                <connections>
+                                    <action selector="selectNewImage:" destination="HEh-GC-pG7" eventType="touchUpInside" id="Ube-Ir-wRn"/>
+                                </connections>
+                            </button>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4W1-LH-cwp">
+                                <rect key="frame" x="248" y="270" width="111" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="WEf-R8-Zwe"/>
+                                </constraints>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                <connections>
+                                    <outlet property="delegate" destination="HEh-GC-pG7" id="JzF-6S-1kk"/>
+                                </connections>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wJI-Ic-3x7">
+                                <rect key="frame" x="16" y="275" width="100" height="30"/>
+                                <state key="normal" title="Save Changes"/>
+                                <connections>
+                                    <action selector="didSelectSaveChanges:" destination="HEh-GC-pG7" eventType="touchUpInside" id="w8R-Dz-SVq"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="aOa-CE-zRb" firstAttribute="top" secondItem="k5n-Ho-vB4" secondAttribute="bottom" constant="56" id="0YL-HK-35a"/>
+                            <constraint firstItem="Smk-bU-gvH" firstAttribute="centerX" secondItem="lgw-Bb-CZR" secondAttribute="centerX" id="4Uy-iH-ZMK"/>
+                            <constraint firstItem="imZ-yW-HcX" firstAttribute="width" secondItem="1ei-aa-raU" secondAttribute="width" id="6zA-bM-JHY"/>
+                            <constraint firstItem="aOa-CE-zRb" firstAttribute="centerX" secondItem="Cg1-Fm-1DG" secondAttribute="centerX" id="BB6-gJ-eT2"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="wJI-Ic-3x7" secondAttribute="trailing" constant="20" symbolic="YES" id="Cgh-Hd-IHq"/>
+                            <constraint firstItem="lgw-Bb-CZR" firstAttribute="top" secondItem="aOa-CE-zRb" secondAttribute="bottom" constant="27" id="J8J-0N-Sk7"/>
+                            <constraint firstItem="1ei-aa-raU" firstAttribute="top" secondItem="aOa-CE-zRb" secondAttribute="bottom" constant="27" id="L9e-bN-hUP"/>
+                            <constraint firstItem="lgw-Bb-CZR" firstAttribute="trailing" secondItem="aOa-CE-zRb" secondAttribute="trailing" id="NTR-Yj-pdz"/>
+                            <constraint firstItem="4W1-LH-cwp" firstAttribute="leading" secondItem="Smk-bU-gvH" secondAttribute="leading" constant="105" id="SoQ-Xs-aOB"/>
+                            <constraint firstItem="wJI-Ic-3x7" firstAttribute="leading" secondItem="imZ-yW-HcX" secondAttribute="leading" id="TDV-zQ-Vhr"/>
+                            <constraint firstItem="imZ-yW-HcX" firstAttribute="top" secondItem="1ei-aa-raU" secondAttribute="bottom" constant="-100" id="VoN-DH-CGc"/>
+                            <constraint firstItem="imZ-yW-HcX" firstAttribute="height" secondItem="1ei-aa-raU" secondAttribute="height" id="XjE-pS-WaV"/>
+                            <constraint firstItem="wJI-Ic-3x7" firstAttribute="width" secondItem="imZ-yW-HcX" secondAttribute="width" id="esE-lS-Ei6"/>
+                            <constraint firstItem="4W1-LH-cwp" firstAttribute="centerY" secondItem="wJI-Ic-3x7" secondAttribute="centerY" id="hmq-kz-wgi"/>
+                            <constraint firstItem="Smk-bU-gvH" firstAttribute="width" secondItem="lgw-Bb-CZR" secondAttribute="width" id="hqW-RZ-EvH"/>
+                            <constraint firstItem="1ei-aa-raU" firstAttribute="leading" secondItem="aOa-CE-zRb" secondAttribute="leading" id="jt3-Ie-e1d"/>
+                            <constraint firstItem="aOa-CE-zRb" firstAttribute="leading" secondItem="Cg1-Fm-1DG" secondAttribute="leading" constant="16" id="kcE-xP-pip"/>
+                            <constraint firstItem="lgw-Bb-CZR" firstAttribute="leading" secondItem="1ei-aa-raU" secondAttribute="trailing" constant="27" id="ndp-09-ez1"/>
+                            <constraint firstItem="4W1-LH-cwp" firstAttribute="trailing" secondItem="Smk-bU-gvH" secondAttribute="trailing" id="qoM-k4-qMh"/>
+                            <constraint firstItem="Smk-bU-gvH" firstAttribute="top" secondItem="lgw-Bb-CZR" secondAttribute="bottom" constant="20" id="r7L-f7-hoV"/>
+                            <constraint firstItem="imZ-yW-HcX" firstAttribute="leading" secondItem="1ei-aa-raU" secondAttribute="trailing" constant="-100" id="rCg-tR-1gz"/>
+                            <constraint firstItem="4W1-LH-cwp" firstAttribute="top" secondItem="Smk-bU-gvH" secondAttribute="bottom" constant="27" id="wAV-fb-QsL"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="cuisineTextField" destination="Smk-bU-gvH" id="Yv8-l7-b4c"/>
+                        <outlet property="locationTextField" destination="lgw-Bb-CZR" id="UAi-os-QAb"/>
+                        <outlet property="priceTextField" destination="4W1-LH-cwp" id="R4D-1O-6fq"/>
+                        <outlet property="restaurantImageView" destination="1ei-aa-raU" id="lW5-8y-g7E"/>
+                        <outlet property="restaurantNameTextField" destination="aOa-CE-zRb" id="iAl-Pu-NEP"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="8Ko-fl-bJg" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1901.5999999999999" y="56.221889055472268"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="lET-T3-plO">
