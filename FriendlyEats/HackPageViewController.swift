@@ -98,7 +98,6 @@ class HackPageViewController: UIViewController {
     hackedRestaurant.category = "GARBAGE"
     hackedRestaurant.city = "HACKEDVILLE"
     hackedRestaurant.averageRating = 1
-    // TODO: Let's not hotlink to their site
     hackedRestaurant.photoURL = URL(string: "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_garbage.png")!
     let documentRef = Firestore.firestore().collection("restaurants").document(hackedRestaurant.documentID)
     documentRef.updateData(hackedRestaurant.documentData) { (error) in
@@ -155,7 +154,6 @@ class HackPageViewController: UIViewController {
   func hackOtherUser(_ user: User) {
     var hackedUser = user
     hackedUser.name = "JOHNNY MNEMONIC"
-    // TODO: Let's not hotlink to their site
     hackedUser.photoURL = URL(string: "https://storage.googleapis.com/firestorequickstarts.appspot.com/user_hacker.png")!
     let documentRef = Firestore.firestore().collection("users").document(hackedUser.documentID)
     documentRef.updateData(hackedUser.documentData) { (error) in
@@ -208,12 +206,8 @@ class HackPageViewController: UIViewController {
     }
   }
 
-
-
-
   override func viewDidLoad() {
     super.viewDidLoad()
   }
-
 
 }
