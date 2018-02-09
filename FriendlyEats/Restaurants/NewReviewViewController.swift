@@ -63,55 +63,19 @@ class NewReviewViewController: UIViewController, UITextFieldDelegate {
                         text: reviewTextField.text!,
                         date: Date(),
                         yumCount: 0)
-    let firestore = Firestore.firestore()
-    let restaurantReference = firestore.restaurants.document(restaurant.documentID)
-    let newReviewReference = firestore.reviews.document(review.documentID)
 
-    firestore.runTransaction({ (transaction, errorPointer) -> Any? in
-      // Read data from Firestore inside the transaction, so we don't accidentally
-      // update using staled client data. Error if we're unable to read here.
-      let restaurantSnapshot: DocumentSnapshot
-      do {
-        try restaurantSnapshot = transaction.getDocument(restaurantReference)
-      } catch let error as NSError {
-        errorPointer?.pointee = error
-        return nil
-      }
-
-      // Error if the restaurant data in Firestore has somehow changed or is malformed.
-      guard let restaurant = Restaurant(document: restaurantSnapshot) else {
-        let error = NSError(
-          domain: "FriendlyEatsErrorDomain",
-          code: 0,
-          userInfo: [
-            NSLocalizedDescriptionKey: "Unable to write to restaurant at Firestore path: \(restaurantReference.path)"
-          ]
-        )
-        errorPointer?.pointee = error
-        return nil
-      }
-
-      // Update the restaurant's rating and rating count and post the new review at the
-      // same time.
-      let newAverage =
-          (Double(restaurant.reviewCount) * restaurant.averageRating + Double(review.rating))
-          / Double(restaurant.reviewCount + 1)
-
-      transaction.setData(review.documentData, forDocument: newReviewReference)
-      transaction.updateData([
-        "reviewCount": restaurant.reviewCount + 1,
-        "averageRating": newAverage
-        ], forDocument: restaurantReference)
-      return nil
-    }) { (_, error) in
-      if let error = error {
-        print(error)
-      } else {
-        // Pop the review controller on success
-        if self.navigationController?.topViewController?.isKind(of: NewReviewViewController.self) ?? false {
-          self.navigationController?.popViewController(animated: true)
-        }
-      }
+    // Write the review to Firestore. Average ratings on the restaurant document
+    // being reviewed will be updated by a Cloud function.
+    Firestore.firestore().reviews.document(review.documentID)
+        .setData(review.documentData) { (error) in
+          if let error = error {
+            print(error)
+          } else {
+            // Pop the review controller on success
+            if self.navigationController?.topViewController?.isKind(of: NewReviewViewController.self) ?? false {
+              self.navigationController?.popViewController(animated: true)
+            }
+          }
     }
   }
 
