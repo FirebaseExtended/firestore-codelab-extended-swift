@@ -1,9 +1,16 @@
+//  Copyright (c) 2016 Google Inc.
 //
-//  EditRestaurantViewController.swift
-//  FriendlyEats
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
 //
-//  Created by Jen Person on 2/5/18.
-//  Copyright © 2018 Firebase. All rights reserved.
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 //
 
 import UIKit
@@ -38,7 +45,6 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
     if let _ = restaurant {
       populateRestaurant()
     }
-    //imagePicker.delegate = self as? UIImagePickerControllerDelegate & UINavigationControllerDelegate
   }
   
   // populate restaurant with current data
@@ -61,18 +67,18 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
     if let downloadUrl = downloadUrl {
       data["photoURL"] = downloadUrl
     }
-    Firestore.firestore().collection("restaurants").document((restaurant?.documentID)!).updateData(data){ err in
+    Firestore.firestore().collection("restaurants").document((restaurant?.documentID)!).updateData(data) { err in
       if let err = err {
         print("Error writing document: \(err)")
       } else {
-        self.didSaveAlert()
+        self.presentDidSaveAlert()
       }
     }
   }
   
   // MARK: Alert Messages
   
-  func didSaveAlert() {
+  func presentDidSaveAlert() {
     var message = "Successfully saved!"
     let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
     let okAction = UIAlertAction(title: "OK", style: .default) { action in
@@ -82,7 +88,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
     self.present(alertController, animated: true, completion: nil)
   }
   
-  func willSaveAlert() {
+  func presentWillSaveAlert() {
     let message = "Are you sure you want to save changes to this restaurant?"
     let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
     let saveAction = UIAlertAction(title: "Save", style: .default) { action in
@@ -96,7 +102,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
   }
   
   // If data in text fields isn't valid, give an alert
-  func invalidDataAlert(message: String) {
+  func presentInvalidDataAlert(message: String) {
     let title = "Invalid Input"
     let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
     let okAction = UIAlertAction(title: "Ok", style: .cancel, handler: nil)
@@ -147,7 +153,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
   }
   
   lazy var inputToolbar: UIToolbar = {
-    var toolbar = UIToolbar()
+    let toolbar = UIToolbar()
     toolbar.barStyle = .default
     toolbar.isTranslucent = true
     toolbar.sizeToFit()
@@ -173,7 +179,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
   }
   
   @IBAction func didSelectSaveChanges(_ sender: Any) {
-    willSaveAlert()
+    presentWillSaveAlert()
   }
   
 }
@@ -186,11 +192,12 @@ extension EditRestaurantViewController: UITextFieldDelegate {
   }
   
   func textFieldDidEndEditing(_ textField: UITextField) {
+    let text = textField.text?.trimmingCharacters(in: .whitespaces)
     if textField == priceTextField {
-      if textField.text != "1" && textField.text != "2" && textField.text != "3" {
+      if text != "1" && text != "2" && text != "3" {
         // return to previous text
         textField.text = restaurant?.price.description
-        invalidDataAlert(message: "Invalid price. Please enter a number from 1 to 3.")
+        presentInvalidDataAlert(message: "Invalid price. Please enter a number from 1 to 3.")
         return
       }
     }
