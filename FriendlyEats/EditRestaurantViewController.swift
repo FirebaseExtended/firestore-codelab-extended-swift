@@ -56,7 +56,6 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
             "city": locationTextField.text,
             "category": cuisineTextField.text,
             "price": Int(priceTextField.text!)
-            //"photoURL": dostuffhere
             ] as [String : Any]
         // if photo was changed, add the new url
         if let downloadUrl = downloadUrl {
@@ -84,7 +83,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
     }
     
     func willSaveAlert() {
-        var message = "Are you sure you want to save changes to this restaurant?"
+        let message = "Are you sure you want to save changes to this restaurant?"
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         let saveAction = UIAlertAction(title: "Save", style: .default) { action in
             self.saveChanges()
@@ -98,7 +97,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
     
     // If data in text fields isn't valid, give an alert
     func invalidDataAlert(message: String) {
-        var title = "Invalid Input"
+        let title = "Invalid Input"
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "Ok", style: .cancel, handler: nil)
         alertController.addAction(okAction)
@@ -117,6 +116,8 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
         }
         
     }
+    
+    // MARK: Keyboard functionality
     
     @objc func inputToolbarDonePressed() {
         resignFirstResponder()
@@ -165,6 +166,8 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
         
         return toolbar
     }()
+    
+    // MARK: IBActions
     
     @IBAction func selectNewImage(_ sender: Any) {
         selectImage()
