@@ -22,6 +22,10 @@ class HackPageViewController: UIViewController {
   @IBOutlet weak var changeRestNameStatus: UILabel!
   @IBOutlet weak var changeUserPicStatus: UILabel!
   @IBOutlet weak var addFakeReviewStatus: UILabel!
+  @IBOutlet weak var addBadDataStatus: UILabel!
+
+  let currentUserID = Auth.auth().currentUser?.uid
+
 
   static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> HackPageViewController {
     let controller = storyboard.instantiateViewController(withIdentifier: "HackPageViewController") as! HackPageViewController
@@ -36,12 +40,11 @@ class HackPageViewController: UIViewController {
         return
       }
       guard let documents = snapshotBlock?.documents else { return }
-      let currentUserID = Auth.auth().currentUser?.uid
 
       // Let's find a review that we didn't write
       for reviewDoc in documents {
         guard let review = Review(document: reviewDoc) else { continue }
-        if review.userInfo.userID != currentUserID {
+        if review.userInfo.userID != self.currentUserID {
           self.hackReview(review)
           // We only want to hack one review
           break
@@ -69,17 +72,142 @@ class HackPageViewController: UIViewController {
 
 
   @IBAction func changeRestNameWasTapped(_ sender: Any) {
+    Firestore.firestore().collection("restaurants").limit(to: 20).getDocuments { (snapshotBlock, error) in
+      if let error = error {
+        print("Received fetch error \(error)")
+        self.changeRestNameStatus.text = "Fetch error"
+        return
+      }
+      guard let documents = snapshotBlock?.documents else { return }
+
+      // Let's find a restaurant that we don't own
+      for restaurantDoc in documents {
+        guard let restaurant = Restaurant(document: restaurantDoc) else { continue }
+        if restaurant.ownerID != self.currentUserID {
+          self.hackOthersRestaurant(restaurant)
+          // We only want to hack one restaurant
+          break
+        }
+      }
+    }
   }
+
+  func hackOthersRestaurant(_ restaurant: Restaurant) {
+    var hackedRestaurant = restaurant
+    hackedRestaurant.name = "DON'T EAT HERE"
+    hackedRestaurant.category = "GARBAGE"
+    hackedRestaurant.city = "HACKEDVILLE"
+    hackedRestaurant.averageRating = 1
+    hackedRestaurant.photoURL = URL(string: "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_garbage.png")!
+    let documentRef = Firestore.firestore().collection("restaurants").document(hackedRestaurant.documentID)
+    documentRef.updateData(hackedRestaurant.documentData) { (error) in
+      if let error = error {
+        print("Could not update restaurant: \(error)")
+        self.changeRestNameStatus.text = "Hack failed!"
+      } else {
+        self.changeRestNameStatus.text = "Mischief Managed"
+      }
+    }
+  }
+
+  @IBAction func addInvalidResturantData(_ sender: Any) {
+    let badRestaurantData: [String : Any] = ["averageRating": "Good",
+                                             "category": "Sushi",
+                                             "city": 42.3,
+                                             "name": "a",
+                                             "ownerID": currentUserID!,
+                                             "photoURL": "https://storage.googleapis.com/firestorequickstarts.appspot.com/food_3.png",
+                                             "price": "expensive",
+                                             "reviewCount": -3]
+    Firestore.firestore().collection("restaurants").addDocument(data: badRestaurantData) { (error) in
+      if let error = error {
+        print("Could not update restaurant: \(error)")
+        self.addBadDataStatus.text = "Hack failed!"
+      } else {
+        self.addBadDataStatus.text = "Mischief Managed"
+      }
+    }
+
+  }
+
 
   @IBAction func changeUserPicWasTapped(_ sender: Any) {
+    Firestore.firestore().collection("users").limit(to: 20).getDocuments { (snapshotBlock, error) in
+      if let error = error {
+        print("Received fetch error \(error)")
+        self.changeUserPicStatus.text = "Fetch error"
+        return
+      }
+      guard let documents = snapshotBlock?.documents else { return }
+      // Let's find a user that isn't the current user
+      for userDoc in documents {
+        guard let user = User(document: userDoc) else { continue }
+        if user.userID != self.currentUserID {
+          self.hackOtherUser(user)
+          // We only want to hack one restaurant
+          break
+        }
+      }
+    }
   }
 
+  func hackOtherUser(_ user: User) {
+    var hackedUser = user
+    hackedUser.name = "JOHNNY MNEMONIC"
+    hackedUser.photoURL = URL(string: "https://storage.googleapis.com/firestorequickstarts.appspot.com/user_hacker.png")!
+    let documentRef = Firestore.firestore().collection("users").document(hackedUser.documentID)
+    documentRef.updateData(hackedUser.documentData) { (error) in
+      if let error = error {
+        print("Could not update user: \(error)")
+        self.changeUserPicStatus.text = "Hack failed!"
+      } else {
+        self.changeUserPicStatus.text = "Mischief Managed"
+      }
+    }
+  }
+
+
   @IBAction func addFakeReviewWasTapped(_ sender: Any) {
+    // TODO: It might be nice to have this write a review for a restarant that we own, although this would
+    // require our having a "Create a restaurant" page. :)
+    let myRestaurantQuery = Firestore.firestore().collection("restaurants").limit(to: 3)
+    myRestaurantQuery.getDocuments { (snapshotBlock, error) in
+      if let error = error {
+        print("Received fetch error \(error)")
+        self.addFakeReviewStatus.text = "Fetch error"
+        return
+      }
+      guard let documents = snapshotBlock?.documents else { return }
+      // Let's find a restaurant that we don't own
+      for restaurantDoc in documents {
+        guard let restaurant = Restaurant(document: restaurantDoc) else { continue }
+        self.writeFakeReviewFor(restaurant)
+      }
+    }
+  }
+
+  func writeFakeReviewFor(_ restaurant: Restaurant) {
+    let fakeUser = User(userID: "ABCDEFG",
+                        name: "Jane Fake",
+                        photoURL: URL(string: "https://storage.googleapis.com/firestorequickstarts.appspot.com/user_fake.png")!)
+    let fakeReview = Review(restaurantID: restaurant.documentID,
+                            rating: 5,
+                            userInfo: fakeUser,
+                            text: "This place is great! And I'm totally not making this up because I'm a fake person!",
+                            date: Date(),
+                            yumCount: 80)
+    Firestore.firestore().collection("reviews").addDocument(data: fakeReview.documentData) { (error) in
+      if let error = error {
+        print("Could not update user: \(error)")
+        self.addFakeReviewStatus.text = "Hack failed!"
+      } else {
+        self.addFakeReviewStatus.text = "Mischief Managed"
+      }
+    }
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
   }
-
 
 }
