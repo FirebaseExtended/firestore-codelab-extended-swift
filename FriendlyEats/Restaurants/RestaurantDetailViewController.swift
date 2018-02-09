@@ -20,12 +20,13 @@ import FirebaseFirestore
 import Firebase
 import FirebaseAuthUI
 
-class RestaurantDetailViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class RestaurantDetailViewController: UIViewController {
 
   // These are optional because we can't do initializer-level dependency injection with storyboards.
   var titleImageURL: URL?
   var restaurant: Restaurant?  
   var localCollection: LocalCollection<Review>!
+  var dataSource: ReviewTableViewDataSource!
 
   static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil))
       -> RestaurantDetailViewController {
@@ -53,7 +54,6 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
     tableView.backgroundView = backgroundView
     tableView.tableFooterView = UIView()
     
-    tableView.dataSource = self
     tableView.rowHeight = UITableViewAutomaticDimension
     tableView.estimatedRowHeight = 140
     
@@ -84,6 +84,11 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
       
       self.tableView.insertRows(at: indexPaths, with: .automatic)
     }
+
+    dataSource = ReviewTableViewDataSource(reviews: localCollection)
+    tableView.dataSource = dataSource
+    tableView.rowHeight = UITableViewAutomaticDimension
+    tableView.estimatedRowHeight = 140
   }
   
   deinit {
@@ -120,22 +125,6 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
       EditRestaurantViewController.fromStoryboard()
     controller.restaurant = self.restaurant
     self.navigationController?.pushViewController(controller, animated: true)
-  }
-  
-  
-  // MARK: - UITableViewDataSource
-  
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return localCollection.count
-  }
-  
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    
-    let cell = tableView.dequeueReusableCell(withIdentifier: "ReviewTableViewCell",
-                                             for: indexPath) as! ReviewTableViewCell
-    let review = localCollection[indexPath.row]
-    cell.populate(review: review)
-    return cell
   }
 
 }
