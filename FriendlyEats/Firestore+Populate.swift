@@ -124,7 +124,8 @@ extension Firestore {
     // an authentication provider (like Firebase Auth) instead of being generated.
     let users: [User] = (0 ..< userCount).map { _ in
       let uid = UUID().uuidString
-      return User(userID: uid)
+      let userName = User.randomUsername()
+      return User(userID: uid, name: userName, photoURL: nil)
     }
 
     func randomUser() -> User { return users[Int(arc4random_uniform(UInt32(userCount)))] }
