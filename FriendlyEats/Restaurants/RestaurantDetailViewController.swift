@@ -55,8 +55,8 @@ class RestaurantDetailViewController: UIViewController {
     tableView.tableFooterView = UIView()
     
     tableView.rowHeight = UITableViewAutomaticDimension
-    tableView.estimatedRowHeight = 140
-    
+    tableView.estimatedRowHeight = 120
+
     // enable edit button if owner of restaurant
     editButton.isHidden = true
     if restaurant?.ownerID == FirebaseAuth.Auth.auth().currentUser?.uid {
@@ -185,11 +185,82 @@ class ReviewTableViewCell: UITableViewCell {
   @IBOutlet var usernameLabel: UILabel!
   @IBOutlet var reviewContentsLabel: UILabel!
   @IBOutlet var starsView: ImmutableStarsView!
-  
+  @IBOutlet weak var yumsLabel: UILabel!
+  @IBOutlet weak var userIcon: UIImageView!
+  @IBOutlet weak var yumButton: UIButton!
+
+  var review: Review!
+
   func populate(review: Review) {
+    self.review = review
     usernameLabel.text = review.userInfo.name
+    userIcon.sd_setImage(with: review.userInfo.photoURL)
     starsView.rating = review.rating
     reviewContentsLabel.text = review.text
+    switch review.yumCount {
+    case 0:
+      yumsLabel.isHidden = true
+      break
+    case 1:
+      yumsLabel.isHidden = false
+      yumsLabel.text = "1 yum"
+      break
+    default:
+      yumsLabel.isHidden = false
+      yumsLabel.text = "\(review.yumCount) yums"
+    }
   }
-  
+
+  @IBAction func yumWasTapped(_ sender: Any) {
+    print("Yum was tapped!!")
+    let reviewReference = Firestore.firestore().collection("reviews").document(review.documentID)
+    Firestore.firestore().runTransaction({ (transaction, errorPointer) -> Any? in
+
+      // First, we're going to make sure we have the most up-to-date number of yums
+      let reviewSnapshot:DocumentSnapshot
+      do {
+        try reviewSnapshot = transaction.getDocument(reviewReference)
+      } catch let error as NSError {
+        errorPointer?.pointee = error
+        return nil
+      }
+
+      // We can convert our snapshot to a review object
+      guard let latestReview = Review(document: reviewSnapshot) else {
+        let error = NSError(domain: "FriendlyEatsErrorDomain", code: 0, userInfo: [
+          NSLocalizedDescriptionKey: "Review at \(reviewReference.path) didn't look like a valid review"
+        ])
+        errorPointer?.pointee = error
+        return nil
+      }
+
+      guard let currentUser = Auth.auth().currentUser else {
+        let error = NSError(domain: "FriendlyEatsErrorDomain", code: 0, userInfo: [
+          NSLocalizedDescriptionKey: "You need to be signed in to Yum a review"
+          ])
+        errorPointer?.pointee = error
+        return nil
+      }
+
+      // First we are going to write a simple "Yum" object into our subcollection...
+      let newYum = Yum(documentID: currentUser.uid, username: currentUser.displayName ?? "Unknown user")
+      let newYumReference = reviewReference.collection("yums").document(newYum.documentID)
+      transaction.setData(newYum.documentData, forDocument: newYumReference)
+
+      // Finally, we can update the "Yum" count
+      let newYumCount = latestReview.yumCount + 1
+      transaction.updateData(["yumCount": newYumCount], forDocument: reviewReference)
+
+      return nil
+
+    })  { (_, error) in
+      if let error = error {
+        print("Got an error attempting the transaction: \(error)")
+      } else {
+        print("Transaction successful!")
+      }
+    }
+
+  }
+
 }
