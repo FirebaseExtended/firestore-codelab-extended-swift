@@ -190,11 +190,9 @@ class ReviewTableViewCell: UITableViewCell {
     switch review.yumCount {
     case 0:
       yumsLabel.isHidden = true
-      break
     case 1:
       yumsLabel.isHidden = false
       yumsLabel.text = "1 yum"
-      break
     default:
       yumsLabel.isHidden = false
       yumsLabel.text = "\(review.yumCount) yums"
