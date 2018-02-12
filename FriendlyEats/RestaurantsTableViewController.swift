@@ -49,7 +49,6 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
   let backgroundView = UIImageView()
 
   private var restaurants: [Restaurant] = []
-  private var documents: [DocumentSnapshot] = []
 
   fileprivate var query: Query? {
     didSet {
@@ -82,9 +81,8 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
         }
       }
       self.restaurants = models
-      self.documents = snapshot.documents
 
-      if self.documents.count > 0 {
+      if self.restaurants.count > 0 {
         self.tableView.backgroundView = nil
       } else {
         self.tableView.backgroundView = self.backgroundView
@@ -215,7 +213,6 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
     let controller = RestaurantDetailViewController.fromStoryboard()
     controller.titleImageURL = restaurants[indexPath.row].photoURL
     controller.restaurant = restaurants[indexPath.row]
-    controller.restaurantReference = documents[indexPath.row].reference
     self.navigationController?.pushViewController(controller, animated: true)
   }
 
