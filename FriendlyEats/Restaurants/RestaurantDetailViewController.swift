@@ -72,17 +72,7 @@ class RestaurantDetailViewController: UIViewController {
       } else {
         self.tableView.backgroundView = nil
       }
-      var indexPaths: [IndexPath] = []
-      
-      // Only care about additions in this block, updating existing reviews probably not important
-      // as there's no way to edit reviews.
-      for addition in changes.filter({ $0.type == .added }) {
-        let index = self.localCollection.index(of: addition.document)!
-        let indexPath = IndexPath(row: index, section: 0)
-        indexPaths.append(indexPath)
-      }
-      
-      self.tableView.insertRows(at: indexPaths, with: .automatic)
+      self.tableView.reloadData()
     }
 
     dataSource = ReviewTableViewDataSource(reviews: localCollection)
@@ -212,7 +202,6 @@ class ReviewTableViewCell: UITableViewCell {
   }
 
   @IBAction func yumWasTapped(_ sender: Any) {
-    print("Yum was tapped!!")
     let reviewReference = Firestore.firestore().collection("reviews").document(review.documentID)
     Firestore.firestore().runTransaction({ (transaction, errorPointer) -> Any? in
 
