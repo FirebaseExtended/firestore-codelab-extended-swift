@@ -661,6 +661,7 @@
                         <outlet property="profileImageView" destination="Pgg-fp-P0X" id="9Cb-bQ-0bb"/>
                         <outlet property="tableView" destination="LIf-XY-xHJ" id="hab-OQ-xgN"/>
                         <outlet property="usernameLabel" destination="rBK-T6-PXC" id="cgh-ae-E7R"/>
+                        <outlet property="viewRestaurantsButton" destination="cNq-e6-84q" id="aDu-Mp-kQW"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="G8L-P3-jS2" userLabel="First Responder" sceneMemberID="firstResponder"/>
