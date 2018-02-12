@@ -20,15 +20,19 @@ import FirebaseFirestore
 import Firebase
 import FirebaseAuthUI
 
-class RestaurantDetailViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, NewReviewViewControllerDelegate {
+class RestaurantDetailViewController: UIViewController {
 
   // These are optional because we can't do initializer-level dependency injection with storyboards.
   var titleImageURL: URL?
   var restaurant: Restaurant?  
   var localCollection: LocalCollection<Review>!
-  
-  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> RestaurantDetailViewController {
-    let controller = storyboard.instantiateViewController(withIdentifier: "RestaurantDetailViewController") as! RestaurantDetailViewController
+  var dataSource: ReviewTableViewDataSource!
+
+  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil))
+      -> RestaurantDetailViewController {
+    let controller =
+        storyboard.instantiateViewController(withIdentifier: "RestaurantDetailViewController")
+        as! RestaurantDetailViewController
     return controller
   }
   
@@ -50,7 +54,6 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
     tableView.backgroundView = backgroundView
     tableView.tableFooterView = UIView()
     
-    tableView.dataSource = self
     tableView.rowHeight = UITableViewAutomaticDimension
     tableView.estimatedRowHeight = 140
     
@@ -81,6 +84,11 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
       
       self.tableView.insertRows(at: indexPaths, with: .automatic)
     }
+
+    dataSource = ReviewTableViewDataSource(reviews: localCollection)
+    tableView.dataSource = dataSource
+    tableView.rowHeight = UITableViewAutomaticDimension
+    tableView.estimatedRowHeight = 140
   }
   
   deinit {
@@ -108,8 +116,7 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
   }
   
   @IBAction func didTapAddButton(_ sender: Any) {
-    let controller = NewReviewViewController.fromStoryboard()
-    controller.delegate = self
+    let controller = NewReviewViewController.fromStoryboard(forRestaurant: self.restaurant!)
     self.navigationController?.pushViewController(controller, animated: true)
   }
   
@@ -119,29 +126,7 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
     controller.restaurant = self.restaurant
     self.navigationController?.pushViewController(controller, animated: true)
   }
-  
-  
-  // MARK: - UITableViewDataSource
-  
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return localCollection.count
-  }
-  
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    
-    let cell = tableView.dequeueReusableCell(withIdentifier: "ReviewTableViewCell",
-                                             for: indexPath) as! ReviewTableViewCell
-    let review = localCollection[indexPath.row]
-    cell.populate(review: review)
-    return cell
-  }
-  
-  // MARK: - NewReviewViewControllerDelegate
-  
-  func reviewController(_ controller: NewReviewViewController, didSubmitFormWithReview review: Review) {
-    // TODO: write transaction logic for creating new review.
-  }
-  
+
 }
 
 class RestaurantTitleView: UIView {
@@ -163,7 +148,8 @@ class RestaurantTitleView: UIView {
   @IBOutlet var titleImageView: UIImageView! {
     didSet {
       let gradient = CAGradientLayer()
-      gradient.colors = [UIColor(red: 0, green: 0, blue: 0, alpha: 0.6).cgColor, UIColor.clear.cgColor]
+      gradient.colors =
+          [UIColor(red: 0, green: 0, blue: 0, alpha: 0.6).cgColor, UIColor.clear.cgColor]
       gradient.locations = [0.0, 1.0]
       
       gradient.startPoint = CGPoint(x: 0, y: 1)

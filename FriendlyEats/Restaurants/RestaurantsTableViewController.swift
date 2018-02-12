@@ -15,8 +15,6 @@
 //
 
 import UIKit
-import FirebaseAuthUI
-import FirebaseGoogleAuthUI
 import FirebaseFirestore
 import SDWebImage
 
@@ -141,11 +139,6 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
 
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-    let auth = FUIAuth.defaultAuthUI()!
-    if auth.auth?.currentUser == nil {
-      auth.providers = []
-      present(auth.authViewController(), animated: true, completion: nil)
-    }
   }
 
   override func viewWillDisappear(_ animated: Bool) {

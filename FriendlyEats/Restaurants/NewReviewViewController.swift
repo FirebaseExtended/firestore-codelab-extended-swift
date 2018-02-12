@@ -20,12 +20,15 @@ import FirebaseAuth
 
 class NewReviewViewController: UIViewController, UITextFieldDelegate {
 
-  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> NewReviewViewController {
+  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil),
+                             forRestaurant restaurant: Restaurant) -> NewReviewViewController {
     let controller = storyboard.instantiateViewController(withIdentifier: "NewReviewViewController") as! NewReviewViewController
+    controller.restaurant = restaurant
     return controller
   }
 
-  weak var delegate: NewReviewViewControllerDelegate?
+  /// The restaurant being reviewed. This must be set when the controller is created.
+  private var restaurant: Restaurant!
 
   @IBOutlet var doneButton: UIBarButtonItem!
 
@@ -52,7 +55,28 @@ class NewReviewViewController: UIViewController, UITextFieldDelegate {
   }
 
   @IBAction func doneButtonPressed(_ sender: Any) {
-    // TODO: Re-write this with new data types.
+    // TODO: handle user not logged in.
+    guard let user = Auth.auth().currentUser.flatMap(User.init) else { return }
+    let review = Review(restaurantID: restaurant.documentID,
+                        rating: ratingView.rating!,
+                        userInfo: user,
+                        text: reviewTextField.text!,
+                        date: Date(),
+                        yumCount: 0)
+
+    // Write the review to Firestore. Average ratings on the restaurant document
+    // being reviewed will be updated by a Cloud function.
+    Firestore.firestore().reviews.document(review.documentID)
+        .setData(review.documentData) { (error) in
+          if let error = error {
+            print(error)
+          } else {
+            // Pop the review controller on success
+            if self.navigationController?.topViewController?.isKind(of: NewReviewViewController.self) ?? false {
+              self.navigationController?.popViewController(animated: true)
+            }
+          }
+    }
   }
 
   @objc func ratingDidChange(_ sender: Any) {
@@ -73,9 +97,3 @@ class NewReviewViewController: UIViewController, UITextFieldDelegate {
   }
 
 }
-
-protocol NewReviewViewControllerDelegate: NSObjectProtocol {
-  func reviewController(_ controller: NewReviewViewController, didSubmitFormWithReview review: Review)
-}
-
-
