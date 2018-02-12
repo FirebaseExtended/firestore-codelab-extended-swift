@@ -24,9 +24,7 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
 
   // These are optional because we can't do initializer-level dependency injection with storyboards.
   var titleImageURL: URL?
-  var restaurant: Restaurant?
-  var restaurantReference: DocumentReference?
-  
+  var restaurant: Restaurant?  
   var localCollection: LocalCollection<Review>!
   
   static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> RestaurantDetailViewController {
