@@ -110,3 +110,23 @@ extension User: DocumentSerializable {
   }
 
 }
+
+// MARK: - Data generation
+
+
+/// A helper for user generation.
+extension User {
+
+  static let firstNames = ["Sophia", "Jackson", "Olivia", "Liam", "Emma", "Noah", "Ava", "Aiden",
+                            "Isabella", "Lucas", "Mia", "Caden", "Aria", "Grayson", "Riley", "Mason"]
+
+  static let lastNames = ["Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson",
+                          "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin",
+                          "Thompson", "Garcia", "Martinez", "Robinson", "Clark", "Rodriguez", "Lewis", "Lee"]
+
+  static func randomUsername() -> String {
+    let randomIndexes = (RandomUniform(firstNames.count), RandomUniform(lastNames.count))
+    return firstNames[randomIndexes.0] + " " + lastNames[randomIndexes.1]
+  }
+  
+}
