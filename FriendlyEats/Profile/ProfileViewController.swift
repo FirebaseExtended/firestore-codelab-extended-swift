@@ -56,6 +56,7 @@ class ProfileViewController: UIViewController {
 
   @IBOutlet private var profileImageView: UIImageView!
   @IBOutlet private var usernameLabel: UILabel!
+  @IBOutlet private var viewRestaurantsButton: UIButton!
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -98,10 +99,11 @@ class ProfileViewController: UIViewController {
     if let user = user {
       profileImageView.sd_setImage(with: user.photoURL)
       usernameLabel.text = user.name
+      viewRestaurantsButton.isEnabled = true
     } else {
       profileImageView.image = nil
       usernameLabel.text = "Not logged in"
-      // TODO disable view my restaurants button
+      viewRestaurantsButton.isEnabled = false
     }
   }
 
