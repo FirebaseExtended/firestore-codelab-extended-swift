@@ -23,6 +23,7 @@ import FirebaseFirestore
 @objc class ReviewTableViewDataSource: NSObject, UITableViewDataSource {
 
   let reviews: LocalCollection<Review>
+  var sectionTitle: String?
 
   /// Returns an instance of ReviewTableViewDataSource. Consumers should update the
   /// table view with new data from Firestore in the updateHandler closure.
@@ -38,6 +39,9 @@ import FirebaseFirestore
   }
 
   // MARK: - UITableViewDataSource
+  func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    return sectionTitle
+  }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return reviews.count
