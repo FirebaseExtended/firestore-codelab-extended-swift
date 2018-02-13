@@ -17,79 +17,70 @@ import UIKit
 import Firebase
 import FirebaseStorage
 
-class EditRestaurantViewController: UIViewController, UINavigationControllerDelegate {
-  
+class AddRestaurantViewController: UIViewController, UINavigationControllerDelegate {
+
   // MARK: Properties
-  
-  private var restaurant: Restaurant!
+
+  private var user: User!
+  private lazy var restaurant: Restaurant = {
+    return Restaurant(ownerID: user.userID, name: "", category: "", city: "", price: 0, reviewCount: 0, averageRating: 0, photoURL: Restaurant.randomPhotoURL())
+  }()
   private var imagePicker = UIImagePickerController()
   private var downloadUrl: String?
-  
+
   // MARK: Outlets
-  
-  @IBOutlet private weak var restaurantImageView: UIImageView!
+
+  @IBOutlet private weak var restaurantImageView: UIImageView! // TODO: this is currently invisible, which is not great UI
   @IBOutlet private weak var restaurantNameTextField: UITextField!
   @IBOutlet private weak var locationTextField: UITextField!
   @IBOutlet private weak var cuisineTextField: UITextField!
   @IBOutlet private weak var priceTextField: UITextField!
-  
-  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil),
-                             restaurant: Restaurant) -> EditRestaurantViewController {
-    let controller = storyboard.instantiateViewController(withIdentifier: "EditRestaurantViewController")
-        as! EditRestaurantViewController
-    controller.restaurant = restaurant
+
+  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil))
+      -> AddRestaurantViewController {
+    let controller = storyboard.instantiateViewController(withIdentifier: "AddRestaurantViewController")
+      as! AddRestaurantViewController
     return controller
   }
-  
+
   override func viewDidLoad() {
     super.viewDidLoad()
+    user = User(user: Auth.auth().currentUser!)
     restaurantImageView.contentMode = .scaleAspectFill
     restaurantImageView.clipsToBounds = true
     hideKeyboardWhenTappedAround()
-    if let _ = restaurant {
-      populateRestaurant()
-    }
   }
-  
-  // populate restaurant with current data
-  func populateRestaurant() {
-    restaurantNameTextField.text = restaurant.name
-    locationTextField.text = restaurant.city
-    cuisineTextField.text = restaurant.category
-    priceTextField.text = restaurant.price.description
-    restaurantImageView.sd_setImage(with: restaurant.photoURL)
-  }
-  
+
   func saveChanges() {
     guard let name = restaurantNameTextField.text,
-        let city = locationTextField.text,
-        let category = cuisineTextField.text,
-        let price = priceTextField.text.flatMap(Int.init) else {
-          return // TODO: consider logging an error here.
+      let city = locationTextField.text,
+      let category = cuisineTextField.text,
+      let price = priceTextField.text.flatMap(Int.init) else {
+        self.presentInvalidDataAlert(message: "All fields must be filled out and price must be an integer from 1 to 3.")
+        return
     }
-    var data = [
-      "name": name,
-      "city": city,
-      "category": category,
-      "price": price
-      ] as [String : Any]
+    restaurant.name = name
+    restaurant.city = city
+    restaurant.category = category
+    restaurant.price = price
     // if photo was changed, add the new url
     if let downloadUrl = downloadUrl {
-      data["photoURL"] = downloadUrl
+      restaurant.photoURL = URL(string: downloadUrl)!
     }
-    Firestore.firestore().collection("restaurants").document(restaurant.documentID).updateData(data) { err in
-      if let err = err {
-        print("Error writing document: \(err)")
-      } else {
-        self.presentDidSaveAlert()
-      }
+    Firestore.firestore().restaurants.document(restaurant.documentID)
+        .setData(restaurant.documentData) { err in
+          if let err = err {
+            print("Error writing document: \(err)")
+          } else {
+            self.presentDidSaveAlert()
+          }
     }
   }
-  
+
   // MARK: Alert Messages
-  
+
   func presentDidSaveAlert() {
-    let message = "Successfully saved!"
+    let message = "Restaurant added successfully!"
     let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
     let okAction = UIAlertAction(title: "OK", style: .default) { action in
       self.navigationController?.popViewController(animated: true)
@@ -97,20 +88,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
     alertController.addAction(okAction)
     self.present(alertController, animated: true, completion: nil)
   }
-  
-  func presentWillSaveAlert() {
-    let message = "Are you sure you want to save changes to this restaurant?"
-    let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-    let saveAction = UIAlertAction(title: "Save", style: .default) { action in
-      self.saveChanges()
-    }
-    let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-    alertController.addAction(saveAction)
-    alertController.addAction(cancelAction)
-    
-    self.present(alertController, animated: true, completion: nil)
-  }
-  
+
   // If data in text fields isn't valid, give an alert
   func presentInvalidDataAlert(message: String) {
     let title = "Invalid Input"
@@ -119,7 +97,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
     alertController.addAction(okAction)
     self.present(alertController, animated: true, completion: nil)
   }
-  
+
   func saveImage(photoData: Data) {
     Storage.storage().reference(withPath: restaurant.documentID).putData(photoData, metadata: nil) { (metadata, error) in
       if let error = error {
@@ -131,13 +109,13 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
       self.downloadUrl = metadata.downloadURL()?.absoluteString
     }
   }
-  
+
   // MARK: Keyboard functionality
-  
+
   @objc func inputToolbarDonePressed() {
     resignFirstResponder()
   }
-  
+
   @objc func keyboardNextButton() {
     if locationTextField.isFirstResponder {
       cuisineTextField.becomeFirstResponder()
@@ -149,7 +127,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
       resignFirstResponder()
     }
   }
-  
+
   @objc func keyboardPreviousButton() {
     if locationTextField.isFirstResponder {
       restaurantNameTextField.becomeFirstResponder()
@@ -161,46 +139,46 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
       resignFirstResponder()
     }
   }
-  
+
   lazy var inputToolbar: UIToolbar = {
     let toolbar = UIToolbar()
     toolbar.barStyle = .default
     toolbar.isTranslucent = true
     toolbar.sizeToFit()
-    
+
     var doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(self.inputToolbarDonePressed))
     var flexibleSpaceButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
     var fixedSpaceButton = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
-    
+
     var nextButton  = UIBarButtonItem(image: #imageLiteral(resourceName: "ic_keyboard_arrow_left"), style: .plain, target: self, action: #selector(self.keyboardPreviousButton))
     nextButton.width = 50.0
     var previousButton  = UIBarButtonItem(image: #imageLiteral(resourceName: "ic_keyboard_arrow_right"), style: .plain, target: self, action: #selector(self.keyboardNextButton))
-    
+
     toolbar.setItems([fixedSpaceButton, nextButton, fixedSpaceButton, previousButton, flexibleSpaceButton, doneButton], animated: false)
     toolbar.isUserInteractionEnabled = true
-    
+
     return toolbar
   }()
-  
+
   // MARK: IBActions
-  
+
   @IBAction func selectNewImage(_ sender: Any) {
     selectImage()
   }
-  
-  @IBAction func didSelectSaveChanges(_ sender: Any) {
-    presentWillSaveAlert()
+
+  @IBAction func didPressSaveButton(_ sender: Any) {
+    saveChanges()
   }
-  
+
 }
 
-extension EditRestaurantViewController: UITextFieldDelegate {
-  
+extension AddRestaurantViewController: UITextFieldDelegate {
+
   func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
     textField.inputAccessoryView = inputToolbar
     return true
   }
-  
+
   func textFieldDidEndEditing(_ textField: UITextField) {
     let text = textField.text?.trimmingCharacters(in: .whitespaces)
     if textField == priceTextField {
@@ -212,43 +190,31 @@ extension EditRestaurantViewController: UITextFieldDelegate {
       }
     }
   }
-  
+
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     textField.resignFirstResponder()
     return true
   }
 }
 
-extension EditRestaurantViewController: UIImagePickerControllerDelegate {
-  
+extension AddRestaurantViewController: UIImagePickerControllerDelegate {
+
   func selectImage() {
     imagePicker.delegate = self
     if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum){
-      
+
       imagePicker.sourceType = .savedPhotosAlbum;
       imagePicker.allowsEditing = false
-      
+
       self.present(imagePicker, animated: true, completion: nil)
     }
   }
-  
+
   func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-    
+
     if let photo = info[UIImagePickerControllerOriginalImage] as? UIImage, let photoData = UIImageJPEGRepresentation(photo, 0.8) {
       saveImage(photoData: photoData)
     }
     self.dismiss(animated: true, completion: nil)
-  }
-}
-
-extension UIViewController {
-  func hideKeyboardWhenTappedAround() {
-    let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
-    tap.cancelsTouchesInView = false
-    view.addGestureRecognizer(tap)
-  }
-
-  @objc func dismissKeyboard() {
-    view.endEditing(true)
   }
 }

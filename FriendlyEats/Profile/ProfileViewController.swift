@@ -89,7 +89,13 @@ class ProfileViewController: UIViewController {
 
   fileprivate func setUser(firebaseUser: FirebaseAuth.UserInfo?) {
     if let firebaseUser = firebaseUser {
-      user = User(user: firebaseUser)
+      let user = User(user: firebaseUser)
+      self.user = user
+      Firestore.firestore().users.document(user.userID).setData(user.documentData) { error in
+        if let error = error {
+          print("Error writing user to Firestore: \(error)")
+        }
+      }
     } else {
       user = nil
     }
@@ -109,13 +115,13 @@ class ProfileViewController: UIViewController {
 
   fileprivate func populateReviews(forUser user: User) {
     let query = Firestore.firestore().reviews.whereField("userInfo.userID", isEqualTo: user.userID)
-    dataSource = ReviewTableViewDataSource(query: query) { [weak self] (changes) in
-      self?.tableView.reloadData()
-      guard let reviews = self?.dataSource?.reviews else { return }
+    dataSource = ReviewTableViewDataSource(query: query) { [unowned self] (changes) in
+      self.tableView.reloadData()
+      guard let reviews = self.dataSource?.reviews else { return }
       if reviews.count > 0 {
-        self?.tableView.backgroundView = nil
+        self.tableView.backgroundView = nil
       } else {
-        self?.tableView.backgroundView = self?.tableBackgroundLabel
+        self.tableView.backgroundView = self.tableBackgroundLabel
       }
     }
     dataSource?.reviews.listen()
@@ -134,7 +140,8 @@ class ProfileViewController: UIViewController {
   }
 
   @IBAction private func didTapViewRestaurantsButton(_ sender: Any) {
-    // TODO: Segue to a new controller listing the user's owned restaurants.
+    let controller = MyRestaurantsViewController.fromStoryboard()
+    self.navigationController?.pushViewController(controller, animated: true)
   }
 
   @IBAction private func didTapSignOutButton(_ sender: Any) {

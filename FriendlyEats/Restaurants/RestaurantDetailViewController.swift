@@ -23,16 +23,16 @@ import FirebaseAuthUI
 class RestaurantDetailViewController: UIViewController {
 
   // These are optional because we can't do initializer-level dependency injection with storyboards.
-  var titleImageURL: URL?
-  var restaurant: Restaurant?  
-  var localCollection: LocalCollection<Review>!
-  var dataSource: ReviewTableViewDataSource!
+  private var restaurant: Restaurant!
+  private var localCollection: LocalCollection<Review>!
+  private var dataSource: ReviewTableViewDataSource!
 
-  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil))
-      -> RestaurantDetailViewController {
+  static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil),
+                             restaurant: Restaurant) -> RestaurantDetailViewController {
     let controller =
         storyboard.instantiateViewController(withIdentifier: "RestaurantDetailViewController")
         as! RestaurantDetailViewController
+    controller.restaurant = restaurant
     return controller
   }
   
@@ -45,7 +45,7 @@ class RestaurantDetailViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    self.title = restaurant?.name
+    self.title = restaurant.name
     navigationController?.navigationBar.tintColor = UIColor.white
     
     backgroundView.image = UIImage(named: "pizza-monster")!
@@ -59,7 +59,7 @@ class RestaurantDetailViewController: UIViewController {
     
     // enable edit button if owner of restaurant
     editButton.isHidden = true
-    if restaurant?.ownerID == FirebaseAuth.Auth.auth().currentUser?.uid {
+    if restaurant.ownerID == FirebaseAuth.Auth.auth().currentUser?.uid {
       editButton.isHidden = false
     }
 
@@ -98,10 +98,7 @@ class RestaurantDetailViewController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     localCollection.listen()
-    titleView.populate(restaurant: restaurant!)
-    if let url = titleImageURL {
-      titleView.populateImage(url: url)
-    }
+    titleView.populate(restaurant: restaurant)
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -122,8 +119,7 @@ class RestaurantDetailViewController: UIViewController {
   
   @IBAction func didTapEditButton(_ sender: Any) {
     let controller =
-      EditRestaurantViewController.fromStoryboard()
-    controller.restaurant = self.restaurant
+      EditRestaurantViewController.fromStoryboard(restaurant: restaurant)
     self.navigationController?.pushViewController(controller, animated: true)
   }
 
@@ -165,17 +161,13 @@ class RestaurantTitleView: UIView {
     }
   }
   
-  func populateImage(url: URL) {
-    titleImageView.sd_setImage(with: url)
-  }
-  
   func populate(restaurant: Restaurant) {
     nameLabel.text = restaurant.name
     categoryLabel.text = restaurant.category
     cityLabel.text = restaurant.city
     priceLabel.text = priceString(from: restaurant.price)
     starsView.rating = Int(restaurant.averageRating.rounded())
-    populateImage(url: restaurant.photoURL)
+    titleImageView.sd_setImage(with: restaurant.photoURL)
   }
   
 }
