@@ -191,6 +191,7 @@ class HackPageViewController: UIViewController {
                         name: "Jane Fake",
                         photoURL: URL(string: "https://storage.googleapis.com/firestorequickstarts.appspot.com/user_fake.png")!)
     let fakeReview = Review(restaurantID: restaurant.documentID,
+                            restaurantName: restaurant.name,
                             rating: 5,
                             userInfo: fakeUser,
                             text: "This place is great! And I'm totally not making this up because I'm a fake person!",

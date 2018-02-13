@@ -172,19 +172,21 @@ class RestaurantTitleView: UIView {
 
 class ReviewTableViewCell: UITableViewCell {
   
-  @IBOutlet var usernameLabel: UILabel!
+  @IBOutlet var usernameLabel: UILabel?
   @IBOutlet var reviewContentsLabel: UILabel!
   @IBOutlet var starsView: ImmutableStarsView!
   @IBOutlet weak var yumsLabel: UILabel!
-  @IBOutlet weak var userIcon: UIImageView!
+  @IBOutlet weak var userIcon: UIImageView?
   @IBOutlet weak var yumButton: UIButton!
+  @IBOutlet weak var restaurantNameLabel: UILabel?
 
   var review: Review!
 
   func populate(review: Review) {
     self.review = review
-    usernameLabel.text = review.userInfo.name
-    userIcon.sd_setImage(with: review.userInfo.photoURL)
+    restaurantNameLabel?.text = review.restaurantName
+    usernameLabel?.text = review.userInfo.name
+    userIcon?.sd_setImage(with: review.userInfo.photoURL)
     starsView.rating = review.rating
     reviewContentsLabel.text = review.text
     switch review.yumCount {
