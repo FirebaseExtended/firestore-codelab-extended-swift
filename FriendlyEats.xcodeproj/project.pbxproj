@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		360549AC2028D56E0090317C /* EditRestaurantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360549AB2028D56E0090317C /* EditRestaurantViewController.swift */; };
 		36BB298A2024F2D8003687EC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 36BB29892024F2D8003687EC /* GoogleService-Info.plist */; };
+		496B609A203363A9005AD625 /* ReviewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496B6099203363A9005AD625 /* ReviewTableViewCell.swift */; };
 		49C24867202A237000D6008A /* HackPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C24866202A237000D6008A /* HackPageViewController.swift */; };
 		8D004D2D1EE879B5004DEF35 /* FiltersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D004D2C1EE879B5004DEF35 /* FiltersViewController.swift */; };
 		8D2A2A0B202BC3B600343C13 /* ReviewTableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2A2A0A202BC3B600343C13 /* ReviewTableViewDataSource.swift */; };
@@ -44,6 +45,7 @@
 /* Begin PBXFileReference section */
 		360549AB2028D56E0090317C /* EditRestaurantViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditRestaurantViewController.swift; sourceTree = "<group>"; };
 		36BB29892024F2D8003687EC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
+		496B6099203363A9005AD625 /* ReviewTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTableViewCell.swift; sourceTree = "<group>"; };
 		49C24866202A237000D6008A /* HackPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackPageViewController.swift; sourceTree = "<group>"; };
 		8D004D2C1EE879B5004DEF35 /* FiltersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiltersViewController.swift; sourceTree = "<group>"; };
 		8D2A2A0A202BC3B600343C13 /* ReviewTableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTableViewDataSource.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				8DF77E1B1EEB645100CB2330 /* StarsView.swift */,
 				8D70C1B9201FECE2007D3082 /* Firestore+Populate.swift */,
 				8D2A2A0A202BC3B600343C13 /* ReviewTableViewDataSource.swift */,
+				496B6099203363A9005AD625 /* ReviewTableViewCell.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -298,6 +301,7 @@
 				8D004D2D1EE879B5004DEF35 /* FiltersViewController.swift in Sources */,
 				8D82F5C5201FE6CE00107172 /* Yum.swift in Sources */,
 				8D82F5C3201FCF5E00107172 /* User.swift in Sources */,
+				496B609A203363A9005AD625 /* ReviewTableViewCell.swift in Sources */,
 				8DF77E1C1EEB645100CB2330 /* StarsView.swift in Sources */,
 				8D2A2A0B202BC3B600343C13 /* ReviewTableViewDataSource.swift in Sources */,
 			);
