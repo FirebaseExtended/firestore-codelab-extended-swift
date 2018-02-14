@@ -723,7 +723,7 @@
         <scene sceneID="Ihz-oT-jZj">
             <objects>
                 <navigationController title="Restaurants" automaticallyAdjustsScrollViewInsets="NO" id="e54-7U-CFe" userLabel="Restaurants" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Restaurants" id="0zk-H7-4FD"/>
+                    <tabBarItem key="tabBarItem" title="Restaurants" image="ic_restaurant" id="0zk-H7-4FD"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="kyk-CK-Ncr">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
@@ -989,7 +989,7 @@
         <scene sceneID="Vg3-Xy-4F6">
             <objects>
                 <navigationController title="Profile" automaticallyAdjustsScrollViewInsets="NO" id="W0I-RW-T34" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Profile" id="bT8-Mg-7xO"/>
+                    <tabBarItem key="tabBarItem" title="Profile" image="ic_person" id="bT8-Mg-7xO"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="xbV-jX-Jcq">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
@@ -1005,4 +1005,8 @@
             <point key="canvasLocation" x="-225" y="-1345"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="ic_person" width="24" height="24"/>
+        <image name="ic_restaurant" width="24" height="24"/>
+    </resources>
 </document>
