@@ -60,7 +60,6 @@ class ProfileViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    tableView.delegate = self
     tableBackgroundLabel.text = "There aren't any reviews here."
     tableView.backgroundView = tableBackgroundLabel
   }
@@ -124,6 +123,7 @@ class ProfileViewController: UIViewController {
         self.tableView.backgroundView = self.tableBackgroundLabel
       }
     }
+    dataSource?.sectionTitle = "My reviews"
     dataSource?.reviews.listen()
     tableView.dataSource = dataSource
   }
@@ -151,14 +151,4 @@ class ProfileViewController: UIViewController {
       print("Error signing out: \(error)")
     }
   }
-}
-
-// MARK: - UITableViewDelegate
-
-extension ProfileViewController: UITableViewDelegate {
-
-  func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    return 0
-  }
-
 }

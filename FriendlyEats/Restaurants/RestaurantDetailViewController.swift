@@ -55,8 +55,8 @@ class RestaurantDetailViewController: UIViewController {
     tableView.tableFooterView = UIView()
     
     tableView.rowHeight = UITableViewAutomaticDimension
-    tableView.estimatedRowHeight = 140
-    
+    tableView.estimatedRowHeight = 120
+
     // enable edit button if owner of restaurant
     editButton.isHidden = true
     if restaurant.ownerID == FirebaseAuth.Auth.auth().currentUser?.uid {
@@ -72,17 +72,7 @@ class RestaurantDetailViewController: UIViewController {
       } else {
         self.tableView.backgroundView = nil
       }
-      var indexPaths: [IndexPath] = []
-      
-      // Only care about additions in this block, updating existing reviews probably not important
-      // as there's no way to edit reviews.
-      for addition in changes.filter({ $0.type == .added }) {
-        let index = self.localCollection.index(of: addition.document)!
-        let indexPath = IndexPath(row: index, section: 0)
-        indexPaths.append(indexPath)
-      }
-      
-      self.tableView.insertRows(at: indexPaths, with: .automatic)
+      self.tableView.reloadData()
     }
 
     dataSource = ReviewTableViewDataSource(reviews: localCollection)
@@ -172,16 +162,3 @@ class RestaurantTitleView: UIView {
   
 }
 
-class ReviewTableViewCell: UITableViewCell {
-  
-  @IBOutlet var usernameLabel: UILabel!
-  @IBOutlet var reviewContentsLabel: UILabel!
-  @IBOutlet var starsView: ImmutableStarsView!
-  
-  func populate(review: Review) {
-    usernameLabel.text = review.userInfo.name
-    starsView.rating = review.rating
-    reviewContentsLabel.text = review.text
-  }
-  
-}

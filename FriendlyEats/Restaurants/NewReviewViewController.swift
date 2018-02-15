@@ -58,6 +58,7 @@ class NewReviewViewController: UIViewController, UITextFieldDelegate {
     // TODO: handle user not logged in.
     guard let user = Auth.auth().currentUser.flatMap(User.init) else { return }
     let review = Review(restaurantID: restaurant.documentID,
+                        restaurantName: restaurant.name,
                         rating: ratingView.rating!,
                         userInfo: user,
                         text: reviewTextField.text!,

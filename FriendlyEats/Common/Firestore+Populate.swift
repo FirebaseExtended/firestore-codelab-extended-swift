@@ -205,6 +205,7 @@ extension Firestore {
         restaurants[i] = restaurant
 
         return Review(restaurantID: restaurantID,
+                      restaurantName: restaurant.name,
                       rating: rating,
                       userInfo: userInfo,
                       text: text,

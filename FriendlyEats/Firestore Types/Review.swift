@@ -25,6 +25,9 @@ struct Review {
   /// The restaurant that this review is reviewing.
   var restaurantID: String
 
+  /// The name of the restaurant for this review.
+  var restaurantName: String
+
   /// The rating given to the restaurant. Values range between 1 and 5.
   var rating: Int
 
@@ -50,15 +53,17 @@ extension Review: DocumentSerializable {
   /// the User object is not serializable.
   private init?(documentID: String, dictionary: [String : Any]) {
     guard let restaurantID = dictionary["restaurantID"] as? String,
+        let restaurantName = dictionary["restaurantName"] as? String,
         let rating = dictionary["rating"] as? Int,
         let userInfo = dictionary["userInfo"] as? [String: Any],
         let text = dictionary["text"] as? String,
         let date = dictionary["date"] as? Date,
         let yumCount = dictionary["yumCount"] as? Int else { return nil }
-
+    
     guard let user = User(dictionary: userInfo) else { return nil }
     self.init(documentID: documentID,
               restaurantID: restaurantID,
+              restaurantName: restaurantName,
               rating: rating,
               userInfo: user,
               text: text,
@@ -76,6 +81,7 @@ extension Review: DocumentSerializable {
   }
 
   public init(restaurantID: String,
+              restaurantName: String,
               rating: Int,
               userInfo: User,
               text: String,
@@ -84,6 +90,7 @@ extension Review: DocumentSerializable {
     let document = Firestore.firestore().reviews.document()
     self.init(documentID: document.documentID,
               restaurantID: restaurantID,
+              restaurantName: restaurantName,
               rating: rating,
               userInfo: userInfo,
               text: text,
@@ -95,6 +102,7 @@ extension Review: DocumentSerializable {
   var documentData: [String: Any] {
     return [
       "restaurantID": restaurantID,
+      "restaurantName": restaurantName,
       "rating": rating,
       "userInfo": userInfo.documentData,
       "text": text,
