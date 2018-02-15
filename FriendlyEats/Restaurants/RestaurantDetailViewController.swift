@@ -20,7 +20,7 @@ import FirebaseFirestore
 import Firebase
 import FirebaseAuthUI
 
-class RestaurantDetailViewController: UIViewController {
+class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
 
   // These are optional because we can't do initializer-level dependency injection with storyboards.
   private var restaurant: Restaurant!
@@ -39,11 +39,20 @@ class RestaurantDetailViewController: UIViewController {
   @IBOutlet var tableView: UITableView!
   @IBOutlet var titleView: RestaurantTitleView!
   @IBOutlet weak var editButton: UIButton!
-  
-  let backgroundView = UIImageView()
-  
+  @IBOutlet weak var pickerView: UIPickerView!
+  @IBOutlet weak var sortButton: UIButton!
+    
+let backgroundView = UIImageView()
+let sortByOptions = ["date", "rating", "yumCount"]
+
   override func viewDidLoad() {
     super.viewDidLoad()
+
+    //hide picker view on view load
+    pickerView.isHidden = true
+    pickerView.delegate = self
+    pickerView.dataSource = self
+    print(pickerView.isHidden)
     
     self.title = restaurant.name
 
@@ -63,7 +72,7 @@ class RestaurantDetailViewController: UIViewController {
     }
 
     let query = Firestore.firestore().reviews.whereField("restaurantID",
-                                                         isEqualTo: restaurant!.documentID)
+                                                         isEqualTo: restaurant.documentID)
     localCollection = LocalCollection(query: query) { [unowned self] (changes) in
       if self.localCollection.count == 0 {
         self.tableView.backgroundView = self.backgroundView
@@ -78,7 +87,8 @@ class RestaurantDetailViewController: UIViewController {
     tableView.dataSource = dataSource
     tableView.rowHeight = UITableViewAutomaticDimension
     tableView.estimatedRowHeight = 140
-  }
+    }
+    
   
   deinit {
     localCollection.stopListening()
@@ -112,6 +122,28 @@ class RestaurantDetailViewController: UIViewController {
     self.navigationController?.pushViewController(controller, animated: true)
   }
 
+    @IBAction func sortPressed(_ sender: Any) {
+        if pickerView.isHidden {
+            pickerView.isHidden = false
+        }
+    }
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return sortByOptions.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return sortByOptions[row]
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+       pickerView.isHidden = true
+        
+    }
 }
 
 class RestaurantTitleView: UIView {
