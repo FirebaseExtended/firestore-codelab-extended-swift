@@ -34,7 +34,7 @@ func priceString(from price: Int) -> String {
   return priceText
 }
 
-class RestaurantsTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
 
   @IBOutlet var tableView: UITableView!
   @IBOutlet var activeFiltersStackView: UIStackView!
@@ -46,41 +46,25 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
 
   let backgroundView = UIImageView()
 
-  private var restaurants: [Restaurant] = []
+  lazy private var dataSource: RestaurantTableViewDataSource = {
+    return dataSourceForQuery(baseQuery)
+  }()
 
   fileprivate var query: Query? {
     didSet {
-      if let listener = listener {
-        listener.remove()
-        observeQuery()
+      dataSource.restaurants.stopListening()
+      tableView.dataSource = nil
+      if let query = query {
+        dataSource = dataSourceForQuery(query)
+        tableView.dataSource = dataSource
+        dataSource.restaurants.listen()
       }
     }
   }
 
-  private var listener: ListenerRegistration?
-
-  fileprivate func observeQuery() {
-    guard let query = query else { return }
-    stopObserving()
-
-    // Display data from Firestore, part one
-
-    listener = query.addSnapshotListener { [unowned self] (snapshot, error) in
-      guard let snapshot = snapshot else {
-        print("Error fetching snapshot results: \(error!)")
-        return
-      }
-      let models = snapshot.documents.map { (document) -> Restaurant in
-        if let model = Restaurant(document: document) {
-          return model
-        } else {
-          // Don't use fatalError here in a real app.
-          fatalError("Unable to initialize type \(Restaurant.self) with dictionary \(document.data())")
-        }
-      }
-      self.restaurants = models
-
-      if self.restaurants.count > 0 {
+  private func dataSourceForQuery(_ query: Query) -> RestaurantTableViewDataSource {
+    return RestaurantTableViewDataSource(query: query) { [unowned self] (changes) in
+      if self.dataSource.restaurants.count > 0 {
         self.tableView.backgroundView = nil
       } else {
         self.tableView.backgroundView = self.backgroundView
@@ -90,13 +74,9 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
     }
   }
 
-  fileprivate func stopObserving() {
-    listener?.remove()
-  }
-
-  fileprivate func baseQuery() -> Query {
+  private lazy var baseQuery: Query = {
     return Firestore.firestore().restaurants.limit(to: 50)
-  }
+  }()
 
   lazy private var filters: (navigationController: UINavigationController,
                              filtersController: FiltersViewController) = {
@@ -118,11 +98,11 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
     navigationController?.navigationBar.titleTextAttributes =
       [ NSAttributedStringKey.foregroundColor: UIColor.white ]
 
-    tableView.dataSource = self
-    tableView.delegate = self
-    query = baseQuery()
+    query = baseQuery
     stackViewHeightConstraint.constant = 0
     activeFiltersStackView.isHidden = true
+    tableView.delegate = self
+    tableView.dataSource = dataSource
 
     self.navigationController?.navigationBar.barStyle = .black
 
@@ -134,16 +114,12 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.setNeedsStatusBarAppearanceUpdate()
-    observeQuery()
-  }
-
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
+    dataSource.restaurants.listen()
   }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
-    stopObserving()
+    dataSource.restaurants.stopListening()
   }
 
   @IBAction func didTapPopulateButton(_ sender: Any) {
@@ -156,7 +132,6 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
       Firestore.firestore().prepopulate()
     }))
     present(confirmationBox, animated: true)
-
   }
 
   @IBAction func didTapClearButton(_ sender: Any) {
@@ -173,7 +148,6 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
     self.navigationController?.pushViewController(hackPage, animated: true)
   }
 
-
   override var preferredStatusBarStyle: UIStatusBarStyle {
     set {}
     get {
@@ -182,30 +156,15 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
   }
 
   deinit {
-    listener?.remove()
-  }
-
-  // MARK: - UITableViewDataSource
-
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "RestaurantTableViewCell",
-                                             for: indexPath) as! RestaurantTableViewCell
-    let restaurant = restaurants[indexPath.row]
-    cell.populate(restaurant: restaurant)
-    return cell
-  }
-
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return restaurants.count
+    dataSource.restaurants.stopListening()
   }
 
   // MARK: - UITableViewDelegate
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
-    let controller = RestaurantDetailViewController.fromStoryboard()
-    controller.titleImageURL = restaurants[indexPath.row].photoURL
-    controller.restaurant = restaurants[indexPath.row]
+    let restaurant = dataSource.restaurants[indexPath.row]
+    let controller = RestaurantDetailViewController.fromStoryboard(restaurant: restaurant)
     self.navigationController?.pushViewController(controller, animated: true)
   }
 
@@ -214,7 +173,7 @@ class RestaurantsTableViewController: UIViewController, UITableViewDataSource, U
 extension RestaurantsTableViewController: FiltersViewControllerDelegate {
 
   func query(withCategory category: String?, city: String?, price: Int?, sortBy: String?) -> Query {
-    var filtered = baseQuery()
+    var filtered = baseQuery
 
     if category == nil && city == nil && price == nil && sortBy == nil {
       stackViewHeightConstraint.constant = 0
@@ -274,7 +233,6 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
     }
 
     self.query = filtered
-    observeQuery()
   }
 
 }
