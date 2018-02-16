@@ -23,9 +23,14 @@ import FirebaseAuthUI
 class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
 
   // These are optional because we can't do initializer-level dependency injection with storyboards.
+
   private var restaurant: Restaurant!
   private var localCollection: LocalCollection<Review>!
   private var dataSource: ReviewTableViewDataSource!
+
+  var titleImageURL: URL?
+  var restaurant: Restaurant?  
+  var sort: String = "name"
 
   static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil),
                              restaurant: Restaurant) -> RestaurantDetailViewController {
@@ -45,6 +50,7 @@ class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, 
 let backgroundView = UIImageView()
 let sortByOptions = ["date", "rating", "yumCount"]
 
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -52,7 +58,6 @@ let sortByOptions = ["date", "rating", "yumCount"]
     pickerView.isHidden = true
     pickerView.delegate = self
     pickerView.dataSource = self
-    print(pickerView.isHidden)
     
     self.title = restaurant.name
 
@@ -71,8 +76,9 @@ let sortByOptions = ["date", "rating", "yumCount"]
       editButton.isHidden = false
     }
 
-    let query = Firestore.firestore().reviews.whereField("restaurantID",
-                                                         isEqualTo: restaurant.documentID)
+    let query = Firestore.firestore().reviews
+        .whereField("restaurantID", isEqualTo: restaurant.documentID)
+        .order(by: sort)
     localCollection = LocalCollection(query: query) { [unowned self] (changes) in
       if self.localCollection.count == 0 {
         self.tableView.backgroundView = self.backgroundView
@@ -142,7 +148,8 @@ let sortByOptions = ["date", "rating", "yumCount"]
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
        pickerView.isHidden = true
-        
+       sort = sortByOptions[row]
+       self.viewWillAppear(true)
     }
 }
 
