@@ -46,8 +46,7 @@ class RestaurantDetailViewController: UIViewController {
     super.viewDidLoad()
     
     self.title = restaurant.name
-    navigationController?.navigationBar.tintColor = UIColor.white
-    
+
     backgroundView.image = UIImage(named: "pizza-monster")!
     backgroundView.contentScaleFactor = 2
     backgroundView.contentMode = .bottom

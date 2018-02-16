@@ -35,6 +35,7 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
   @IBOutlet private weak var locationTextField: UITextField!
   @IBOutlet private weak var cuisineTextField: UITextField!
   @IBOutlet private weak var priceTextField: UITextField!
+  @IBOutlet fileprivate weak var addPhotoButton: UIButton!
 
   static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil))
       -> AddRestaurantViewController {
@@ -67,6 +68,7 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
     if let downloadUrl = downloadUrl {
       restaurant.photoURL = URL(string: downloadUrl)!
     }
+    print("Going to save document data as \(restaurant.documentData)")
     Firestore.firestore().restaurants.document(restaurant.documentID)
         .setData(restaurant.documentData) { err in
           if let err = err {
@@ -213,6 +215,9 @@ extension AddRestaurantViewController: UIImagePickerControllerDelegate {
   func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
 
     if let photo = info[UIImagePickerControllerOriginalImage] as? UIImage, let photoData = UIImageJPEGRepresentation(photo, 0.8) {
+      self.restaurantImageView.image = photo
+      self.addPhotoButton.titleLabel?.text = ""
+      self.addPhotoButton.backgroundColor = UIColor.clear
       saveImage(photoData: photoData)
     }
     self.dismiss(animated: true, completion: nil)
