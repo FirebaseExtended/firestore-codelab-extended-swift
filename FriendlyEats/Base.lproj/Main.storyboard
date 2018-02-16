@@ -373,9 +373,8 @@
                                                 <action selector="didTapEditButton:" destination="yyz-cR-dIw" eventType="touchUpInside" id="rET-6C-cbh"/>
                                             </connections>
                                         </button>
-                                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0MI-t4-Snh">
-                                            <rect key="frame" x="229" y="75" width="130" height="30"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0MI-t4-Snh">
+                                            <rect key="frame" x="324" y="71" width="35" height="34"/>
                                             <state key="normal" title="Sort">
                                                 <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </state>
@@ -393,6 +392,7 @@
                                         <constraint firstItem="Ojs-Kq-qFI" firstAttribute="leading" secondItem="PPW-8S-SIQ" secondAttribute="trailing" constant="65.5" id="CuC-f2-Jqm"/>
                                         <constraint firstAttribute="bottom" secondItem="PPW-8S-SIQ" secondAttribute="bottom" constant="16" id="Hfu-Ml-mlr"/>
                                         <constraint firstItem="DBM-Cn-nJI" firstAttribute="leading" secondItem="P0j-uF-Lec" secondAttribute="trailing" constant="4" id="IdA-gT-Ha8"/>
+                                        <constraint firstItem="0MI-t4-Snh" firstAttribute="top" secondItem="13p-IC-WyC" secondAttribute="bottom" constant="8" id="PyK-2S-5nJ"/>
                                         <constraint firstItem="P0j-uF-Lec" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" constant="16" id="RUo-TK-uIk"/>
                                         <constraint firstAttribute="trailing" secondItem="ZNQ-b3-Wfl" secondAttribute="trailing" id="Rb4-Jt-0va"/>
                                         <constraint firstItem="13p-IC-WyC" firstAttribute="centerY" secondItem="cKR-2o-ofP" secondAttribute="centerY" id="VCR-hY-46B"/>
@@ -400,6 +400,7 @@
                                         <constraint firstItem="PPW-8S-SIQ" firstAttribute="leading" secondItem="DBM-Cn-nJI" secondAttribute="trailing" constant="4" id="XJe-U9-GkG"/>
                                         <constraint firstItem="cKR-2o-ofP" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" constant="16" id="Z4a-Pa-F0w"/>
                                         <constraint firstItem="N5p-cL-L2M" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" constant="16" id="ZFG-Px-rp4"/>
+                                        <constraint firstAttribute="trailing" secondItem="0MI-t4-Snh" secondAttribute="trailing" constant="16" id="cem-Dv-bBI"/>
                                         <constraint firstAttribute="trailing" secondItem="13p-IC-WyC" secondAttribute="trailing" constant="16" id="gLL-7f-2s6"/>
                                         <constraint firstAttribute="bottom" secondItem="ZNQ-b3-Wfl" secondAttribute="bottom" id="hEn-w5-9M0"/>
                                         <constraint firstItem="ZNQ-b3-Wfl" firstAttribute="top" secondItem="Qev-tW-OCy" secondAttribute="top" id="ni3-HG-af6"/>
