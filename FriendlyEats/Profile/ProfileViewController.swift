@@ -57,6 +57,9 @@ class ProfileViewController: UIViewController {
   @IBOutlet private var profileImageView: UIImageView!
   @IBOutlet private var usernameLabel: UILabel!
   @IBOutlet private var viewRestaurantsButton: UIButton!
+  @IBOutlet weak var signInButton: UIButton!
+  // Not weak because we might remove it
+  @IBOutlet var signOutButton: UIBarButtonItem!
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -72,11 +75,12 @@ class ProfileViewController: UIViewController {
     }
   }
 
+  @IBAction func signInButtonWasTapped(_ sender: Any) {
+    presentLoginController()
+  }
+
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-    if user == nil {
-      presentLoginController()
-    }
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -104,11 +108,15 @@ class ProfileViewController: UIViewController {
     if let user = user {
       profileImageView.sd_setImage(with: user.photoURL)
       usernameLabel.text = user.name
-      viewRestaurantsButton.isEnabled = true
+      viewRestaurantsButton.isHidden = false
+      signInButton.isHidden = true
+      self.navigationItem.leftBarButtonItem = signOutButton
     } else {
       profileImageView.image = nil
-      usernameLabel.text = "Not logged in"
-      viewRestaurantsButton.isEnabled = false
+      usernameLabel.text = "Sign in, why don'cha?"
+      viewRestaurantsButton.isHidden = true
+      signInButton.isHidden = false
+      self.navigationItem.leftBarButtonItem = nil
     }
   }
 

@@ -15,7 +15,7 @@
 //
 
 import UIKit
-import FirebaseFirestore
+import Firebase
 import SDWebImage
 
 func priceString(from price: Int) -> String {
@@ -137,8 +137,12 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
   }
 
   @objc func goToHackPage(_ sender: Any) {
-    let hackPage = HackPageViewController.fromStoryboard()
-    self.navigationController?.pushViewController(hackPage, animated: true)
+    if Auth.auth().currentUser != nil {
+      let hackPage = HackPageViewController.fromStoryboard()
+      self.navigationController?.pushViewController(hackPage, animated: true)
+    } else {
+      Utils.showSimpleAlert(message: "You must be signed in to be a 1337 hax0r", presentingVC: self)
+    }
   }
 
   override var preferredStatusBarStyle: UIStatusBarStyle {

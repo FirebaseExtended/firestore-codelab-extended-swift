@@ -365,8 +365,8 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ojs-Kq-qFI">
-                                            <rect key="frame" x="229" y="99.5" width="130" height="30"/>
-                                            <state key="normal" title="Edit My Restaurant">
+                                            <rect key="frame" x="329" y="99.5" width="30" height="30"/>
+                                            <state key="normal" title="Edit">
                                                 <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </state>
                                             <connections>
@@ -380,7 +380,6 @@
                                         <constraint firstItem="Ojs-Kq-qFI" firstAttribute="trailing" secondItem="13p-IC-WyC" secondAttribute="trailing" id="0T7-dO-SXJ"/>
                                         <constraint firstItem="DBM-Cn-nJI" firstAttribute="top" secondItem="N5p-cL-L2M" secondAttribute="bottom" constant="8" id="6I1-bW-m9B"/>
                                         <constraint firstAttribute="bottom" secondItem="P0j-uF-Lec" secondAttribute="bottom" constant="16" id="Az9-vO-lcA"/>
-                                        <constraint firstItem="Ojs-Kq-qFI" firstAttribute="leading" secondItem="PPW-8S-SIQ" secondAttribute="trailing" constant="65.5" id="CuC-f2-Jqm"/>
                                         <constraint firstAttribute="bottom" secondItem="PPW-8S-SIQ" secondAttribute="bottom" constant="16" id="Hfu-Ml-mlr"/>
                                         <constraint firstItem="DBM-Cn-nJI" firstAttribute="leading" secondItem="P0j-uF-Lec" secondAttribute="trailing" constant="4" id="IdA-gT-Ha8"/>
                                         <constraint firstItem="P0j-uF-Lec" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" constant="16" id="RUo-TK-uIk"/>
@@ -727,16 +726,23 @@
                                             </constraints>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="10" verticalHuggingPriority="10" text="User Name Label" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rBK-T6-PXC">
-                                            <rect key="frame" x="136" y="8" width="231" height="74"/>
+                                            <rect key="frame" x="136" y="8" width="231" height="20.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cNq-e6-84q">
-                                            <rect key="frame" x="136" y="90" width="144" height="30"/>
-                                            <state key="normal" title="View my Restaurants"/>
+                                            <rect key="frame" x="136" y="36.5" width="107" height="30"/>
+                                            <state key="normal" title="My Restaurants"/>
                                             <connections>
                                                 <action selector="didTapViewRestaurantsButton:" destination="SHW-NA-Ovv" eventType="touchUpInside" id="YGK-Ur-LYY"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uBs-g0-MSd">
+                                            <rect key="frame" x="136" y="36" width="47" height="30"/>
+                                            <state key="normal" title="Sign in"/>
+                                            <connections>
+                                                <action selector="signInButtonWasTapped:" destination="SHW-NA-Ovv" eventType="touchUpInside" id="4kB-oh-06E"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -746,14 +752,15 @@
                                         <constraint firstItem="cNq-e6-84q" firstAttribute="leading" secondItem="Pgg-fp-P0X" secondAttribute="trailing" constant="8" id="Dkz-V4-bix"/>
                                         <constraint firstAttribute="trailing" secondItem="rBK-T6-PXC" secondAttribute="trailing" constant="8" id="TPb-Jo-e6y"/>
                                         <constraint firstItem="cNq-e6-84q" firstAttribute="top" secondItem="rBK-T6-PXC" secondAttribute="bottom" constant="8" id="UqN-C4-3FZ"/>
+                                        <constraint firstItem="uBs-g0-MSd" firstAttribute="leading" secondItem="rBK-T6-PXC" secondAttribute="leading" id="dz9-Dv-CwG"/>
                                         <constraint firstItem="Pgg-fp-P0X" firstAttribute="centerY" secondItem="ZOJ-EW-YiM" secondAttribute="centerY" id="keg-BW-Odg"/>
                                         <constraint firstItem="Pgg-fp-P0X" firstAttribute="leading" secondItem="ZOJ-EW-YiM" secondAttribute="leading" constant="8" id="lR3-lb-FJU"/>
-                                        <constraint firstAttribute="bottom" secondItem="cNq-e6-84q" secondAttribute="bottom" constant="8" id="wHN-PO-dQC"/>
+                                        <constraint firstItem="uBs-g0-MSd" firstAttribute="top" secondItem="rBK-T6-PXC" secondAttribute="bottom" constant="7.5" id="qwB-HZ-uh0"/>
                                         <constraint firstItem="rBK-T6-PXC" firstAttribute="top" secondItem="ZOJ-EW-YiM" secondAttribute="top" constant="8" id="xIB-FS-vAo"/>
                                     </constraints>
                                 </view>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ReviewTableViewCell" rowHeight="150" id="Srp-bj-7Dp" customClass="ReviewTableViewCell" customModule="FriendlyEats" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ReviewTableViewCell" rowHeight="150" id="Srp-bj-7Dp" customClass="ReviewTableViewCell" customModule="FriendlyEats" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="183.5" width="375" height="150"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Srp-bj-7Dp" id="US6-51-Kbe">
@@ -830,6 +837,8 @@
                     </navigationItem>
                     <connections>
                         <outlet property="profileImageView" destination="Pgg-fp-P0X" id="9Cb-bQ-0bb"/>
+                        <outlet property="signInButton" destination="uBs-g0-MSd" id="lsh-uN-KBl"/>
+                        <outlet property="signOutButton" destination="mQD-ug-rsU" id="GSs-Ki-cAt"/>
                         <outlet property="tableView" destination="LIf-XY-xHJ" id="hab-OQ-xgN"/>
                         <outlet property="usernameLabel" destination="rBK-T6-PXC" id="cgh-ae-E7R"/>
                         <outlet property="viewRestaurantsButton" destination="cNq-e6-84q" id="aDu-Mp-kQW"/>
@@ -1099,8 +1108,8 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
-                        <segue destination="W0I-RW-T34" kind="relationship" relationship="viewControllers" id="dBZ-PJ-Qi9"/>
                         <segue destination="e54-7U-CFe" kind="relationship" relationship="viewControllers" id="3PE-ib-kHV"/>
+                        <segue destination="W0I-RW-T34" kind="relationship" relationship="viewControllers" id="dBZ-PJ-Qi9"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JmZ-O6-SGb" userLabel="First Responder" sceneMemberID="firstResponder"/>

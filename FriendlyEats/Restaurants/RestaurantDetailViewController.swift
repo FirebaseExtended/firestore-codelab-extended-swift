@@ -102,8 +102,12 @@ class RestaurantDetailViewController: UIViewController {
   }
   
   @IBAction func didTapAddButton(_ sender: Any) {
-    let controller = NewReviewViewController.fromStoryboard(forRestaurant: self.restaurant!)
-    self.navigationController?.pushViewController(controller, animated: true)
+    if Auth.auth().currentUser == nil {
+      Utils.showSimpleAlert(message: "You need to be signed in to add a review.", presentingVC: self)
+    } else {
+      let controller = NewReviewViewController.fromStoryboard(forRestaurant: self.restaurant!)
+      self.navigationController?.pushViewController(controller, animated: true)
+    }
   }
   
   @IBAction func didTapEditButton(_ sender: Any) {

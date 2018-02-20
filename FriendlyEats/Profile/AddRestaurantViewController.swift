@@ -93,11 +93,7 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
 
   // If data in text fields isn't valid, give an alert
   func presentInvalidDataAlert(message: String) {
-    let title = "Invalid Input"
-    let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-    let okAction = UIAlertAction(title: "Ok", style: .cancel, handler: nil)
-    alertController.addAction(okAction)
-    self.present(alertController, animated: true, completion: nil)
+    Utils.showSimpleAlert(title: "Invalid Input", message: message, presentingVC: self)
   }
 
   func saveImage(photoData: Data) {
