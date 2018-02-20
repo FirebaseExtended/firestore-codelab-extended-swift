@@ -30,7 +30,7 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
 
   // MARK: Outlets
 
-  @IBOutlet private weak var restaurantImageView: UIImageView! // TODO: this is currently invisible, which is not great UI
+  @IBOutlet private weak var restaurantImageView: UIImageView!
   @IBOutlet private weak var restaurantNameTextField: UITextField!
   @IBOutlet private weak var locationTextField: UITextField!
   @IBOutlet private weak var cuisineTextField: UITextField!
