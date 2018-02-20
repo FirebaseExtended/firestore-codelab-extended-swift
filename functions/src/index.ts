@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import { Firestore } from '@google-cloud/firestore';
 
 exports.computeAverageReview = functions.firestore
   .document('reviews/{reviewId}').onWrite((event) => {
@@ -8,8 +9,8 @@ exports.computeAverageReview = functions.firestore
     const rating = eventData.rating;
     const db = event.data.ref.firestore;
     
-    // get the previouw value, if it exists
-    const prev = event.data.previous
+    // get the previous value, if it exists
+    const prev = event.data.previous;
     const previousValue = event.data.previous.data();
     if (prev.exists) {
         const difference = previousValue.rating - rating
@@ -18,7 +19,7 @@ exports.computeAverageReview = functions.firestore
         return updateAverage(db, restaurantID, rating, false);
     }
   });
-
+  
   async function updateAverage(db, restaurantID, newRating, prev) {
     const updateDB = db.collection('restaurants').doc(restaurantID);
     const transactionResult = await db.runTransaction(t => {
@@ -43,3 +44,30 @@ exports.computeAverageReview = functions.firestore
     })
    return transactionResult;
   }
+
+exports.updateRestaurant = functions.firestore.document('restaurants/{restaurantID}/name/').onUpdate((event) => {
+    const db = event.data.ref.firestore;
+    const restaurantID = event.params.restaurantID;
+    const eventData = event.data.data();
+    // if one or more of these fields was updated
+    return updateRestaurant(db, restaurantID, eventData);
+})
+
+// update changes to restaurant
+async function updateRestaurant(db: Firestore, restaurantID, data) {
+    const updateRef = db.collection('reviews');
+    // query a list of reviews of the restaurant
+    const queryRef = updateRef.where('restaurantID', '==', restaurantID);
+
+    const transactionResult = await db.runTransaction(t => {
+        const promises = [];
+        return (async () => {
+            const reviewsSnapshot = await t.get(queryRef);
+            for (const doc of reviewsSnapshot.docs) {
+                promises.push(await db.doc(doc.ref.path).update({name: data}));
+            };
+            return Promise.all(promises);
+        })();
+    }) 
+    return transactionResult; 
+}
