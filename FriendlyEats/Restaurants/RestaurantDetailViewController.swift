@@ -70,6 +70,7 @@ class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, 
   @IBOutlet var tableView: UITableView!
   @IBOutlet var titleView: RestaurantTitleView!
   @IBOutlet weak var editButton: UIButton!
+  // TODO: Give the picker view an "OK" or "Done" button to select values.
   @IBOutlet weak var pickerView: UIPickerView!
   @IBOutlet weak var sortButton: UIButton!
 
