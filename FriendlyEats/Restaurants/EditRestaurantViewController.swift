@@ -91,7 +91,10 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
       }
       if let snapshot = snapshot {
         for reviewDoc in snapshot.documents {
-          batchWrite.updateData(["restaurantName": data["name"] ?? "(unknown)"], forDocument: reviewDoc.reference)
+          // Skip restaurants that no longer exist. This shouldn't be possible
+          // since our app doesn't allow for restaurant deletion.
+          guard let name = data["name"] else { continue }
+          batchWrite.updateData(["restaurantName": name], forDocument: reviewDoc.reference)
           print("Updating a review, too!")
         }
       }
