@@ -8,9 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		360549AC2028D56E0090317C /* EditRestaurantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360549AB2028D56E0090317C /* EditRestaurantViewController.swift */; };
-		36BB298A2024F2D8003687EC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 36BB29892024F2D8003687EC /* GoogleService-Info.plist */; };
 		496B609A203363A9005AD625 /* ReviewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496B6099203363A9005AD625 /* ReviewTableViewCell.swift */; };
 		49C24867202A237000D6008A /* HackPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C24866202A237000D6008A /* HackPageViewController.swift */; };
+		77784140203509A3000CB45A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7778413F203509A3000CB45A /* GoogleService-Info.plist */; };
 		8D004D2D1EE879B5004DEF35 /* FiltersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D004D2C1EE879B5004DEF35 /* FiltersViewController.swift */; };
 		8D2A2A0B202BC3B600343C13 /* ReviewTableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2A2A0A202BC3B600343C13 /* ReviewTableViewDataSource.swift */; };
 		8D5DF7021F7EF3BA00B0D24F /* NewReviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5DF7011F7EF3BA00B0D24F /* NewReviewViewController.swift */; };
@@ -47,9 +47,9 @@
 
 /* Begin PBXFileReference section */
 		360549AB2028D56E0090317C /* EditRestaurantViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditRestaurantViewController.swift; sourceTree = "<group>"; };
-		36BB29892024F2D8003687EC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		496B6099203363A9005AD625 /* ReviewTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTableViewCell.swift; sourceTree = "<group>"; };
 		49C24866202A237000D6008A /* HackPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackPageViewController.swift; sourceTree = "<group>"; };
+		7778413F203509A3000CB45A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8D004D2C1EE879B5004DEF35 /* FiltersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiltersViewController.swift; sourceTree = "<group>"; };
 		8D2A2A0A202BC3B600343C13 /* ReviewTableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTableViewDataSource.swift; sourceTree = "<group>"; };
 		8D5DF7011F7EF3BA00B0D24F /* NewReviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewReviewViewController.swift; sourceTree = "<group>"; };
@@ -164,7 +164,7 @@
 		8D9BBC2F1EE2200900194E9A /* FriendlyEats */ = {
 			isa = PBXGroup;
 			children = (
-				36BB29892024F2D8003687EC /* GoogleService-Info.plist */,
+				7778413F203509A3000CB45A /* GoogleService-Info.plist */,
 				8D9BBC301EE2200900194E9A /* AppDelegate.swift */,
 				8D6014FA202B8B0F003E8091 /* Profile */,
 				8D6014F7202B8A7F003E8091 /* Restaurants */,
@@ -276,9 +276,9 @@
 			files = (
 				8D9BBC3B1EE2200900194E9A /* LaunchScreen.storyboard in Resources */,
 				8D9BBC381EE2200900194E9A /* Assets.xcassets in Resources */,
-				36BB298A2024F2D8003687EC /* GoogleService-Info.plist in Resources */,
 				8D9BBC361EE2200900194E9A /* Main.storyboard in Resources */,
 				8DD9ACDA1F7B166900C2DD24 /* pizza-monster.png in Resources */,
+				77784140203509A3000CB45A /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -373,6 +373,15 @@
                                                 <action selector="didTapEditButton:" destination="yyz-cR-dIw" eventType="touchUpInside" id="rET-6C-cbh"/>
                                             </connections>
                                         </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0MI-t4-Snh">
+                                            <rect key="frame" x="324" y="71" width="35" height="34"/>
+                                            <state key="normal" title="Sort">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="sortPressed:" destination="yyz-cR-dIw" eventType="touchUpInside" id="3Ob-mf-sU2"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <constraints>
@@ -383,6 +392,7 @@
                                         <constraint firstItem="Ojs-Kq-qFI" firstAttribute="leading" secondItem="PPW-8S-SIQ" secondAttribute="trailing" constant="65.5" id="CuC-f2-Jqm"/>
                                         <constraint firstAttribute="bottom" secondItem="PPW-8S-SIQ" secondAttribute="bottom" constant="16" id="Hfu-Ml-mlr"/>
                                         <constraint firstItem="DBM-Cn-nJI" firstAttribute="leading" secondItem="P0j-uF-Lec" secondAttribute="trailing" constant="4" id="IdA-gT-Ha8"/>
+                                        <constraint firstItem="0MI-t4-Snh" firstAttribute="top" secondItem="13p-IC-WyC" secondAttribute="bottom" constant="8" id="PyK-2S-5nJ"/>
                                         <constraint firstItem="P0j-uF-Lec" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" constant="16" id="RUo-TK-uIk"/>
                                         <constraint firstAttribute="trailing" secondItem="ZNQ-b3-Wfl" secondAttribute="trailing" id="Rb4-Jt-0va"/>
                                         <constraint firstItem="13p-IC-WyC" firstAttribute="centerY" secondItem="cKR-2o-ofP" secondAttribute="centerY" id="VCR-hY-46B"/>
@@ -390,6 +400,7 @@
                                         <constraint firstItem="PPW-8S-SIQ" firstAttribute="leading" secondItem="DBM-Cn-nJI" secondAttribute="trailing" constant="4" id="XJe-U9-GkG"/>
                                         <constraint firstItem="cKR-2o-ofP" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" constant="16" id="Z4a-Pa-F0w"/>
                                         <constraint firstItem="N5p-cL-L2M" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" constant="16" id="ZFG-Px-rp4"/>
+                                        <constraint firstAttribute="trailing" secondItem="0MI-t4-Snh" secondAttribute="trailing" constant="16" id="cem-Dv-bBI"/>
                                         <constraint firstAttribute="trailing" secondItem="13p-IC-WyC" secondAttribute="trailing" constant="16" id="gLL-7f-2s6"/>
                                         <constraint firstAttribute="bottom" secondItem="ZNQ-b3-Wfl" secondAttribute="bottom" id="hEn-w5-9M0"/>
                                         <constraint firstItem="ZNQ-b3-Wfl" firstAttribute="top" secondItem="Qev-tW-OCy" secondAttribute="top" id="ni3-HG-af6"/>
@@ -490,10 +501,16 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="u11-8I-cth">
+                                <rect key="frame" x="0.0" y="451" width="375" height="216"/>
+                            </pickerView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="FPu-IJ-I0V" firstAttribute="leading" secondItem="q4g-4j-FYl" secondAttribute="leading" id="8bB-0F-eey"/>
+                            <constraint firstItem="u11-8I-cth" firstAttribute="width" secondItem="q4g-4j-FYl" secondAttribute="width" id="Ozt-Qd-CRj"/>
+                            <constraint firstItem="0Ll-AF-CkL" firstAttribute="top" secondItem="u11-8I-cth" secondAttribute="bottom" id="Z95-dV-o0z"/>
+                            <constraint firstItem="u11-8I-cth" firstAttribute="centerX" secondItem="q4g-4j-FYl" secondAttribute="centerX" id="ci3-E0-KUN"/>
                             <constraint firstItem="FPu-IJ-I0V" firstAttribute="top" secondItem="SNq-9e-2oH" secondAttribute="bottom" id="dep-w1-xYv"/>
                             <constraint firstItem="0Ll-AF-CkL" firstAttribute="top" secondItem="FPu-IJ-I0V" secondAttribute="bottom" id="ej8-dh-IwR"/>
                             <constraint firstAttribute="trailing" secondItem="FPu-IJ-I0V" secondAttribute="trailing" id="rmx-TD-u2o"/>
@@ -510,6 +527,8 @@
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="editButton" destination="Ojs-Kq-qFI" id="xDW-nN-4Bz"/>
+                        <outlet property="pickerView" destination="u11-8I-cth" id="dBB-MK-9Vp"/>
+                        <outlet property="sortButton" destination="0MI-t4-Snh" id="tFk-di-S4H"/>
                         <outlet property="tableView" destination="FPu-IJ-I0V" id="rH7-m0-GVn"/>
                         <outlet property="titleView" destination="Qev-tW-OCy" id="L4W-ch-HXI"/>
                     </connections>
