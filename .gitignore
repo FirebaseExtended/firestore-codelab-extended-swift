@@ -17,6 +17,12 @@ DerivedData/
 !default.perspectivev3
 xcuserdata/
 
+## Functions-related
+functions/etc/
+functions/lib/
+functions/node_modules/
+.firebaserc
+
 ## Other
 *.moved-aside
 *.xccheckout
