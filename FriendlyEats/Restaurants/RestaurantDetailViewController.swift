@@ -32,8 +32,6 @@ class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, 
     didSet {
       if let query = query {
         localCollection = LocalCollection(query: query) { [unowned self] (changes) in
-          print(changes)
-          print(self.localCollection.items)
           if self.localCollection.count == 0 {
             self.tableView.backgroundView = self.backgroundView
           } else {
@@ -103,7 +101,7 @@ class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, 
     }
 
     // Sort by date by default.
-    query = baseQuery.order(by: "date")
+    query = baseQuery
     tableView.dataSource = dataSource
     tableView.rowHeight = UITableViewAutomaticDimension
     tableView.estimatedRowHeight = 140
