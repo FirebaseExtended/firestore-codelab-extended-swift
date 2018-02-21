@@ -52,19 +52,19 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
 
   fileprivate var query: Query? {
     didSet {
-      dataSource.restaurants.stopListening()
+      dataSource.stopUpdates()
       tableView.dataSource = nil
       if let query = query {
         dataSource = dataSourceForQuery(query)
         tableView.dataSource = dataSource
-        dataSource.restaurants.listen()
+        dataSource.startUpdates()
       }
     }
   }
 
   private func dataSourceForQuery(_ query: Query) -> RestaurantTableViewDataSource {
     return RestaurantTableViewDataSource(query: query) { [unowned self] (changes) in
-      if self.dataSource.restaurants.count > 0 {
+      if self.dataSource.count > 0 {
         self.tableView.backgroundView = nil
       } else {
         self.tableView.backgroundView = self.backgroundView
@@ -107,12 +107,12 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.setNeedsStatusBarAppearanceUpdate()
-    dataSource.restaurants.listen()
+    dataSource.startUpdates()
   }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
-    dataSource.restaurants.stopListening()
+    dataSource.stopUpdates()
   }
 
   @IBAction func didTapPopulateButton(_ sender: Any) {
@@ -153,14 +153,14 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
   }
 
   deinit {
-    dataSource.restaurants.stopListening()
+    dataSource.stopUpdates()
   }
 
   // MARK: - UITableViewDelegate
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
-    let restaurant = dataSource.restaurants[indexPath.row]
+    let restaurant = dataSource[indexPath.row]
     let controller = RestaurantDetailViewController.fromStoryboard(restaurant: restaurant)
     self.navigationController?.pushViewController(controller, animated: true)
   }

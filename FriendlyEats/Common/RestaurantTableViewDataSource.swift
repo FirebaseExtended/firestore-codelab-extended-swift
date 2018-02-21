@@ -22,7 +22,7 @@ import FirebaseFirestore
 /// table view with new data from Firestore in the updateHandler closure.
 @objc class RestaurantTableViewDataSource: NSObject, UITableViewDataSource {
 
-  let restaurants: LocalCollection<Restaurant>
+  private let restaurants: LocalCollection<Restaurant>
 
   /// Returns an instance of RestaurantTableViewDataSource. Consumers should update the
   /// table view with new data from Firestore in the updateHandler closure.
@@ -37,10 +37,31 @@ import FirebaseFirestore
     self.init(restaurants: collection)
   }
 
+  /// Starts listening to the Firestore query and invoking the updateHandler.
+  public func startUpdates() {
+    restaurants.listen()
+  }
+
+  /// Stops listening to the Firestore query. updateHandler will not be called unless startListening
+  /// is called again.
+  public func stopUpdates() {
+    restaurants.stopListening()
+  }
+
+  /// Returns the restaurant at the given index.
+  subscript(index: Int) -> Restaurant {
+    return restaurants[index]
+  }
+
+  /// The number of items in the data source.
+  public var count: Int {
+    return restaurants.count
+  }
+
   // MARK: - UITableViewDataSource
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return restaurants.count
+    return count
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
