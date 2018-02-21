@@ -42,13 +42,13 @@ class MyRestaurantsViewController: UIViewController {
     }
 
     tableView.dataSource = dataSource
-    dataSource.restaurants.listen()
+    dataSource.startUpdates()
     tableView.delegate = self
   }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
-    dataSource.restaurants.stopListening()
+    dataSource.stopUpdates()
   }
 
   @IBOutlet private var tableView: UITableView!
@@ -66,7 +66,7 @@ extension MyRestaurantsViewController: UITableViewDelegate {
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
-    let restaurant = dataSource.restaurants[indexPath.row]
+    let restaurant = dataSource[indexPath.row]
     let controller = RestaurantDetailViewController.fromStoryboard(restaurant: restaurant)
     self.navigationController?.pushViewController(controller, animated: true)
   }
