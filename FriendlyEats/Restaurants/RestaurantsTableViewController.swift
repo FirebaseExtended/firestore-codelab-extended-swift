@@ -75,7 +75,7 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
   }
 
   private lazy var baseQuery: Query = {
-    return Firestore.firestore().restaurants.limit(to: 50)
+    return fatalError("Implement me: Fetch Data from Cloud Firestore")
   }()
 
   lazy private var filters: (navigationController: UINavigationController,
