@@ -1,5 +1,4 @@
 import * as functions from 'firebase-functions';
-//import { Firestore } from '@google-cloud/firestore';
 import * as admin from 'firebase-admin';
 type Firestore = admin.firestore.Firestore
 
