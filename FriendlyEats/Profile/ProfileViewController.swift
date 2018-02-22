@@ -116,6 +116,7 @@ class ProfileViewController: UIViewController {
   }
 
   fileprivate func populateReviews(forUser user: User) {
+
     dataSource?.sectionTitle = "My reviews"
     dataSource?.startUpdates()
     tableView.dataSource = dataSource
