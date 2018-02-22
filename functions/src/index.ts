@@ -77,16 +77,11 @@ async function updateRestaurant(db: Firestore, restaurantID: string, name: strin
     const updateRef = db.collection('reviews');
     // query a list of reviews of the restaurant
     const queryRef = updateRef.where('restaurantID', '==', restaurantID);
-
-    const transactionResult = await db.runTransaction(t => {
-        return (async () => {
-            const reviewsSnapshot = await t.get(queryRef);
-            for (const doc of reviewsSnapshot.docs) {
-                const result = await t.update(doc.ref, {name: name});
-            };
-            console.log(`name of restaurant updated to ${name}`);
-            return null;
-        })();
-    }) 
-    return transactionResult; 
+    const batch = db.batch();
+    const reviewsSnapshot = await queryRef.get();
+    for (const doc of reviewsSnapshot.docs) {
+        await batch.update(doc.ref, {name: name});
+    };
+    await batch.commit();
+    console.log(`name of restaurant updated to ${name}`);
 }
