@@ -23,6 +23,7 @@ class HackPageViewController: UIViewController {
   @IBOutlet weak var changeUserPicStatus: UILabel!
   @IBOutlet weak var addFakeReviewStatus: UILabel!
   @IBOutlet weak var addBadDataStatus: UILabel!
+  @IBOutlet weak var giveMeFiveStarsStatus: UILabel!
 
   let currentUserID = Auth.auth().currentUser?.uid
 
@@ -168,8 +169,6 @@ class HackPageViewController: UIViewController {
 
 
   @IBAction func addFakeReviewWasTapped(_ sender: Any) {
-    // TODO: It might be nice to have this write a review for a restarant that we own, although this would
-    // require our having a "Create a restaurant" page. :)
     let myRestaurantQuery = Firestore.firestore().collection("restaurants").limit(to: 3)
     myRestaurantQuery.getDocuments { (snapshotBlock, error) in
       if let error = error {
@@ -206,6 +205,35 @@ class HackPageViewController: UIViewController {
       }
     }
   }
+
+  @IBAction func giveMeFiveStarsWasTapped(_ sender: Any) {
+    let myRestaurantQuery = Firestore.firestore().collection("restaurants").whereField("ownerID", isEqualTo: currentUserID!).limit(to: 1)
+    myRestaurantQuery.getDocuments { (snapshotBlock, error) in
+      if let error = error {
+        print("Received fetch error \(error)")
+        self.giveMeFiveStarsStatus.text = "Fetch error"
+        return
+      }
+      guard let documents = snapshotBlock?.documents else { return }
+      for restaurantDoc in documents {
+        guard let restaurant = Restaurant(document: restaurantDoc) else { continue }
+        self.giveFiveStarsTo(restaurant)
+      }
+    }
+  }
+
+  func giveFiveStarsTo(_ restaurant: Restaurant) {
+    let newData = ["averageRating": 5, "reviewCount": 100]
+    Firestore.firestore().collection("restaurants").document(restaurant.documentID).updateData(newData) { (error) in
+      if let error = error {
+        print("Could not update restuarant: \(error)")
+        self.giveMeFiveStarsStatus.text = "Hack failed!"
+      } else {
+        self.giveMeFiveStarsStatus.text = "Mischief Managed"
+      }
+    }
+  }
+
 
   override func viewDidLoad() {
     super.viewDidLoad()
