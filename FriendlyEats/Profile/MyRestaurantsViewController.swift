@@ -52,6 +52,7 @@ class MyRestaurantsViewController: UIViewController {
   }
 
   @IBOutlet private var tableView: UITableView!
+  @IBAction func unwindToMyRestaurants(segue: UIStoryboardSegue) {}
 
   @IBAction private func didTapAddRestaurantButton(_ sender: Any) {
     let controller = AddRestaurantViewController.fromStoryboard()

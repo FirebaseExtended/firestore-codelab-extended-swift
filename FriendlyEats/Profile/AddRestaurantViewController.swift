@@ -173,7 +173,7 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
     let message = "Restaurant added successfully!"
     let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
     let okAction = UIAlertAction(title: "OK", style: .default) { action in
-      self.navigationController?.popViewController(animated: true)
+      self.performSegue(withIdentifier: "unwindToMyRestaurantsSegue", sender: self)
     }
     alertController.addAction(okAction)
     self.present(alertController, animated: true, completion: nil)
