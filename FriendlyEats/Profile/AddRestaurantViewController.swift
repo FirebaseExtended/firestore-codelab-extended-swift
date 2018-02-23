@@ -86,9 +86,10 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
           if let err = err {
             print("Error writing document: \(err)")
           } else {
-            self.presentDidSaveAlert()
+            print("Write confirmed by the server")
           }
     }
+    self.presentDidSaveAlert()
   }
 
 
