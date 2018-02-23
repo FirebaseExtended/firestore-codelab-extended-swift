@@ -17,7 +17,7 @@ import UIKit
 import Firebase
 import FirebaseStorage
 
-class EditRestaurantViewController: UIViewController, UINavigationControllerDelegate {
+class EditRestaurantViewController: UIViewController, UINavigationControllerDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
   
   // MARK: Properties
   
@@ -29,9 +29,21 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
   
   @IBOutlet private weak var restaurantImageView: UIImageView!
   @IBOutlet private weak var restaurantNameTextField: UITextField!
-  @IBOutlet private weak var locationTextField: UITextField!
-  @IBOutlet private weak var cuisineTextField: UITextField!
-  @IBOutlet private weak var priceTextField: UITextField!
+  @IBOutlet private weak var cityTextField: UITextField! {
+    didSet {
+      cityTextField.inputView = cityPickerView
+    }
+  }
+  @IBOutlet private weak var categoryTextField: UITextField! {
+    didSet {
+      categoryTextField.inputView = categoryPickerView
+    }
+  }
+  @IBOutlet private weak var priceTextField: UITextField!  {
+    didSet {
+      priceTextField.inputView = pricePickerView
+    }
+  }
   
   static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil),
                              restaurant: Restaurant) -> EditRestaurantViewController {
@@ -54,18 +66,19 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
   // populate restaurant with current data
   func populateRestaurant() {
     restaurantNameTextField.text = restaurant.name
-    locationTextField.text = restaurant.city
-    cuisineTextField.text = restaurant.category
+    cityTextField.text = restaurant.city
+    categoryTextField.text = restaurant.category
     priceTextField.text = restaurant.price.description
     restaurantImageView.sd_setImage(with: restaurant.photoURL)
   }
   
   func saveChanges() {
     guard let name = restaurantNameTextField.text,
-        let city = locationTextField.text,
-        let category = cuisineTextField.text,
-        let price = priceTextField.text.flatMap(Int.init) else {
-          return // TODO: consider logging an error here.
+        let city = cityTextField.text,
+        let category = categoryTextField.text,
+        let price = price(from: priceTextField.text) else {
+        self.presentInvalidDataAlert(message: "All fields must be filled out.")
+        return
     }
     var data = [
       "name": name,
@@ -106,9 +119,96 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
           self.presentDidSaveAlert()
         }
       })
+  private func price(from string: String?) -> Int? {
+    guard let string = string else { return nil }
+    switch string {
+    case "$":
+      return 1
+    case "$$":
+      return 2
+    case "$$$":
+      return 3
+
+    case _:
+      return nil
     }
   }
-  
+
+  // MARK: Setting up pickers
+  private let priceOptions = ["$", "$$", "$$$"]
+  private let cityOptions = Restaurant.cities
+  private let categoryOptions = Restaurant.categories
+
+  private lazy var cityPickerView: UIPickerView = {
+    let pickerView = UIPickerView()
+    pickerView.dataSource = self
+    pickerView.delegate = self
+    return pickerView
+  }()
+
+  private lazy var categoryPickerView: UIPickerView = {
+    let pickerView = UIPickerView()
+    pickerView.dataSource = self
+    pickerView.delegate = self
+    return pickerView
+  }()
+
+  private lazy var pricePickerView: UIPickerView = {
+    let pickerView = UIPickerView()
+    pickerView.dataSource = self
+    pickerView.delegate = self
+    return pickerView
+  }()
+
+  // MARK: UIPickerViewDataSource
+
+  func numberOfComponents(in pickerView: UIPickerView) -> Int {
+    return 1
+  }
+
+  func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    switch pickerView {
+    case pricePickerView:
+      return priceOptions.count
+    case cityPickerView:
+      return cityOptions.count
+    case categoryPickerView:
+      return categoryOptions.count
+
+    case _:
+      fatalError("Unhandled picker view: \(pickerView)")
+    }
+  }
+
+  // MARK: - UIPickerViewDelegate
+
+  func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent: Int) -> String? {
+    switch pickerView {
+    case pricePickerView:
+      return priceOptions[row]
+    case cityPickerView:
+      return cityOptions[row]
+    case categoryPickerView:
+      return categoryOptions[row]
+    case _:
+      fatalError("Unhandled picker view: \(pickerView)")
+    }
+  }
+
+  func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    switch pickerView {
+    case pricePickerView:
+      priceTextField.text = priceOptions[row]
+    case cityPickerView:
+      cityTextField.text = cityOptions[row]
+    case categoryPickerView:
+      categoryTextField.text = categoryOptions[row]
+    case _:
+      fatalError("Unhandled picker view: \(pickerView)")
+    }
+  }
+
+
   // MARK: Alert Messages
   
   func presentDidSaveAlert() {
@@ -158,24 +258,24 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
   }
   
   @objc func keyboardNextButton() {
-    if locationTextField.isFirstResponder {
-      cuisineTextField.becomeFirstResponder()
-    } else if cuisineTextField.isFirstResponder {
+    if cityTextField.isFirstResponder {
+      categoryTextField.becomeFirstResponder()
+    } else if categoryTextField.isFirstResponder {
       priceTextField.becomeFirstResponder()
     } else if restaurantNameTextField.isFirstResponder {
-      locationTextField.becomeFirstResponder()
+      cityTextField.becomeFirstResponder()
     } else {
       resignFirstResponder()
     }
   }
   
   @objc func keyboardPreviousButton() {
-    if locationTextField.isFirstResponder {
+    if cityTextField.isFirstResponder {
       restaurantNameTextField.becomeFirstResponder()
-    } else if cuisineTextField.isFirstResponder {
-      locationTextField.becomeFirstResponder()
+    } else if categoryTextField.isFirstResponder {
+      cityTextField.becomeFirstResponder()
     } else if priceTextField.isFirstResponder {
-      cuisineTextField.becomeFirstResponder()
+      categoryTextField.becomeFirstResponder()
     } else {
       resignFirstResponder()
     }
@@ -221,15 +321,8 @@ extension EditRestaurantViewController: UITextFieldDelegate {
   }
   
   func textFieldDidEndEditing(_ textField: UITextField) {
-    let text = textField.text?.trimmingCharacters(in: .whitespaces)
-    if textField == priceTextField {
-      if text != "1" && text != "2" && text != "3" {
-        // return to previous text
-        textField.text = restaurant.price.description
-        presentInvalidDataAlert(message: "Invalid price. Please enter a number from 1 to 3.")
-        return
-      }
-    }
+    let trimmed = textField.text?.trimmingCharacters(in: .whitespaces)
+    textField.text = trimmed
   }
   
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {
