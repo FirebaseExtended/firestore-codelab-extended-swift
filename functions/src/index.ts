@@ -83,7 +83,7 @@ async function updateRestaurant(db: Firestore, restaurantID: string, name: strin
     const batch = db.batch();
     const reviewsSnapshot = await queryRef.get();
     for (const doc of reviewsSnapshot.docs) {
-        await batch.update(doc.ref, {name: name});
+        await batch.update(doc.ref, {restaurantName: name});
     };
     await batch.commit();
     console.log(`name of restaurant updated to ${name}`);
