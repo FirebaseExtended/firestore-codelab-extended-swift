@@ -68,7 +68,7 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
     guard let name = restaurantNameTextField.text,
       let city = cityTextField.text,
       let category = categoryTextField.text,
-      let price = price(from: priceTextField.text) else {
+      let price = Utils.priceValue(from: priceTextField.text) else {
         self.presentInvalidDataAlert(message: "All fields must be filled out.")
         return
     }
@@ -91,20 +91,6 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
     }
   }
 
-  private func price(from string: String?) -> Int? {
-    guard let string = string else { return nil }
-    switch string {
-    case "$":
-      return 1
-    case "$$":
-      return 2
-    case "$$$":
-      return 3
-
-    case _:
-      return nil
-    }
-  }
 
   // MARK: Setting up pickers
   private let priceOptions = ["$", "$$", "$$$"]

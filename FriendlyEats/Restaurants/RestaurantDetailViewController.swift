@@ -210,7 +210,7 @@ class RestaurantTitleView: UIView {
     nameLabel.text = restaurant.name
     categoryLabel.text = restaurant.category
     cityLabel.text = restaurant.city
-    priceLabel.text = priceString(from: restaurant.price)
+    priceLabel.text = Utils.priceString(from: restaurant.price)
     starsView.rating = Int(restaurant.averageRating.rounded())
     titleImageView.sd_setImage(with: restaurant.photoURL)
   }

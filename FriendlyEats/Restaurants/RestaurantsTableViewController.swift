@@ -18,21 +18,6 @@ import UIKit
 import Firebase
 import SDWebImage
 
-func priceString(from price: Int) -> String {
-  let priceText: String
-  switch price {
-  case 1:
-    priceText = "$"
-  case 2:
-    priceText = "$$"
-  case 3:
-    priceText = "$$$"
-  case _:
-    fatalError("price must be between one and three")
-  }
-
-  return priceText
-}
 
 class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
 
@@ -223,7 +208,7 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
     }
 
     if let price = price {
-      priceFilterLabel.text = priceString(from: price)
+      priceFilterLabel.text = Utils.priceString(from: price)
       priceFilterLabel.isHidden = false
     } else {
       priceFilterLabel.isHidden = true
@@ -253,7 +238,7 @@ class RestaurantTableViewCell: UITableViewCell {
     cityLabel.text = restaurant.city
     categoryLabel.text = restaurant.category
     starsView.rating = Int(restaurant.averageRating.rounded())
-    priceLabel.text = priceString(from: restaurant.price)
+    priceLabel.text = Utils.priceString(from: restaurant.price)
 
     let image = restaurant.photoURL
     thumbnailView.sd_setImage(with: image)

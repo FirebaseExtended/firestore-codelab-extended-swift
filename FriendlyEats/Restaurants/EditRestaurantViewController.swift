@@ -68,7 +68,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
     restaurantNameTextField.text = restaurant.name
     cityTextField.text = restaurant.city
     categoryTextField.text = restaurant.category
-    priceTextField.text = restaurant.price.description
+    priceTextField.text = Utils.priceString(from: restaurant.price)
     restaurantImageView.sd_setImage(with: restaurant.photoURL)
   }
   
@@ -76,7 +76,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
     guard let name = restaurantNameTextField.text,
         let city = cityTextField.text,
         let category = categoryTextField.text,
-        let price = price(from: priceTextField.text) else {
+        let price = Utils.priceValue(from: priceTextField.text) else {
         self.presentInvalidDataAlert(message: "All fields must be filled out.")
         return
     }
