@@ -8,12 +8,15 @@ export const computeAverageReview = functions.firestore
     const eventData = event.data.data();
     // get the previous value, if it exists
     const prev = event.data.previous;
-    const previousValue = prev.data();
     const rating = eventData.rating;
-    const prevRating = previousValue.rating;
-    if (rating === prevRating) {
-        console.log("not a new rating.");
-        return null;
+    let previousValue
+    if (prev.exists) {
+        previousValue = prev.data();
+        const prevRating = previousValue.rating;
+        if (rating === prevRating) {
+            console.log("not a new rating.");
+            return null;
+        }
     }
     // get the restaurant ID
     const restaurantID = eventData.restaurantID;
