@@ -166,7 +166,6 @@ class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, 
     // pickerView.isHidden = true
     let sort = sortByOptions[row]
     print("Sorting by: \(sort)")
-    query = baseQuery.order(by: sort)
   }
 }
 
