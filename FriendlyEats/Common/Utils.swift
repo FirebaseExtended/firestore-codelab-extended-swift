@@ -30,35 +30,13 @@ class Utils: NSObject {
   }
 
   static func priceString(from price: Int) -> String {
-    let priceText: String
-    switch price {
-    case 1:
-      priceText = "$"
-    case 2:
-      priceText = "$$"
-    case 3:
-      priceText = "$$$"
-    case _:
-      // Yeah, we probably don't want to fail in real-life
-      fatalError("price must be between one and three")
-    }
-
-    return priceText
+    return (0 ..< price).reduce("") { s, _ in s + "$" }
   }
 
   static func priceValue(from string: String?) -> Int? {
     guard let string = string else { return nil }
-    switch string {
-    case "$":
-      return 1
-    case "$$":
-      return 2
-    case "$$$":
-      return 3
-
-    case _:
-      return nil
-    }
+    // TODO: Maybe ensure that we're only counting dollar signs
+    return string.count
   }
 
 }
