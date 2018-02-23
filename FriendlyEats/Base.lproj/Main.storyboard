@@ -1280,8 +1280,8 @@
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="addPhotoButton" destination="Uej-8C-gqJ" id="CXx-k1-eFY"/>
-                        <outlet property="cuisineTextField" destination="S4J-9t-gDg" id="jac-0u-joR"/>
-                        <outlet property="locationTextField" destination="Sac-kH-c4v" id="Wuv-zy-AiP"/>
+                        <outlet property="categoryTextField" destination="S4J-9t-gDg" id="jac-0u-joR"/>
+                        <outlet property="cityTextField" destination="Sac-kH-c4v" id="Wuv-zy-AiP"/>
                         <outlet property="priceTextField" destination="qYQ-jD-WY0" id="JP5-Jv-tMU"/>
                         <outlet property="restaurantImageView" destination="zzH-SR-d9y" id="fKN-gM-yfc"/>
                         <outlet property="restaurantNameTextField" destination="nXB-XG-fFH" id="pep-b4-Sh0"/>
