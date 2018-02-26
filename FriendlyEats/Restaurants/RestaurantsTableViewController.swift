@@ -53,9 +53,11 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
   fileprivate var query: Query? {
     didSet {
       tableView.dataSource = nil
+      dataSource.stopUpdates()
       if let query = query {
         dataSource = dataSourceForQuery(query)
         tableView.dataSource = dataSource
+        dataSource.startUpdates()
       }
     }
   }
