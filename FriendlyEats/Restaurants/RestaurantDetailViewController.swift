@@ -20,7 +20,7 @@ import FirebaseFirestore
 import Firebase
 import FirebaseAuthUI
 
-class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
+class RestaurantDetailViewController: UIViewController {
 
   // These are optional because we can't do initializer-level dependency injection with storyboards.
 
@@ -68,9 +68,8 @@ class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, 
   @IBOutlet var tableView: UITableView!
   @IBOutlet var titleView: RestaurantTitleView!
   @IBOutlet weak var editButton: UIButton!
-  // TODO: Give the picker view an "OK" or "Done" button to select values.
-  @IBOutlet weak var pickerView: UIPickerView!
-  @IBOutlet weak var sortButton: UIButton!
+  @IBOutlet weak var bottomToolbar: UIToolbar!
+
 
   let backgroundView = UIImageView()
   let sortByOptions = ["date", "rating", "yumCount"]
@@ -78,11 +77,6 @@ class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, 
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    //hide picker view on view load
-    pickerView.isHidden = true
-    pickerView.delegate = self
-    pickerView.dataSource = self
-    
     self.title = restaurant.name
 
     backgroundView.image = UIImage(named: "pizza-monster")!
@@ -105,6 +99,9 @@ class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, 
     tableView.dataSource = dataSource
     tableView.rowHeight = UITableViewAutomaticDimension
     tableView.estimatedRowHeight = 140
+
+    // Comment out this line to show the toolbar
+    // bottomToolbar.isHidden = true
   }
     
   
@@ -144,30 +141,37 @@ class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, 
     self.navigationController?.pushViewController(controller, animated: true)
   }
 
-  @IBAction func sortPressed(_ sender: Any) {
-    if pickerView.isHidden {
-      pickerView.isHidden = false
+  @IBAction func sortReviewsWasTapped(_ sender: Any) {
+    let pickSortMethod = UIAlertController(title: "Sort reviews by...", message: nil, preferredStyle: .actionSheet)
+    let sortByDefault = UIAlertAction(title: "Default", style: .default) { _ in
+      self.query = self.baseQuery
     }
+    let sortByDate = UIAlertAction(title: "Newest first", style: .default) { _ in
+      self.query = self.baseQuery.order(by: "date", descending: true)
+    }
+    let sortByYums = UIAlertAction(title: "Most yums", style: .default) { _ in
+      self.query = self.baseQuery.order(by: "yumCount", descending: true)
+    }
+    let sortByBest = UIAlertAction(title: "Best first", style: .default) { _ in
+      self.query = self.baseQuery.order(by: "rating", descending: true)
+    }
+    let sortByWorst = UIAlertAction(title: "Worst first", style: .default) { _ in
+      self.query = self.baseQuery.order(by: "rating", descending: false)
+    }
+    pickSortMethod.addAction(sortByDefault)
+    pickSortMethod.addAction(sortByDate)
+    pickSortMethod.addAction(sortByYums)
+    pickSortMethod.addAction(sortByBest)
+    pickSortMethod.addAction(sortByWorst)
+
+    present(pickSortMethod, animated: true)
   }
 
-  func numberOfComponents(in pickerView: UIPickerView) -> Int {
-    return 1
+  func sortByDefault() {
+    query = baseQuery
+
   }
 
-  func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-    return sortByOptions.count
-  }
-
-  func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-    return sortByOptions[row]
-  }
-
-  func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-    // pickerView.isHidden = true
-    let sort = sortByOptions[row]
-    print("Sorting by: \(sort)")
-    query = baseQuery.order(by: sort)
-  }
 }
 
 class RestaurantTitleView: UIView {
