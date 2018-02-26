@@ -30,22 +30,7 @@ class ReviewTableViewCell: UITableViewCell {
   var review: Review!
 
   func populate(review: Review) {
-    self.review = review
-    restaurantNameLabel?.text = review.restaurantName
-    usernameLabel?.text = review.userInfo.name
-    userIcon?.sd_setImage(with: review.userInfo.photoURL)
-    starsView.rating = review.rating
-    reviewContentsLabel.text = review.text
-    switch review.yumCount {
-    case 0:
-      yumsLabel.isHidden = true
-    case 1:
-      yumsLabel.isHidden = false
-      yumsLabel.text = "1 yum"
-    default:
-      yumsLabel.isHidden = false
-      yumsLabel.text = "\(review.yumCount) yums"
-    }
+
   }
 
   @IBAction func yumWasTapped(_ sender: Any) {

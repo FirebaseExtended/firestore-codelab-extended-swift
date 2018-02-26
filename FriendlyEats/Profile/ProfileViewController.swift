@@ -35,7 +35,7 @@ class ProfileViewController: UIViewController {
       if let user = user {
         populateReviews(forUser: user)
       } else {
-        dataSource?.reviews.stopListening()
+        dataSource?.stopUpdates()
         dataSource = nil
         tableView.backgroundView = tableBackgroundLabel
         tableView.reloadData()
@@ -57,9 +57,9 @@ class ProfileViewController: UIViewController {
   @IBOutlet private var profileImageView: UIImageView!
   @IBOutlet private var usernameLabel: UILabel!
   @IBOutlet private var viewRestaurantsButton: UIButton!
-  @IBOutlet weak var signInButton: UIButton!
+  @IBOutlet private var signInButton: UIButton!
   // Not weak because we might remove it
-  @IBOutlet var signOutButton: UIBarButtonItem!
+  @IBOutlet private var signOutButton: UIBarButtonItem!
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -94,11 +94,6 @@ class ProfileViewController: UIViewController {
     if let firebaseUser = firebaseUser {
       let user = User(user: firebaseUser)
       self.user = user
-      Firestore.firestore().users.document(user.userID).setData(user.documentData) { error in
-        if let error = error {
-          print("Error writing user to Firestore: \(error)")
-        }
-      }
     } else {
       user = nil
     }
@@ -121,18 +116,9 @@ class ProfileViewController: UIViewController {
   }
 
   fileprivate func populateReviews(forUser user: User) {
-    let query = Firestore.firestore().reviews.whereField("userInfo.userID", isEqualTo: user.userID)
-    dataSource = ReviewTableViewDataSource(query: query) { [unowned self] (changes) in
-      self.tableView.reloadData()
-      guard let reviews = self.dataSource?.reviews else { return }
-      if reviews.count > 0 {
-        self.tableView.backgroundView = nil
-      } else {
-        self.tableView.backgroundView = self.tableBackgroundLabel
-      }
-    }
+
     dataSource?.sectionTitle = "My reviews"
-    dataSource?.reviews.listen()
+    dataSource?.startUpdates()
     tableView.dataSource = dataSource
   }
 

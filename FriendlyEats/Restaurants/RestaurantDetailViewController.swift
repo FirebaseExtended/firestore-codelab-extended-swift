@@ -22,8 +22,6 @@ import FirebaseAuthUI
 
 class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
 
-  // These are optional because we can't do initializer-level dependency injection with storyboards.
-
   private var restaurant: Restaurant!
   private var localCollection: LocalCollection<Review>!
   private var dataSource: ReviewTableViewDataSource?
@@ -52,8 +50,7 @@ class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, 
   }
 
   lazy private var baseQuery: Query = {
-    Firestore.firestore().reviews
-        .whereField("restaurantID", isEqualTo: restaurant.documentID)
+    return fatalError("Unimplemented")
   }()
 
   static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil),
@@ -64,7 +61,7 @@ class RestaurantDetailViewController: UIViewController, UIPickerViewDataSource, 
     controller.restaurant = restaurant
     return controller
   }
-  
+
   @IBOutlet var tableView: UITableView!
   @IBOutlet var titleView: RestaurantTitleView!
   @IBOutlet weak var editButton: UIButton!

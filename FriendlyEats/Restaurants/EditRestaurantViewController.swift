@@ -78,35 +78,6 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
       data["photoURL"] = downloadUrl
     }
 
-    // We can now make this a batch write
-    let batchWrite = Firestore.firestore().batch()
-    let restaurantToEdit = Firestore.firestore().collection("restaurants").document(restaurant.documentID)
-    batchWrite.updateData(data, forDocument: restaurantToEdit)
-
-    // And now, let's fix our denormalized data.
-    Firestore.firestore().collection("reviews").whereField("restaurantID", isEqualTo: restaurant.documentID).getDocuments { (snapshot, error) in
-      if let error = error {
-        print("Received an error attempting to get reviews! \(error)")
-        return
-      }
-      if let snapshot = snapshot {
-        for reviewDoc in snapshot.documents {
-          // Skip restaurants that no longer exist. This shouldn't be possible
-          // since our app doesn't allow for restaurant deletion.
-          guard let name = data["name"] else { continue }
-          batchWrite.updateData(["restaurantName": name], forDocument: reviewDoc.reference)
-          print("Updating a review, too!")
-        }
-      }
-
-      batchWrite.commit(completion: { (error) in
-        if let error = error {
-          print("Error writing document: \(error)")
-        } else {
-          self.presentDidSaveAlert()
-        }
-      })
-    }
   }
   
   // MARK: Alert Messages
