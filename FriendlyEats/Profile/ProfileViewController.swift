@@ -35,7 +35,7 @@ class ProfileViewController: UIViewController {
       if let user = user {
         populateReviews(forUser: user)
       } else {
-        dataSource?.reviews.stopListening()
+        dataSource?.stopUpdates()
         dataSource = nil
         tableView.backgroundView = tableBackgroundLabel
         tableView.reloadData()
@@ -124,15 +124,15 @@ class ProfileViewController: UIViewController {
     let query = Firestore.firestore().reviews.whereField("userInfo.userID", isEqualTo: user.userID)
     dataSource = ReviewTableViewDataSource(query: query) { [unowned self] (changes) in
       self.tableView.reloadData()
-      guard let reviews = self.dataSource?.reviews else { return }
-      if reviews.count > 0 {
+      guard let dataSource = self.dataSource else { return }
+      if dataSource.count > 0 {
         self.tableView.backgroundView = nil
       } else {
         self.tableView.backgroundView = self.tableBackgroundLabel
       }
     }
     dataSource?.sectionTitle = "My reviews"
-    dataSource?.reviews.listen()
+    dataSource?.startUpdates()
     tableView.dataSource = dataSource
   }
 
