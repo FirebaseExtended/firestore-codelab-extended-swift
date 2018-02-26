@@ -1105,14 +1105,16 @@
                     <navigationItem key="navigationItem" title="Edit Restaurant" id="ux4-Va-jG2"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
-                        <outlet property="cuisineTextField" destination="Smk-bU-gvH" id="Yv8-l7-b4c"/>
-                        <outlet property="locationTextField" destination="lgw-Bb-CZR" id="UAi-os-QAb"/>
+                        <outlet property="categoryTextField" destination="Smk-bU-gvH" id="Yv8-l7-b4c"/>
+                        <outlet property="cityTextField" destination="lgw-Bb-CZR" id="UAi-os-QAb"/>
                         <outlet property="priceTextField" destination="4W1-LH-cwp" id="R4D-1O-6fq"/>
                         <outlet property="restaurantImageView" destination="1ei-aa-raU" id="lW5-8y-g7E"/>
                         <outlet property="restaurantNameTextField" destination="aOa-CE-zRb" id="iAl-Pu-NEP"/>
+                        <segue destination="qWQ-tn-nhV" kind="unwind" identifier="unwindToMyRestaurantsSegue" unwindAction="unwindToMyRestaurantsWithSegue:" id="wh9-SY-Z3r"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8Ko-fl-bJg" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="qWQ-tn-nhV" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1901.5999999999999" y="56.221889055472268"/>
         </scene>
@@ -1280,14 +1282,16 @@
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="addPhotoButton" destination="Uej-8C-gqJ" id="CXx-k1-eFY"/>
-                        <outlet property="cuisineTextField" destination="S4J-9t-gDg" id="jac-0u-joR"/>
-                        <outlet property="locationTextField" destination="Sac-kH-c4v" id="Wuv-zy-AiP"/>
+                        <outlet property="categoryTextField" destination="S4J-9t-gDg" id="jac-0u-joR"/>
+                        <outlet property="cityTextField" destination="Sac-kH-c4v" id="Wuv-zy-AiP"/>
                         <outlet property="priceTextField" destination="qYQ-jD-WY0" id="JP5-Jv-tMU"/>
                         <outlet property="restaurantImageView" destination="zzH-SR-d9y" id="fKN-gM-yfc"/>
                         <outlet property="restaurantNameTextField" destination="nXB-XG-fFH" id="pep-b4-Sh0"/>
+                        <segue destination="7YK-Xl-ffg" kind="unwind" identifier="unwindToMyRestaurantsSegue" unwindAction="unwindToMyRestaurantsWithSegue:" id="L5q-Kn-nDC"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="H3K-du-slr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="7YK-Xl-ffg" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1087" y="-2113"/>
         </scene>

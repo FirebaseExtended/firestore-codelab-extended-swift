@@ -18,21 +18,6 @@ import UIKit
 import Firebase
 import SDWebImage
 
-func priceString(from price: Int) -> String {
-  let priceText: String
-  switch price {
-  case 1:
-    priceText = "$"
-  case 2:
-    priceText = "$$"
-  case 3:
-    priceText = "$$$"
-  case _:
-    fatalError("price must be between one and three")
-  }
-
-  return priceText
-}
 
 class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
 
@@ -52,8 +37,8 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
 
   fileprivate var query: Query? {
     didSet {
-      tableView.dataSource = nil
       dataSource.stopUpdates()
+      tableView.dataSource = nil
       if let query = query {
         dataSource = dataSourceForQuery(query)
         tableView.dataSource = dataSource
@@ -161,6 +146,14 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
   func query(withCategory category: String?, city: String?, price: Int?, sortBy: String?) -> Query {
     var filtered = baseQuery
 
+    if category == nil && city == nil && price == nil && sortBy == nil {
+      stackViewHeightConstraint.constant = 0
+      activeFiltersStackView.isHidden = true
+    } else {
+      stackViewHeightConstraint.constant = 44
+      activeFiltersStackView.isHidden = false
+    }
+
     // Advanced queries
 
     if let category = category, !category.isEmpty {
@@ -212,7 +205,7 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
     }
 
     if let price = price {
-      priceFilterLabel.text = priceString(from: price)
+      priceFilterLabel.text = Utils.priceString(from: price)
       priceFilterLabel.isHidden = false
     } else {
       priceFilterLabel.isHidden = true
@@ -242,7 +235,7 @@ class RestaurantTableViewCell: UITableViewCell {
     cityLabel.text = restaurant.city
     categoryLabel.text = restaurant.category
     starsView.rating = Int(restaurant.averageRating.rounded())
-    priceLabel.text = priceString(from: restaurant.price)
+    priceLabel.text = Utils.priceString(from: restaurant.price)
     thumbnailView.sd_setImage(with: restaurant.photoURL)
   }
 

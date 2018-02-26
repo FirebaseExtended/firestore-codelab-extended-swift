@@ -17,7 +17,7 @@ import UIKit
 import Firebase
 import FirebaseStorage
 
-class AddRestaurantViewController: UIViewController, UINavigationControllerDelegate {
+class AddRestaurantViewController: UIViewController, UINavigationControllerDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
 
   // MARK: Properties
 
@@ -32,9 +32,21 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
 
   @IBOutlet private weak var restaurantImageView: UIImageView!
   @IBOutlet private weak var restaurantNameTextField: UITextField!
-  @IBOutlet private weak var locationTextField: UITextField!
-  @IBOutlet private weak var cuisineTextField: UITextField!
-  @IBOutlet private weak var priceTextField: UITextField!
+  @IBOutlet private weak var cityTextField: UITextField! {
+    didSet {
+      cityTextField.inputView = cityPickerView
+    }
+  }
+  @IBOutlet private weak var categoryTextField: UITextField! {
+    didSet {
+      categoryTextField.inputView = categoryPickerView
+    }
+  }
+  @IBOutlet private weak var priceTextField: UITextField! {
+    didSet {
+      priceTextField.inputView = pricePickerView
+    }
+  }
   @IBOutlet fileprivate weak var addPhotoButton: UIButton!
 
   static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil))
@@ -54,10 +66,10 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
 
   func saveChanges() {
     guard let name = restaurantNameTextField.text,
-      let city = locationTextField.text,
-      let category = cuisineTextField.text,
-      let price = priceTextField.text.flatMap(Int.init) else {
-        self.presentInvalidDataAlert(message: "All fields must be filled out and price must be an integer from 1 to 3.")
+      let city = cityTextField.text,
+      let category = categoryTextField.text,
+      let price = Utils.priceValue(from: priceTextField.text) else {
+        self.presentInvalidDataAlert(message: "All fields must be filled out.")
         return
     }
     restaurant.name = name
@@ -69,8 +81,91 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
       restaurant.photoURL = URL(string: downloadUrl)!
     }
     print("Going to save document data as \(restaurant.documentData)")
-
+    Firestore.firestore().restaurants.document(restaurant.documentID)
+        .setData(restaurant.documentData) { err in
+          if let err = err {
+            print("Error writing document: \(err)")
+          } else {
+            print("Write confirmed by the server")
+          }
+    }
+    self.presentDidSaveAlert()
   }
+
+
+  // MARK: Setting up pickers
+  private let priceOptions = ["$", "$$", "$$$"]
+  private let cityOptions = Restaurant.cities
+  private let categoryOptions = Restaurant.categories
+
+  private lazy var cityPickerView: UIPickerView = {
+    let pickerView = UIPickerView()
+    pickerView.dataSource = self
+    pickerView.delegate = self
+    return pickerView
+  }()
+
+  private lazy var categoryPickerView: UIPickerView = {
+    let pickerView = UIPickerView()
+    pickerView.dataSource = self
+    pickerView.delegate = self
+    return pickerView
+  }()
+
+  private lazy var pricePickerView: UIPickerView = {
+    let pickerView = UIPickerView()
+    pickerView.dataSource = self
+    pickerView.delegate = self
+    return pickerView
+  }()
+ // MARK: UIPickerViewDataSource
+
+  func numberOfComponents(in pickerView: UIPickerView) -> Int {
+    return 1
+  }
+
+  func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    switch pickerView {
+    case pricePickerView:
+      return priceOptions.count
+    case cityPickerView:
+      return cityOptions.count
+    case categoryPickerView:
+      return categoryOptions.count
+    case _:
+
+      fatalError("Unhandled picker view: \(pickerView)")
+    }
+  }
+
+  // MARK: - UIPickerViewDelegate
+
+  func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent: Int) -> String? {
+    switch pickerView {
+    case pricePickerView:
+      return priceOptions[row]
+    case cityPickerView:
+      return cityOptions[row]
+    case categoryPickerView:
+      return categoryOptions[row]
+    case _:
+      fatalError("Unhandled picker view: \(pickerView)")
+    }
+  }
+
+  func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    switch pickerView {
+    case pricePickerView:
+      priceTextField.text = priceOptions[row]
+    case cityPickerView:
+      cityTextField.text = cityOptions[row]
+    case categoryPickerView:
+      categoryTextField.text = categoryOptions[row]
+    case _:
+      fatalError("Unhandled picker view: \(pickerView)")
+    }
+  }
+
 
   // MARK: Alert Messages
 
@@ -78,7 +173,7 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
     let message = "Restaurant added successfully!"
     let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
     let okAction = UIAlertAction(title: "OK", style: .default) { action in
-      self.navigationController?.popViewController(animated: true)
+      self.performSegue(withIdentifier: "unwindToMyRestaurantsSegue", sender: self)
     }
     alertController.addAction(okAction)
     self.present(alertController, animated: true, completion: nil)
@@ -108,24 +203,24 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
   }
 
   @objc func keyboardNextButton() {
-    if locationTextField.isFirstResponder {
-      cuisineTextField.becomeFirstResponder()
-    } else if cuisineTextField.isFirstResponder {
+    if cityTextField.isFirstResponder {
+      categoryTextField.becomeFirstResponder()
+    } else if categoryTextField.isFirstResponder {
       priceTextField.becomeFirstResponder()
     } else if restaurantNameTextField.isFirstResponder {
-      locationTextField.becomeFirstResponder()
+      cityTextField.becomeFirstResponder()
     } else {
       resignFirstResponder()
     }
   }
 
   @objc func keyboardPreviousButton() {
-    if locationTextField.isFirstResponder {
+    if cityTextField.isFirstResponder {
       restaurantNameTextField.becomeFirstResponder()
-    } else if cuisineTextField.isFirstResponder {
-      locationTextField.becomeFirstResponder()
+    } else if categoryTextField.isFirstResponder {
+      cityTextField.becomeFirstResponder()
     } else if priceTextField.isFirstResponder {
-      cuisineTextField.becomeFirstResponder()
+      categoryTextField.becomeFirstResponder()
     } else {
       resignFirstResponder()
     }
@@ -171,15 +266,8 @@ extension AddRestaurantViewController: UITextFieldDelegate {
   }
 
   func textFieldDidEndEditing(_ textField: UITextField) {
-    let text = textField.text?.trimmingCharacters(in: .whitespaces)
-    if textField == priceTextField {
-      if text != "1" && text != "2" && text != "3" {
-        // return to previous text
-        textField.text = restaurant.price.description
-        presentInvalidDataAlert(message: "Invalid price. Please enter a number from 1 to 3.")
-        return
-      }
-    }
+    let trimmed = textField.text?.trimmingCharacters(in: .whitespaces)
+    textField.text = trimmed
   }
 
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {
