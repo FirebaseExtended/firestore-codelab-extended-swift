@@ -162,10 +162,8 @@ class RestaurantDetailViewController: UIViewController {
     pickSortMethod.addAction(sortByYums)
     pickSortMethod.addAction(sortByBest)
     pickSortMethod.addAction(sortByWorst)
-
     present(pickSortMethod, animated: true)
   }
-
 
 }
 
