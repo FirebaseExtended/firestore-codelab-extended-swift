@@ -52,30 +52,20 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
 
   fileprivate var query: Query? {
     didSet {
-      dataSource.stopUpdates()
       tableView.dataSource = nil
       if let query = query {
         dataSource = dataSourceForQuery(query)
         tableView.dataSource = dataSource
-        dataSource.startUpdates()
       }
     }
   }
 
   private func dataSourceForQuery(_ query: Query) -> RestaurantTableViewDataSource {
-    return RestaurantTableViewDataSource(query: query) { [unowned self] (changes) in
-      if self.dataSource.count > 0 {
-        self.tableView.backgroundView = nil
-      } else {
-        self.tableView.backgroundView = self.backgroundView
-      }
-
-      self.tableView.reloadData()
-    }
+    fatalError("Unimplemented")
   }
 
   private lazy var baseQuery: Query = {
-    return fatalError("Implement me: Fetch Data from Cloud Firestore")
+    fatalError("Unimplemented")
   }()
 
   lazy private var filters: (navigationController: UINavigationController,
@@ -90,12 +80,9 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
     backgroundView.alpha = 0.5
     tableView.backgroundView = backgroundView
     tableView.tableFooterView = UIView()
-
-    query = baseQuery
     stackViewHeightConstraint.constant = 0
     activeFiltersStackView.isHidden = true
     tableView.delegate = self
-    tableView.dataSource = dataSource
 
     self.navigationController?.navigationBar.barStyle = .black
 
@@ -107,12 +94,6 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.setNeedsStatusBarAppearanceUpdate()
-    dataSource.startUpdates()
-  }
-
-  override func viewWillDisappear(_ animated: Bool) {
-    super.viewWillDisappear(animated)
-    dataSource.stopUpdates()
   }
 
   @IBAction func didTapPopulateButton(_ sender: Any) {
@@ -152,10 +133,6 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
     }
   }
 
-  deinit {
-    dataSource.stopUpdates()
-  }
-
   // MARK: - UITableViewDelegate
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -171,14 +148,6 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
 
   func query(withCategory category: String?, city: String?, price: Int?, sortBy: String?) -> Query {
     var filtered = baseQuery
-
-    if category == nil && city == nil && price == nil && sortBy == nil {
-      stackViewHeightConstraint.constant = 0
-      activeFiltersStackView.isHidden = true
-    } else {
-      stackViewHeightConstraint.constant = 44
-      activeFiltersStackView.isHidden = false
-    }
 
     // Advanced queries
 
@@ -206,6 +175,14 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
                   city: String?,
                   price: Int?,
                   sortBy: String?) {
+    if category == nil && city == nil && price == nil && sortBy == nil {
+      stackViewHeightConstraint.constant = 0
+      activeFiltersStackView.isHidden = true
+    } else {
+      stackViewHeightConstraint.constant = 44
+      activeFiltersStackView.isHidden = false
+    }
+
     let filtered = query(withCategory: category, city: city, price: price, sortBy: sortBy)
 
     if let category = category, !category.isEmpty {
@@ -229,7 +206,7 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
       priceFilterLabel.isHidden = true
     }
 
-    self.query = filtered
+    query = filtered
   }
 
 }
@@ -254,9 +231,7 @@ class RestaurantTableViewCell: UITableViewCell {
     categoryLabel.text = restaurant.category
     starsView.rating = Int(restaurant.averageRating.rounded())
     priceLabel.text = priceString(from: restaurant.price)
-
-    let image = restaurant.photoURL
-    thumbnailView.sd_setImage(with: image)
+    thumbnailView.sd_setImage(with: restaurant.photoURL)
   }
 
   override func prepareForReuse() {

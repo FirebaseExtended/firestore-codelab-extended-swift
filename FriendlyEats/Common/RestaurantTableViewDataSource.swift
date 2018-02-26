@@ -23,6 +23,13 @@ import FirebaseFirestore
 @objc class RestaurantTableViewDataSource: NSObject, UITableViewDataSource {
 
   private var restaurants: [Restaurant] = []
+  private let query: Query
+
+  public init(query: Query,
+              updateHandler: @escaping ([DocumentChange]) -> ()) {
+    fatalError("Unimplemented")
+  }
+
 
   // Pull data from Firestore
 

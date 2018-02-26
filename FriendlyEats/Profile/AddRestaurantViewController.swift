@@ -69,14 +69,7 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
       restaurant.photoURL = URL(string: downloadUrl)!
     }
     print("Going to save document data as \(restaurant.documentData)")
-    Firestore.firestore().restaurants.document(restaurant.documentID)
-        .setData(restaurant.documentData) { err in
-          if let err = err {
-            print("Error writing document: \(err)")
-          } else {
-            self.presentDidSaveAlert()
-          }
-    }
+
   }
 
   // MARK: Alert Messages
