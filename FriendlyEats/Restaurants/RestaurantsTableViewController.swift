@@ -94,6 +94,16 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.setNeedsStatusBarAppearanceUpdate()
+    dataSource.startUpdates()
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    dataSource.stopUpdates()
+  }
+
+  deinit {
+    dataSource.stopUpdates()
   }
 
   @IBAction func didTapPopulateButton(_ sender: Any) {
