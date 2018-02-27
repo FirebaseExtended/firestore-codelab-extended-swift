@@ -81,12 +81,12 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.setNeedsStatusBarAppearanceUpdate()
-    dataSource.startUpdates()
+//    dataSource.startUpdates()
   }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
-    dataSource.stopUpdates()
+//    dataSource.stopUpdates()
   }
 
   deinit {
