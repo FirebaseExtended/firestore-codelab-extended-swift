@@ -34,53 +34,7 @@ class ReviewTableViewCell: UITableViewCell {
   }
 
   @IBAction func yumWasTapped(_ sender: Any) {
-    let reviewReference = Firestore.firestore().collection("reviews").document(review.documentID)
-    Firestore.firestore().runTransaction({ (transaction, errorPointer) -> Any? in
-
-      // First, we're going to make sure we have the most up-to-date number of yums
-      let reviewSnapshot:DocumentSnapshot
-      do {
-        try reviewSnapshot = transaction.getDocument(reviewReference)
-      } catch let error as NSError {
-        errorPointer?.pointee = error
-        return nil
-      }
-
-      // We can convert our snapshot to a review object
-      guard let latestReview = Review(document: reviewSnapshot) else {
-        let error = NSError(domain: "FriendlyEatsErrorDomain", code: 0, userInfo: [
-          NSLocalizedDescriptionKey: "Review at \(reviewReference.path) didn't look like a valid review"
-          ])
-        errorPointer?.pointee = error
-        return nil
-      }
-
-      guard let currentUser = Auth.auth().currentUser else {
-        let error = NSError(domain: "FriendlyEatsErrorDomain", code: 0, userInfo: [
-          NSLocalizedDescriptionKey: "You need to be signed in to Yum a review"
-          ])
-        errorPointer?.pointee = error
-        return nil
-      }
-
-      // First we are going to write a simple "Yum" object into our subcollection...
-      let newYum = Yum(documentID: currentUser.uid, username: currentUser.displayName ?? "Unknown user")
-      let newYumReference = reviewReference.collection("yums").document(newYum.documentID)
-      transaction.setData(newYum.documentData, forDocument: newYumReference)
-
-      // Finally, we can update the "Yum" count
-      let newYumCount = latestReview.yumCount + 1
-      transaction.updateData(["yumCount": newYumCount], forDocument: reviewReference)
-
-      return nil
-
-    })  { (_, error) in
-      if let error = error {
-        print("Got an error attempting the transaction: \(error)")
-      } else {
-        print("Transaction successful!")
-      }
-    }
+    // TODO: Let's increment the yumCount!
 
   }
 

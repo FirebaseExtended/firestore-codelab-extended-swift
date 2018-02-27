@@ -91,15 +91,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
       data["photoURL"] = downloadUrl
     }
 
-
-    Firestore.firestore().collection("restaurants").document(restaurant.documentID).updateData(data) { err in
-      if let err = err {
-        print("Error writing document: \(err)")
-      } else {
-        print("Edit confirmed by the server.")
-      }
-    }
-    self.presentDidSaveAlert()
+    // TODO: Update the restaurant document in Cloud Firestore
   }
 
   // MARK: Setting up pickers
