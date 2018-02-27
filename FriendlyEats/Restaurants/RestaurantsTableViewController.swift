@@ -154,23 +154,7 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
       activeFiltersStackView.isHidden = false
     }
 
-    // Advanced queries
-
-    if let category = category, !category.isEmpty {
-      filtered = filtered.whereField("category", isEqualTo: category)
-    }
-
-    if let city = city, !city.isEmpty {
-      filtered = filtered.whereField("city", isEqualTo: city)
-    }
-
-    if let price = price {
-      filtered = filtered.whereField("price", isEqualTo: price)
-    }
-
-    if let sortBy = sortBy, !sortBy.isEmpty {
-      filtered = filtered.order(by: sortBy)
-    }
+    // Sorts and Filters in practice
 
     return filtered
   }
@@ -231,12 +215,7 @@ class RestaurantTableViewCell: UITableViewCell {
   @IBOutlet private var priceLabel: UILabel!
 
   func populate(restaurant: Restaurant) {
-    nameLabel.text = restaurant.name
-    cityLabel.text = restaurant.city
-    categoryLabel.text = restaurant.category
-    starsView.rating = Int(restaurant.averageRating.rounded())
-    priceLabel.text = Utils.priceString(from: restaurant.price)
-    thumbnailView.sd_setImage(with: restaurant.photoURL)
+
   }
 
   override func prepareForReuse() {
