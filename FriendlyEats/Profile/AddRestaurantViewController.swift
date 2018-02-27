@@ -80,16 +80,8 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
     if let downloadUrl = downloadUrl {
       restaurant.photoURL = URL(string: downloadUrl)!
     }
-    print("Going to save document data as \(restaurant.documentData)")
-    Firestore.firestore().restaurants.document(restaurant.documentID)
-        .setData(restaurant.documentData) { err in
-          if let err = err {
-            print("Error writing document: \(err)")
-          } else {
-            print("Write confirmed by the server")
-          }
-    }
-    self.presentDidSaveAlert()
+    // TODO: Save the restaurant document to Cloud Firestore
+
   }
 
 

@@ -74,8 +74,8 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
     self.navigationController?.navigationBar.barStyle = .black
 
     // Uncomment these two lines to enable SECRET HACKER PAGE!!!
-    let omgHAX = UIBarButtonItem(barButtonSystemItem: .bookmarks, target: self, action: #selector(goToHackPage))
-    navigationItem.rightBarButtonItems?.append(omgHAX)
+    // let omgHAX = UIBarButtonItem(barButtonSystemItem: .bookmarks, target: self, action: #selector(goToHackPage))
+    // navigationItem.rightBarButtonItems?.append(omgHAX)
   }
 
   override func viewWillAppear(_ animated: Bool) {
