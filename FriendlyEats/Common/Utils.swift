@@ -28,5 +28,16 @@ class Utils: NSObject {
     alertController.addAction(okAction)
     presentingVC.present(alertController, animated: true, completion: nil)
   }
+
+  static func priceString(from price: Int) -> String {
+    return (0 ..< price).reduce("") { s, _ in s + "$" }
+  }
+
+  static func priceValue(from string: String?) -> Int? {
+    guard let string = string else { return nil }
+    // TODO: Maybe ensure that we're only counting dollar signs
+    return string.count
+  }
+
 }
 

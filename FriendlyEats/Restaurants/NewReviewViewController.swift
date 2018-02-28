@@ -68,16 +68,17 @@ class NewReviewViewController: UIViewController, UITextFieldDelegate {
     // Write the review to Firestore. Average ratings on the restaurant document
     // being reviewed will be updated by a Cloud function.
     Firestore.firestore().reviews.document(review.documentID)
-        .setData(review.documentData) { (error) in
-          if let error = error {
-            print(error)
-          } else {
-            // Pop the review controller on success
-            if self.navigationController?.topViewController?.isKind(of: NewReviewViewController.self) ?? false {
-              self.navigationController?.popViewController(animated: true)
-            }
-          }
+      .setData(review.documentData) { (error) in
+        if let error = error {
+          print(error)
+        } else {
+          print("Write confirmed by the server!")
+        }
     }
+    if self.navigationController?.topViewController?.isKind(of: NewReviewViewController.self) ?? false {
+      self.navigationController?.popViewController(animated: true)
+    }
+
   }
 
   @objc func ratingDidChange(_ sender: Any) {

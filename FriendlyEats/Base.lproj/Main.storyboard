@@ -391,15 +391,6 @@
                                                 <action selector="didTapEditButton:" destination="yyz-cR-dIw" eventType="touchUpInside" id="rET-6C-cbh"/>
                                             </connections>
                                         </button>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0MI-t4-Snh">
-                                            <rect key="frame" x="324" y="71" width="35" height="34"/>
-                                            <state key="normal" title="Sort">
-                                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            </state>
-                                            <connections>
-                                                <action selector="sortPressed:" destination="yyz-cR-dIw" eventType="touchUpInside" id="3Ob-mf-sU2"/>
-                                            </connections>
-                                        </button>
                                     </subviews>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <constraints>
@@ -409,7 +400,6 @@
                                         <constraint firstAttribute="bottom" secondItem="P0j-uF-Lec" secondAttribute="bottom" constant="16" id="Az9-vO-lcA"/>
                                         <constraint firstAttribute="bottom" secondItem="PPW-8S-SIQ" secondAttribute="bottom" constant="16" id="Hfu-Ml-mlr"/>
                                         <constraint firstItem="DBM-Cn-nJI" firstAttribute="leading" secondItem="P0j-uF-Lec" secondAttribute="trailing" constant="4" id="IdA-gT-Ha8"/>
-                                        <constraint firstItem="0MI-t4-Snh" firstAttribute="top" secondItem="13p-IC-WyC" secondAttribute="bottom" constant="8" id="PyK-2S-5nJ"/>
                                         <constraint firstItem="P0j-uF-Lec" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" constant="16" id="RUo-TK-uIk"/>
                                         <constraint firstAttribute="trailing" secondItem="ZNQ-b3-Wfl" secondAttribute="trailing" id="Rb4-Jt-0va"/>
                                         <constraint firstItem="13p-IC-WyC" firstAttribute="centerY" secondItem="cKR-2o-ofP" secondAttribute="centerY" id="VCR-hY-46B"/>
@@ -417,7 +407,6 @@
                                         <constraint firstItem="PPW-8S-SIQ" firstAttribute="leading" secondItem="DBM-Cn-nJI" secondAttribute="trailing" constant="4" id="XJe-U9-GkG"/>
                                         <constraint firstItem="cKR-2o-ofP" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" constant="16" id="Z4a-Pa-F0w"/>
                                         <constraint firstItem="N5p-cL-L2M" firstAttribute="leading" secondItem="Qev-tW-OCy" secondAttribute="leading" constant="16" id="ZFG-Px-rp4"/>
-                                        <constraint firstAttribute="trailing" secondItem="0MI-t4-Snh" secondAttribute="trailing" constant="16" id="cem-Dv-bBI"/>
                                         <constraint firstAttribute="trailing" secondItem="13p-IC-WyC" secondAttribute="trailing" constant="16" id="gLL-7f-2s6"/>
                                         <constraint firstAttribute="bottom" secondItem="ZNQ-b3-Wfl" secondAttribute="bottom" id="hEn-w5-9M0"/>
                                         <constraint firstItem="ZNQ-b3-Wfl" firstAttribute="top" secondItem="Qev-tW-OCy" secondAttribute="top" id="ni3-HG-af6"/>
@@ -518,18 +507,26 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="u11-8I-cth">
-                                <rect key="frame" x="0.0" y="451" width="375" height="216"/>
-                            </pickerView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="E5l-VP-ZzA">
+                                <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="GWK-5c-PjF"/>
+                                    <barButtonItem title="Sort Reviews" id="22d-OA-dzg">
+                                        <connections>
+                                            <action selector="sortReviewsWasTapped:" destination="yyz-cR-dIw" id="kjz-0z-18S"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="0Ll-AF-CkL" firstAttribute="top" secondItem="E5l-VP-ZzA" secondAttribute="bottom" id="1D8-MM-3XV"/>
                             <constraint firstItem="FPu-IJ-I0V" firstAttribute="leading" secondItem="q4g-4j-FYl" secondAttribute="leading" id="8bB-0F-eey"/>
-                            <constraint firstItem="u11-8I-cth" firstAttribute="width" secondItem="q4g-4j-FYl" secondAttribute="width" id="Ozt-Qd-CRj"/>
-                            <constraint firstItem="0Ll-AF-CkL" firstAttribute="top" secondItem="u11-8I-cth" secondAttribute="bottom" id="Z95-dV-o0z"/>
-                            <constraint firstItem="u11-8I-cth" firstAttribute="centerX" secondItem="q4g-4j-FYl" secondAttribute="centerX" id="ci3-E0-KUN"/>
                             <constraint firstItem="FPu-IJ-I0V" firstAttribute="top" secondItem="SNq-9e-2oH" secondAttribute="bottom" id="dep-w1-xYv"/>
                             <constraint firstItem="0Ll-AF-CkL" firstAttribute="top" secondItem="FPu-IJ-I0V" secondAttribute="bottom" id="ej8-dh-IwR"/>
+                            <constraint firstItem="E5l-VP-ZzA" firstAttribute="centerX" secondItem="q4g-4j-FYl" secondAttribute="centerX" id="jFW-HY-RFc"/>
+                            <constraint firstItem="E5l-VP-ZzA" firstAttribute="width" secondItem="q4g-4j-FYl" secondAttribute="width" id="jXR-YO-kJ5"/>
                             <constraint firstAttribute="trailing" secondItem="FPu-IJ-I0V" secondAttribute="trailing" id="rmx-TD-u2o"/>
                         </constraints>
                     </view>
@@ -543,9 +540,8 @@
                     </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
+                        <outlet property="bottomToolbar" destination="E5l-VP-ZzA" id="AHU-6C-6CB"/>
                         <outlet property="editButton" destination="Ojs-Kq-qFI" id="xDW-nN-4Bz"/>
-                        <outlet property="pickerView" destination="u11-8I-cth" id="dBB-MK-9Vp"/>
-                        <outlet property="sortButton" destination="0MI-t4-Snh" id="tFk-di-S4H"/>
                         <outlet property="tableView" destination="FPu-IJ-I0V" id="rH7-m0-GVn"/>
                         <outlet property="titleView" destination="Qev-tW-OCy" id="L4W-ch-HXI"/>
                     </connections>
@@ -1105,14 +1101,16 @@
                     <navigationItem key="navigationItem" title="Edit Restaurant" id="ux4-Va-jG2"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
-                        <outlet property="cuisineTextField" destination="Smk-bU-gvH" id="Yv8-l7-b4c"/>
-                        <outlet property="locationTextField" destination="lgw-Bb-CZR" id="UAi-os-QAb"/>
+                        <outlet property="categoryTextField" destination="Smk-bU-gvH" id="Yv8-l7-b4c"/>
+                        <outlet property="cityTextField" destination="lgw-Bb-CZR" id="UAi-os-QAb"/>
                         <outlet property="priceTextField" destination="4W1-LH-cwp" id="R4D-1O-6fq"/>
                         <outlet property="restaurantImageView" destination="1ei-aa-raU" id="lW5-8y-g7E"/>
                         <outlet property="restaurantNameTextField" destination="aOa-CE-zRb" id="iAl-Pu-NEP"/>
+                        <segue destination="qWQ-tn-nhV" kind="unwind" identifier="unwindToMyRestaurantsSegue" unwindAction="unwindToMyRestaurantsWithSegue:" id="wh9-SY-Z3r"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8Ko-fl-bJg" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="qWQ-tn-nhV" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1901.5999999999999" y="56.221889055472268"/>
         </scene>
@@ -1280,14 +1278,16 @@
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="addPhotoButton" destination="Uej-8C-gqJ" id="CXx-k1-eFY"/>
-                        <outlet property="cuisineTextField" destination="S4J-9t-gDg" id="jac-0u-joR"/>
-                        <outlet property="locationTextField" destination="Sac-kH-c4v" id="Wuv-zy-AiP"/>
+                        <outlet property="categoryTextField" destination="S4J-9t-gDg" id="jac-0u-joR"/>
+                        <outlet property="cityTextField" destination="Sac-kH-c4v" id="Wuv-zy-AiP"/>
                         <outlet property="priceTextField" destination="qYQ-jD-WY0" id="JP5-Jv-tMU"/>
                         <outlet property="restaurantImageView" destination="zzH-SR-d9y" id="fKN-gM-yfc"/>
                         <outlet property="restaurantNameTextField" destination="nXB-XG-fFH" id="pep-b4-Sh0"/>
+                        <segue destination="7YK-Xl-ffg" kind="unwind" identifier="unwindToMyRestaurantsSegue" unwindAction="unwindToMyRestaurantsWithSegue:" id="L5q-Kn-nDC"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="H3K-du-slr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="7YK-Xl-ffg" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1087" y="-2113"/>
         </scene>
