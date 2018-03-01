@@ -111,7 +111,7 @@
 			path = Restaurants;
 			sourceTree = "<group>";
 		};
-		8D6014F8202B8ADA003E8091 /* Firestore Types */ = {
+		8D6014F8202B8ADA003E8091 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				8DF1E3121EE5CFF900192CDE /* Restaurant.swift */,
@@ -119,7 +119,7 @@
 				8D82F5C2201FCF5E00107172 /* User.swift */,
 				8D82F5C4201FE6CE00107172 /* Yum.swift */,
 			);
-			path = "Firestore Types";
+			path = Models;
 			sourceTree = "<group>";
 		};
 		8D6014F9202B8AF5003E8091 /* Common */ = {
@@ -171,7 +171,7 @@
 				8D9BBC301EE2200900194E9A /* AppDelegate.swift */,
 				8D6014FA202B8B0F003E8091 /* Profile */,
 				8D6014F7202B8A7F003E8091 /* Restaurants */,
-				8D6014F8202B8ADA003E8091 /* Firestore Types */,
+				8D6014F8202B8ADA003E8091 /* Models */,
 				8D6014F9202B8AF5003E8091 /* Common */,
 				8D9BBC341EE2200900194E9A /* Main.storyboard */,
 				8D9BBC371EE2200900194E9A /* Assets.xcassets */,
