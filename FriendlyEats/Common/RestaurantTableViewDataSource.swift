@@ -22,30 +22,25 @@ import FirebaseFirestore
 /// table view with new data from Firestore in the updateHandler closure.
 @objc class RestaurantTableViewDataSource: NSObject, UITableViewDataSource {
 
-  private let restaurants: LocalCollection<Restaurant>
+  private var restaurants: [Restaurant] = []
 
-  /// Returns an instance of RestaurantTableViewDataSource. Consumers should update the
-  /// table view with new data from Firestore in the updateHandler closure.
-  public init(restaurants: LocalCollection<Restaurant>) {
-    self.restaurants = restaurants
+  public init(query: Query,
+              updateHandler: @escaping ([DocumentChange]) -> ()) {
+    fatalError("Unimplemented")
   }
 
-  /// Returns an instance of RestaurantTableViewDataSource. Consumers should update the
-  /// table view with new data from Firestore in the updateHandler closure.
-  public convenience init(query: Query, updateHandler: @escaping ([DocumentChange]) -> ()) {
-    let collection = LocalCollection<Restaurant>(query: query, updateHandler: updateHandler)
-    self.init(restaurants: collection)
-  }
+
+  // Pull data from Firestore
 
   /// Starts listening to the Firestore query and invoking the updateHandler.
   public func startUpdates() {
-    restaurants.listen()
+    fatalError("Unimplemented")
   }
 
   /// Stops listening to the Firestore query. updateHandler will not be called unless startListening
   /// is called again.
   public func stopUpdates() {
-    restaurants.stopListening()
+    fatalError("Unimplemented")
   }
 
   /// Returns the restaurant at the given index.

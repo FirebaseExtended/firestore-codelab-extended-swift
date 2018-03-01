@@ -81,19 +81,14 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
       restaurant.photoURL = URL(string: downloadUrl)!
     }
     print("Going to save document data as \(restaurant.documentData)")
-    Firestore.firestore().restaurants.document(restaurant.documentID)
-        .setData(restaurant.documentData) { err in
-          if let err = err {
-            print("Error writing document: \(err)")
-          } else {
-            print("Write confirmed by the server")
-          }
-    }
+
+    // TODO: Save the restaurant document to Cloud Firestore
+
     self.presentDidSaveAlert()
   }
 
-
   // MARK: Setting up pickers
+
   private let priceOptions = ["$", "$$", "$$$"]
   private let cityOptions = Restaurant.cities
   private let categoryOptions = Restaurant.categories
@@ -118,6 +113,7 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
     pickerView.delegate = self
     return pickerView
   }()
+
  // MARK: UIPickerViewDataSource
 
   func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -132,7 +128,6 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
       return cityOptions.count
     case categoryPickerView:
       return categoryOptions.count
-
     case _:
       fatalError("Unhandled picker view: \(pickerView)")
     }

@@ -92,14 +92,7 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
     }
 
 
-    Firestore.firestore().collection("restaurants").document(restaurant.documentID).updateData(data) { err in
-      if let err = err {
-        print("Error writing document: \(err)")
-      } else {
-        print("Edit confirmed by the server.")
-      }
-    }
-    self.presentDidSaveAlert()
+    // TODO: Update the restaurant document in Cloud Firestore
   }
 
   // MARK: Setting up pickers
@@ -142,7 +135,6 @@ class EditRestaurantViewController: UIViewController, UINavigationControllerDele
       return cityOptions.count
     case categoryPickerView:
       return categoryOptions.count
-
     case _:
       fatalError("Unhandled picker view: \(pickerView)")
     }

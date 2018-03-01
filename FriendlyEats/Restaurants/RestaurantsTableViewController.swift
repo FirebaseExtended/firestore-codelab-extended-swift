@@ -48,19 +48,11 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
   }
 
   private func dataSourceForQuery(_ query: Query) -> RestaurantTableViewDataSource {
-    return RestaurantTableViewDataSource(query: query) { [unowned self] (changes) in
-      if self.dataSource.count > 0 {
-        self.tableView.backgroundView = nil
-      } else {
-        self.tableView.backgroundView = self.backgroundView
-      }
-
-      self.tableView.reloadData()
-    }
+    fatalError("Unimplemented")
   }
 
   private lazy var baseQuery: Query = {
-    return Firestore.firestore().restaurants.limit(to: 50)
+    fatalError("Unimplemented")
   }()
 
   lazy private var filters: (navigationController: UINavigationController,
@@ -75,28 +67,27 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
     backgroundView.alpha = 0.5
     tableView.backgroundView = backgroundView
     tableView.tableFooterView = UIView()
-
-    query = baseQuery
     stackViewHeightConstraint.constant = 0
     activeFiltersStackView.isHidden = true
     tableView.delegate = self
-    tableView.dataSource = dataSource
 
     self.navigationController?.navigationBar.barStyle = .black
 
     // Uncomment these two lines to enable SECRET HACKER PAGE!!!
-    let omgHAX = UIBarButtonItem(barButtonSystemItem: .bookmarks, target: self, action: #selector(goToHackPage))
-    navigationItem.rightBarButtonItems?.append(omgHAX)
+    // let omgHAX = UIBarButtonItem(barButtonSystemItem: .bookmarks, target: self, action: #selector(goToHackPage))
+    // navigationItem.rightBarButtonItems?.append(omgHAX)
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.setNeedsStatusBarAppearanceUpdate()
-    dataSource.startUpdates()
   }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
+  }
+
+  deinit {
     dataSource.stopUpdates()
   }
 
@@ -137,10 +128,6 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
     }
   }
 
-  deinit {
-    dataSource.stopUpdates()
-  }
-
   // MARK: - UITableViewDelegate
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -165,23 +152,7 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
       activeFiltersStackView.isHidden = false
     }
 
-    // Advanced queries
-
-    if let category = category, !category.isEmpty {
-      filtered = filtered.whereField("category", isEqualTo: category)
-    }
-
-    if let city = city, !city.isEmpty {
-      filtered = filtered.whereField("city", isEqualTo: city)
-    }
-
-    if let price = price {
-      filtered = filtered.whereField("price", isEqualTo: price)
-    }
-
-    if let sortBy = sortBy, !sortBy.isEmpty {
-      filtered = filtered.order(by: sortBy)
-    }
+    // Sorts and Filters in practice
 
     return filtered
   }
@@ -191,6 +162,14 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
                   city: String?,
                   price: Int?,
                   sortBy: String?) {
+    if category == nil && city == nil && price == nil && sortBy == nil {
+      stackViewHeightConstraint.constant = 0
+      activeFiltersStackView.isHidden = true
+    } else {
+      stackViewHeightConstraint.constant = 44
+      activeFiltersStackView.isHidden = false
+    }
+
     let filtered = query(withCategory: category, city: city, price: price, sortBy: sortBy)
 
     if let category = category, !category.isEmpty {
@@ -214,7 +193,7 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
       priceFilterLabel.isHidden = true
     }
 
-    self.query = filtered
+    query = filtered
   }
 
 }
@@ -234,14 +213,7 @@ class RestaurantTableViewCell: UITableViewCell {
   @IBOutlet private var priceLabel: UILabel!
 
   func populate(restaurant: Restaurant) {
-    nameLabel.text = restaurant.name
-    cityLabel.text = restaurant.city
-    categoryLabel.text = restaurant.category
-    starsView.rating = Int(restaurant.averageRating.rounded())
-    priceLabel.text = Utils.priceString(from: restaurant.price)
 
-    let image = restaurant.photoURL
-    thumbnailView.sd_setImage(with: image)
   }
 
   override func prepareForReuse() {
