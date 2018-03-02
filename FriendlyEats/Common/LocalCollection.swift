@@ -95,6 +95,7 @@ final class LocalCollection<T: DocumentSerializable> {
   }
 
   func stopListening() {
+    listener?.remove()
     listener = nil
   }
 
