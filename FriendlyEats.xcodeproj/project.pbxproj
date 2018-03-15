@@ -11,7 +11,8 @@
 		496B609A203363A9005AD625 /* ReviewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496B6099203363A9005AD625 /* ReviewTableViewCell.swift */; };
 		499D8970203CD176009C067E /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499D896F203CD176009C067E /* Utils.swift */; };
 		49C24867202A237000D6008A /* HackPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C24866202A237000D6008A /* HackPageViewController.swift */; };
-		77784140203509A3000CB45A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7778413F203509A3000CB45A /* GoogleService-Info.plist */; };
+		49DEA0D7205B19AC00F2A452 /* BasicRestaurantsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DEA0D6205B19AC00F2A452 /* BasicRestaurantsTableViewController.swift */; };
+		49DEA0D9205B19D900F2A452 /* RestaurantTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DEA0D8205B19D900F2A452 /* RestaurantTableViewCell.swift */; };
 		8D004D2D1EE879B5004DEF35 /* FiltersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D004D2C1EE879B5004DEF35 /* FiltersViewController.swift */; };
 		8D2A2A0B202BC3B600343C13 /* ReviewTableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2A2A0A202BC3B600343C13 /* ReviewTableViewDataSource.swift */; };
 		8D5DF7021F7EF3BA00B0D24F /* NewReviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5DF7011F7EF3BA00B0D24F /* NewReviewViewController.swift */; };
@@ -51,7 +52,8 @@
 		496B6099203363A9005AD625 /* ReviewTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTableViewCell.swift; sourceTree = "<group>"; };
 		499D896F203CD176009C067E /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		49C24866202A237000D6008A /* HackPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackPageViewController.swift; sourceTree = "<group>"; };
-		7778413F203509A3000CB45A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		49DEA0D6205B19AC00F2A452 /* BasicRestaurantsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicRestaurantsTableViewController.swift; sourceTree = "<group>"; };
+		49DEA0D8205B19D900F2A452 /* RestaurantTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantTableViewCell.swift; sourceTree = "<group>"; };
 		8D004D2C1EE879B5004DEF35 /* FiltersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiltersViewController.swift; sourceTree = "<group>"; };
 		8D2A2A0A202BC3B600343C13 /* ReviewTableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTableViewDataSource.swift; sourceTree = "<group>"; };
 		8D5DF7011F7EF3BA00B0D24F /* NewReviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewReviewViewController.swift; sourceTree = "<group>"; };
@@ -107,6 +109,8 @@
 				360549AB2028D56E0090317C /* EditRestaurantViewController.swift */,
 				8D5DF7011F7EF3BA00B0D24F /* NewReviewViewController.swift */,
 				8D004D2C1EE879B5004DEF35 /* FiltersViewController.swift */,
+				49DEA0D6205B19AC00F2A452 /* BasicRestaurantsTableViewController.swift */,
+				49DEA0D8205B19D900F2A452 /* RestaurantTableViewCell.swift */,
 			);
 			path = Restaurants;
 			sourceTree = "<group>";
@@ -167,7 +171,6 @@
 		8D9BBC2F1EE2200900194E9A /* FriendlyEats */ = {
 			isa = PBXGroup;
 			children = (
-				7778413F203509A3000CB45A /* GoogleService-Info.plist */,
 				8D9BBC301EE2200900194E9A /* AppDelegate.swift */,
 				8D6014FA202B8B0F003E8091 /* Profile */,
 				8D6014F7202B8A7F003E8091 /* Restaurants */,
@@ -241,7 +244,6 @@
 				TargetAttributes = {
 					8D9BBC2C1EE2200900194E9A = {
 						CreatedOnToolsVersion = 8.3.2;
-						DevelopmentTeam = 739D5HF686;
 						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 					};
@@ -281,7 +283,6 @@
 				8D9BBC381EE2200900194E9A /* Assets.xcassets in Resources */,
 				8D9BBC361EE2200900194E9A /* Main.storyboard in Resources */,
 				8DD9ACDA1F7B166900C2DD24 /* pizza-monster.png in Resources */,
-				77784140203509A3000CB45A /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +305,7 @@
 				8D9BBC311EE2200900194E9A /* AppDelegate.swift in Sources */,
 				8D82F5C1201FCE2500107172 /* Review.swift in Sources */,
 				8DF1E3151EE72C4600192CDE /* LocalCollection.swift in Sources */,
+				49DEA0D7205B19AC00F2A452 /* BasicRestaurantsTableViewController.swift in Sources */,
 				8D6014FC202B8B23003E8091 /* ProfileViewController.swift in Sources */,
 				8D5DF7021F7EF3BA00B0D24F /* NewReviewViewController.swift in Sources */,
 				8DDCD366203277CA00CFBF60 /* AddRestaurantViewController.swift in Sources */,
@@ -312,6 +314,7 @@
 				8DF77E1A1EEB45E500CB2330 /* RestaurantDetailViewController.swift in Sources */,
 				8D70C1BA201FECE2007D3082 /* Firestore+Populate.swift in Sources */,
 				360549AC2028D56E0090317C /* EditRestaurantViewController.swift in Sources */,
+				49DEA0D9205B19D900F2A452 /* RestaurantTableViewCell.swift in Sources */,
 				8D004D2D1EE879B5004DEF35 /* FiltersViewController.swift in Sources */,
 				8DDCD364203261A500CFBF60 /* RestaurantTableViewDataSource.swift in Sources */,
 				8D82F5C5201FE6CE00107172 /* Yum.swift in Sources */,
@@ -472,7 +475,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 739D5HF686;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = FriendlyEats/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.firebase.FriendlyEats;
@@ -486,7 +489,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 739D5HF686;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = FriendlyEats/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.firebase.FriendlyEats;
