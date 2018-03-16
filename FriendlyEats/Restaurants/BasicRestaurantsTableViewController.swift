@@ -33,17 +33,44 @@ class BasicRestaurantsTableViewController: UIViewController, UITableViewDataSour
   var restaurantListener: ListenerRegistration?
 
   private func startListeningForRestaurants() {
-    // TODO: Create a listener for the "restaurants" collection and use that data
-    // to popualte our `restaurantData` model
+    let basicQuery = Firestore.firestore().collection("restaurants").limit(to: 50)
+    restaurantListener = basicQuery.addSnapshotListener { (snapsot, error) in
+      if let error = error {
+        print ("I got an error retrieving restaurants: \(error)")
+        return
+      }
+      guard let snapshot = snapsot else { return }
+      self.restaurantData = []
+      for restaurantDocument in snapshot.documents {
+        if let newRestaurant = Restaurant(document: restaurantDocument) {
+          self.restaurantData.append(newRestaurant)
+        }
+      }
+      self.tableView.reloadData()
+    }
   }
 
   func tryASampleQuery() {
-    // TODO: Let's put a sample query here to see how basic data fetching works in
-    // Cloud Firestore
+    let basicQuery = Firestore.firestore().collection("restaurants").limit(to: 3)
+    basicQuery.getDocuments { (snapshot, error) in
+      if let error = error {
+        print("Oh no! Got an error! \(error.localizedDescription)")
+        return
+      }
+      guard let snapshot = snapshot else { return }
+      let allDocuments = snapshot.documents
+      for restaurantDocument in allDocuments {
+        print("I have this restaurant \(restaurantDocument.data())")
+        if let newRestaurant = Restaurant(document: restaurantDocument) {
+          print("Restaurant \(newRestaurant.name) has an average score of \(newRestaurant.averageRating)")
+        }
+      }
+    }
   }
 
   private func stopListeningForRestaurants() {
-    // TODO: We should "deactivate" our restaurant listener when this view goes away
+    restaurantListener?.remove()
+    restaurantListener = nil
   }
 
   override func viewDidLoad() {
