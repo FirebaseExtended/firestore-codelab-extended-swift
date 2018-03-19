@@ -153,7 +153,7 @@
         <!--Restaurants-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController title="Restaurants" automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="RestaurantsTableViewController" customModule="FriendlyEats" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Restaurants" automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="BasicRestaurantsTableViewController" customModule="FriendlyEats" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
