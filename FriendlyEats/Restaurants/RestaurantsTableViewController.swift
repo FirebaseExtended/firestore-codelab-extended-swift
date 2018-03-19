@@ -219,34 +219,3 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
 
 }
 
-class RestaurantTableViewCell: UITableViewCell {
-
-  @IBOutlet private var thumbnailView: UIImageView!
-
-  @IBOutlet private var nameLabel: UILabel!
-
-  @IBOutlet var starsView: ImmutableStarsView!
-
-  @IBOutlet private var cityLabel: UILabel!
-
-  @IBOutlet private var categoryLabel: UILabel!
-
-  @IBOutlet private var priceLabel: UILabel!
-
-  func populate(restaurant: Restaurant) {
-    nameLabel.text = restaurant.name
-    cityLabel.text = restaurant.city
-    categoryLabel.text = restaurant.category
-    starsView.rating = Int(restaurant.averageRating.rounded())
-    priceLabel.text = Utils.priceString(from: restaurant.price)
-
-    let image = restaurant.photoURL
-    thumbnailView.sd_setImage(with: image)
-  }
-
-  override func prepareForReuse() {
-    super.prepareForReuse()
-    thumbnailView.sd_cancelCurrentImageLoad()
-  }
-
-}
