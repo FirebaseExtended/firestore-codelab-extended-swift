@@ -16,13 +16,14 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 type Firestore = admin.firestore.Firestore
+const app = admin.initializeApp();
 
 export const computeAverageReview = functions.firestore
-  .document('reviews/{reviewId}').onWrite((event) => {
+  .document('reviews/{reviewId}').onWrite((change, context) => {
     // get the data from the write event
-    const eventData = event.data.data();
+    const eventData = change.after.data();
     // get the previous value, if it exists
-    const prev = event.data.previous;
+    const prev = change.before;
     const rating = eventData.rating;
     let previousValue
     if (prev.exists) {
@@ -36,8 +37,7 @@ export const computeAverageReview = functions.firestore
     // get the restaurant ID
     const restaurantID = eventData.restaurantID;
     // get a reference to the root of the firestore DB
-    const db = event.data.ref.firestore;
-
+    const db = app.firestore()
     // if a previous value exists, then it needs to be replaced
     // when computing an average. Otherwise, add the new rating
     if (prev.exists) {
@@ -48,17 +48,17 @@ export const computeAverageReview = functions.firestore
     }
   });
 
-  export const updateRest = functions.firestore.document('restaurants/{restaurantID}').onUpdate((event) => {
-    const db = event.data.ref.firestore;
-    const restaurantID = event.params.restaurantID;
-    const eventData = event.data.data();
-    const prevEventData = event.data.previous.data();
+  export const updateRest = functions.firestore.document('restaurants/{restaurantID}').onUpdate((change, context) => {
+    const eventData = change.after.data();
+    const restaurantID = context.params.restaurantID;
+    const prevEventData = change.before.data();
     const name = eventData.name;
     const oldName = prevEventData.name;
     if (oldName === name) {
         console.log("change was not in name. No need to update reviews.");
         return null;
     }
+    const db = app.firestore()
     // if name was updated
     return updateRestaurant(db, restaurantID, name);
 });
