@@ -37,11 +37,11 @@ export const computeAverageReview = functions.firestore
     // get the restaurant ID
     const restaurantID = eventData.restaurantID;
     // get a reference to the root of the firestore DB
-    const db = app.firestore()
+    const db = app.firestore();
     // if a previous value exists, then it needs to be replaced
     // when computing an average. Otherwise, add the new rating
     if (prev.exists) {
-        const difference = previousValue.rating - rating
+        const difference = previousValue.rating - rating;
         return updateAverage(db, restaurantID, difference, true);
     } else {
         return updateAverage(db, restaurantID, rating, false);
@@ -58,7 +58,7 @@ export const computeAverageReview = functions.firestore
         console.log("change was not in name. No need to update reviews.");
         return null;
     }
-    const db = app.firestore()
+    const db = app.firestore();
     // if name was updated
     return updateRestaurant(db, restaurantID, name);
 });
