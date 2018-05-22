@@ -103,3 +103,55 @@ async function updateRestaurant(db: Firestore, restaurantID: string, name: strin
     await batch.commit();
     console.log(`name of restaurant updated to ${name}`);
 }
+
+export const watchForYums = functions.firestore.document('pendingYums/{pendingYumID}').onCreate((snapshot, context) => {
+    // get the data from the write event
+    const eventData = snapshot.data();
+    const reviewID = eventData.review;
+    const userID = eventData.userId;
+    const userName = eventData.userName;
+    const db = app.firestore();
+    const pendingYumID = context.params.pendingYumID;
+    console.log(`Found a pending yum for review ${reviewID} by ${userName} (Id: ${userID}`);
+    return addYum(db, reviewID, userID, userName, pendingYumID);
+});
+
+async function addYum(db: Firestore, reviewID: string, userId: string, userName: string, docID: string) {
+    // First, we need to figure out if there's already a yum by this user
+    const transactionResult = await db.runTransaction(t => {
+        const pendingYum = db.collection('pendingYums').doc(docID)
+        const targetReview = db.collection('reviews').doc(reviewID);
+        const thisUsersYum =  targetReview.collection('yums').doc(userId);
+        return (async () => {
+            const existingYumDoc = await t.get(thisUsersYum);
+            const targetReviewDoc = await t.get(targetReview);
+            let shouldUpdateReview = true;
+            if (existingYumDoc.exists) {
+                console.log("User has already yummed this review. We won't update it.");
+                shouldUpdateReview = false;
+            }
+            if (!targetReviewDoc.exists) {
+                // This should never happen (famous last words)
+                console.error("Target reivew doc doesn't exist?!");
+                shouldUpdateReview = false;
+            }
+            if (shouldUpdateReview) {
+                // We're going to increment the yumCount
+                const oldYumCount = targetReviewDoc.data().yumCount;
+                const newYumcount = oldYumCount + 1
+                await t.update(targetReview, {yumCount: newYumcount})
+                console.log("Review yumCount has been updated to " + newYumcount)
+
+                // And add the new yum document to indicate that this user has already yummed the review
+                const newYumData = {username: userName};
+                await t.set(thisUsersYum, newYumData);   
+                console.log("New yum document has been added");             
+            }
+            // No matter what happens, we'll want to delete the pending yum
+            await t.delete(pendingYum);
+            console.log("Pending yum removed");
+            return null;
+        })();
+    });
+    return transactionResult;
+}
