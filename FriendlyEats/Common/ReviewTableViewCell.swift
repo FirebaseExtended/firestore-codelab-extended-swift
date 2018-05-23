@@ -57,7 +57,9 @@ class ReviewTableViewCell: UITableViewCell {
       print("You need to be signed in to Yum a review!")
       return
     }
-    let pendingYum = ["review": review.documentID, "userId": currentUser.uid, "userName": currentUser.displayName ?? "Anonymous"]
+    let pendingYum = ["review": review.documentID,
+                      "userID": currentUser.uid,
+                      "userName": currentUser.displayName ?? "Anonymous"]
     Firestore.firestore().collection("pendingYums").addDocument(data: pendingYum)
 
     // We can "fake" the data if we're offline.

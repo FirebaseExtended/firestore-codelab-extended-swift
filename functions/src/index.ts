@@ -108,7 +108,7 @@ export const watchForYums = functions.firestore.document('pendingYums/{pendingYu
     // get the data from the write event
     const eventData = snapshot.data();
     const reviewID = eventData.review;
-    const userID = eventData.userId;
+    const userID = eventData.userID;
     const userName = eventData.userName;
     const db = app.firestore();
     const pendingYumID = context.params.pendingYumID;
@@ -116,12 +116,12 @@ export const watchForYums = functions.firestore.document('pendingYums/{pendingYu
     return addYum(db, reviewID, userID, userName, pendingYumID);
 });
 
-async function addYum(db: Firestore, reviewID: string, userId: string, userName: string, docID: string) {
+async function addYum(db: Firestore, reviewID: string, userID: string, userName: string, docID: string) {
     // First, we need to figure out if there's already a yum by this user
     const transactionResult = await db.runTransaction(t => {
         const pendingYum = db.collection('pendingYums').doc(docID)
         const targetReview = db.collection('reviews').doc(reviewID);
-        const thisUsersYum =  targetReview.collection('yums').doc(userId);
+        const thisUsersYum =  targetReview.collection('yums').doc(userID);
         return (async () => {
             const existingYumDoc = await t.get(thisUsersYum);
             const targetReviewDoc = await t.get(targetReview);
