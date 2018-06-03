@@ -180,14 +180,20 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
   }
 
   func saveImage(photoData: Data) {
-    Storage.storage().reference(withPath: restaurant.documentID).putData(photoData, metadata: nil) { (metadata, error) in
+    let storageRef = Storage.storage().reference(withPath: restaurant.documentID)
+    storageRef.putData(photoData, metadata: nil) { (metadata, error) in
       if let error = error {
         print(error)
-      }
-      guard let metadata = metadata else {
         return
       }
-      self.downloadUrl = metadata.downloadURL()?.absoluteString
+      storageRef.downloadURL { (url, error) in
+        if let error = error {
+          print(error)
+        }
+        if let url = url {
+          self.downloadUrl = url.absoluteString
+        }
+      }
     }
   }
 
