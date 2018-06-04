@@ -5,6 +5,7 @@ target 'FriendlyEats' do
   use_frameworks!
 
   pod 'SDWebImage'
+  pod 'Firebase/Core'
   pod 'FirebaseUI/Auth'
   pod 'FirebaseUI/Google'
   pod 'Firebase/Firestore'
