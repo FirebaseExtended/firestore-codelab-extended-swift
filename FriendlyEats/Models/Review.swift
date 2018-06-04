@@ -57,7 +57,7 @@ extension Review: DocumentSerializable {
         let rating = dictionary["rating"] as? Int,
         let userInfo = dictionary["userInfo"] as? [String: Any],
         let text = dictionary["text"] as? String,
-        let date = dictionary["date"] as? Date,
+        let timestamp = dictionary["date"] as? Timestamp,
         let yumCount = dictionary["yumCount"] as? Int else { return nil }
     
     guard let user = User(dictionary: userInfo) else { return nil }
@@ -67,7 +67,7 @@ extension Review: DocumentSerializable {
               rating: rating,
               userInfo: user,
               text: text,
-              date: date,
+              date: timestamp.dateValue(),
               yumCount: yumCount)
   }
 
@@ -106,7 +106,7 @@ extension Review: DocumentSerializable {
       "rating": rating,
       "userInfo": userInfo.documentData,
       "text": text,
-      "date": date,
+      "date": Timestamp(date:date),
       "yumCount": yumCount
     ]
   }
