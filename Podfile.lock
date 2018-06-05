@@ -8,6 +8,9 @@ PODS:
   - Firebase/Auth (5.1.0):
     - Firebase/CoreOnly
     - FirebaseAuth (= 5.0.0)
+  - Firebase/Core (5.1.0):
+    - Firebase/CoreOnly
+    - FirebaseAnalytics (= 5.0.1)
   - Firebase/CoreOnly (5.1.0):
     - FirebaseCore (= 5.0.2)
   - Firebase/Firestore (5.1.0):
@@ -16,6 +19,11 @@ PODS:
   - Firebase/Storage (5.1.0):
     - Firebase/CoreOnly
     - FirebaseStorage (= 3.0.0)
+  - FirebaseAnalytics (5.0.1):
+    - FirebaseCore (~> 5.0)
+    - FirebaseInstanceID (~> 3.0)
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
+    - nanopb (~> 0.3)
   - FirebaseAuth (5.0.0):
     - FirebaseCore (~> 5.0)
     - GTMSessionFetcher/Core (~> 1.1)
@@ -32,6 +40,8 @@ PODS:
     - gRPC-ProtoRPC (~> 1.0)
     - leveldb-library (~> 1.18)
     - Protobuf (~> 3.1)
+  - FirebaseInstanceID (3.0.0):
+    - FirebaseCore (~> 5.0)
   - FirebaseStorage (3.0.0):
     - FirebaseCore (~> 5.0)
     - GTMSessionFetcher/Core (~> 1.1)
@@ -93,6 +103,7 @@ PODS:
   - SDWebImage/Core (4.4.0)
 
 DEPENDENCIES:
+  - Firebase/Core
   - Firebase/Firestore
   - Firebase/Storage
   - FirebaseUI/Auth
@@ -100,12 +111,14 @@ DEPENDENCIES:
   - SDWebImage
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  https://github.com/cocoapods/specs.git:
     - BoringSSL
     - Firebase
+    - FirebaseAnalytics
     - FirebaseAuth
     - FirebaseCore
     - FirebaseFirestore
+    - FirebaseInstanceID
     - FirebaseStorage
     - FirebaseUI
     - GoogleSignIn
@@ -124,9 +137,11 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   BoringSSL: c46efb47593135382bc0934196f16d2f726f5f36
   Firebase: e08fb0795f35707aeb1d8a715c731c45bdf6fd56
+  FirebaseAnalytics: b3628aea54c50464c32c393fb2ea032566e7ecc2
   FirebaseAuth: acbeef02fe7c3a26624e309849f3fe30c84115af
   FirebaseCore: b81044df1044c0857a0737c6324678b72d4f7f00
   FirebaseFirestore: 93b8bf70484c92c271ae93940fe1e2ca9e35f92b
+  FirebaseInstanceID: 83e0040351565df711a5db3d8ebe5ea21aca998a
   FirebaseStorage: 7ca4bb7b58a25fa647b04f524033fc7cb7eb272b
   FirebaseUI: 0e9ab15e00073e421890c755b6f2bd757605601f
   GoogleSignIn: d9ef55b10f0aa401a5de2747f59b725e4b9732ac
@@ -142,6 +157,6 @@ SPEC CHECKSUMS:
   Protobuf: 8a9838fba8dae3389230e1b7f8c104aa32389c03
   SDWebImage: b534502786e43dde36dfcaee89356fe6df30e203
 
-PODFILE CHECKSUM: 7e252b0c09f7a508bba1e97a482f669e0306fa56
+PODFILE CHECKSUM: 07c8c16a1fd5c7dd943bb399ef7c87e88509b455
 
-COCOAPODS: 1.5.0
+COCOAPODS: 1.5.3
