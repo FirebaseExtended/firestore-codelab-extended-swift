@@ -138,28 +138,8 @@ class RestaurantDetailViewController: UIViewController {
   }
 
   @IBAction func sortReviewsWasTapped(_ sender: Any) {
-    let pickSortMethod = UIAlertController(title: "Sort reviews by...", message: nil, preferredStyle: .actionSheet)
-    let sortByDefault = UIAlertAction(title: "Default", style: .default) { _ in
-      self.query = self.baseQuery
-    }
-    let sortByDate = UIAlertAction(title: "Newest first", style: .default) { _ in
-      self.query = self.baseQuery.order(by: "date", descending: true)
-    }
-    let sortByYums = UIAlertAction(title: "Most yums", style: .default) { _ in
-      self.query = self.baseQuery.order(by: "yumCount", descending: true)
-    }
-    let sortByBest = UIAlertAction(title: "Best first", style: .default) { _ in
-      self.query = self.baseQuery.order(by: "rating", descending: true)
-    }
-    let sortByWorst = UIAlertAction(title: "Worst first", style: .default) { _ in
-      self.query = self.baseQuery.order(by: "rating", descending: false)
-    }
-    pickSortMethod.addAction(sortByDefault)
-    pickSortMethod.addAction(sortByDate)
-    pickSortMethod.addAction(sortByYums)
-    pickSortMethod.addAction(sortByBest)
-    pickSortMethod.addAction(sortByWorst)
-    present(pickSortMethod, animated: true)
+    // TODO: Add an action sheet-style alert controller that let our user
+    // sort reviews by different methods
   }
 }
 
