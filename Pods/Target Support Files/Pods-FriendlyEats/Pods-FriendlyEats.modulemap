@@ -1,0 +1,6 @@
+framework module Pods_FriendlyEats {
+  umbrella header "Pods-FriendlyEats-umbrella.h"
+
+  export *
+  module * { export * }
+}
