@@ -32,7 +32,7 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
   let backgroundView = UIImageView()
 
   lazy private var dataSource: RestaurantTableViewDataSource = {
-    return dataSourceForQuery(baseQuery)
+    fatalError("Unimplemented")
   }()
 
   fileprivate var query: Query? {
@@ -70,6 +70,7 @@ class RestaurantsTableViewController: UIViewController, UITableViewDelegate {
     stackViewHeightConstraint.constant = 0
     activeFiltersStackView.isHidden = true
     tableView.delegate = self
+    // TODO: assign our data source
 
     self.navigationController?.navigationBar.barStyle = .black
 
@@ -152,7 +153,7 @@ extension RestaurantsTableViewController: FiltersViewControllerDelegate {
       activeFiltersStackView.isHidden = false
     }
 
-    // Sorts and Filters in practice
+    // Sort and Filter data
 
     return filtered
   }
