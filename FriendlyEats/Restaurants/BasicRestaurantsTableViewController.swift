@@ -34,12 +34,12 @@ class BasicRestaurantsTableViewController: UIViewController, UITableViewDataSour
 
   private func startListeningForRestaurants() {
     let basicQuery = Firestore.firestore().collection("restaurants").limit(to: 50)
-    restaurantListener = basicQuery.addSnapshotListener { (snapsot, error) in
+    restaurantListener = basicQuery.addSnapshotListener { (snapshot, error) in
       if let error = error {
         print ("I got an error retrieving restaurants: \(error)")
         return
       }
-      guard let snapshot = snapsot else { return }
+      guard let snapshot = snapshot else { return }
       self.restaurantData = []
       for restaurantDocument in snapshot.documents {
         if let newRestaurant = Restaurant(document: restaurantDocument) {
