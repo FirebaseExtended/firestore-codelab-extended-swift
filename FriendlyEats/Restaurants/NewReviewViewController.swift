@@ -68,9 +68,9 @@ class NewReviewViewController: UIViewController, UITextFieldDelegate {
     // Write the review to Firestore. Average ratings on the restaurant document
     // being reviewed will be updated by a Cloud function.
     Firestore.firestore().reviews.document(review.documentID)
-      .setData(review.documentData) { (error) in
+      .setData(review.documentData) { error in
         if let error = error {
-          print(error)
+          print("Error writing new review: \(error)")
         } else {
           print("Write confirmed by the server!")
         }
