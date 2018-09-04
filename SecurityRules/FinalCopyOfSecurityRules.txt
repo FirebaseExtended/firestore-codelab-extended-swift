@@ -1,0 +1,52 @@
+// This document shows you what your security rules should look like at the end of the codelab.
+// It is not a complete and thorough set of security rules that will prevent all bad requests; 
+// just the ones we talk about in the workshop.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /{document=**} {
+      // This line means that anybody can read anything in your database. This might
+      // not be what you want in a production app.
+      allow read;
+    }
+
+    match /reviews/{reviewID} {
+      allow update: if (request.auth.uid == resource.data.userInfo.userID &&
+                       request.resource.data.userInfo.userID == resource.data.userInfo.userID);
+      allow create: if request.auth.uid == request.resource.data.userInfo.userID;      
+    }
+
+    match /pendingYums/{yumID} {
+      allow create: if request.auth.uid == request.resource.data.userID;
+    }
+
+    match /restaurants/{restaurantID} {
+      function isValidRestaurant(restData) {
+        return restData.averageRating is number && 
+               restData.averageRating >= 0 && restData.averageRating <= 5.0 &&
+               restData.category is string &&
+               restData.city is string &&
+               restData.name is string &&
+               restData.name.size() > 3 && restData.name.size() < 64 &&
+               restData.photoURL is string &&
+               restData.price is number && 
+               restData.price >= 1 && restData.price <= 3 &&
+               restData.reviewCount is number &&
+               restData.reviewCount >= 0;
+      }
+
+      allow update: if request.auth.uid == resource.data.ownerID && 
+                    request.resource.data.reviewCount == resource.data.reviewCount &&
+                    request.resource.data.averageRating == resource.data.averageRating &&
+                    isValidRestaurant(request.resource.data);
+      allow create: if isValidRestaurant(request.resource.data);
+    }
+
+    match /users/{userID} {
+      allow update: if request.auth.uid == userID;
+      allow create: if request.auth.uid == userID;
+    }
+  }
+}
+
