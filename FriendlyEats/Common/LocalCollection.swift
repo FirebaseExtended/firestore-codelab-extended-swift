@@ -75,9 +75,13 @@ final class LocalCollection<T: DocumentSerializable> {
 
   func listen() {
     guard listener == nil else { return }
-    listener = query.addSnapshotListener { [unowned self] querySnapshot, error in
+    listener = query.addSnapshotListener { [unowned self] (querySnapshot, error) in
       guard let snapshot = querySnapshot else {
-        print("Error fetching snapshot results: \(error!)")
+        if let error = error {
+          print("Error fetching snapshot results: \(error)")
+        } else {
+          print("Unknown error fetching snapshot data")
+        }
         return
       }
       let models = snapshot.documents.map { (document) -> T in

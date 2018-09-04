@@ -82,9 +82,9 @@ class AddRestaurantViewController: UIViewController, UINavigationControllerDeleg
     }
     print("Going to save document data as \(restaurant.documentData)")
     Firestore.firestore().restaurants.document(restaurant.documentID)
-        .setData(restaurant.documentData) { err in
-          if let err = err {
-            print("Error writing document: \(err)")
+        .setData(restaurant.documentData) { error in
+          if let error = error {
+            print("Error writing document: \(error)")
           } else {
             print("Write confirmed by the server")
           }
