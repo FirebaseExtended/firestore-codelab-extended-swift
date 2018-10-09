@@ -314,6 +314,7 @@ extension EditRestaurantViewController: UIImagePickerControllerDelegate {
     
     if let photo = info[UIImagePickerControllerOriginalImage] as? UIImage, let photoData = UIImageJPEGRepresentation(photo, 0.8) {
       saveImage(photoData: photoData)
+      restaurantImageView.image = photo
     }
     self.dismiss(animated: true, completion: nil)
   }

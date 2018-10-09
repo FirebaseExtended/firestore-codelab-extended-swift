@@ -16,6 +16,8 @@
 
 #include "Firestore/core/src/firebase/firestore/util/status.h"
 
+#if defined(__APPLE__)
+
 #include "Firestore/core/src/firebase/firestore/util/string_format.h"
 
 namespace firebase {
@@ -32,7 +34,7 @@ Status Status::FromNSError(NSError* error) {
   while (error) {
     if ([error.domain isEqualToString:NSPOSIXErrorDomain]) {
       return FromErrno(static_cast<int>(error.code),
-                       MakeStringView(original.localizedDescription));
+                       MakeString(original.localizedDescription));
     }
 
     error = error.userInfo[NSUnderlyingErrorKey];
@@ -45,3 +47,5 @@ Status Status::FromNSError(NSError* error) {
 }  // namespace util
 }  // namespace firestore
 }  // namespace firebase
+
+#endif  // defined(__APPLE__)

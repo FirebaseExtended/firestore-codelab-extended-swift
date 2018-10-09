@@ -89,6 +89,10 @@ static NSMutableArray<Class<FIRCoreConfigurable>> *gRegisteredAsConfigurable;
 
 @property(nonatomic) BOOL alreadySentDeleteNotification;
 
+#ifdef DEBUG
+@property(nonatomic) BOOL alreadyOutputDataCollectionFlag;
+#endif  // DEBUG
+
 @end
 
 @implementation FIRApp
@@ -331,7 +335,9 @@ static NSMutableDictionary *sLibraryVersions;
   if ([self.name isEqualToString:kFIRDefaultAppName]) {
     Class firAnalyticsClass = NSClassFromString(@"FIRAnalytics");
     if (!firAnalyticsClass) {
-      FIRLogError(kFIRLoggerCore, @"I-COR000022", @"Firebase Analytics is not available.");
+      FIRLogWarning(kFIRLoggerCore, @"I-COR000022",
+                    @"Firebase Analytics is not available. To add it, include Firebase/Core in the "
+                    @"Podfile or add FirebaseAnalytics.framework to the Link Build Phase");
     } else {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
@@ -357,6 +363,12 @@ static NSMutableDictionary *sLibraryVersions;
 }
 
 - (void)setDataCollectionDefaultEnabled:(BOOL)dataCollectionDefaultEnabled {
+#ifdef DEBUG
+  FIRLogDebug(kFIRLoggerCore, @"I-COR000034", @"Explicitly %@ data collection flag.",
+              dataCollectionDefaultEnabled ? @"enabled" : @"disabled");
+  self.alreadyOutputDataCollectionFlag = YES;
+#endif  // DEBUG
+
   NSString *key =
       [NSString stringWithFormat:kFIRGlobalAppDataCollectionEnabledDefaultsKeyFormat, self.name];
   [[NSUserDefaults standardUserDefaults] setBool:dataCollectionDefaultEnabled forKey:key];
@@ -382,7 +394,14 @@ static NSMutableDictionary *sLibraryVersions;
 - (BOOL)isDataCollectionDefaultEnabled {
   // Check if it's been manually set before in code, and use that as the higher priority value.
   NSNumber *defaultsObject = [[self class] readDataCollectionSwitchFromUserDefaultsForApp:self];
-  if (defaultsObject) {
+  if (defaultsObject != nil) {
+#ifdef DEBUG
+    if (!self.alreadyOutputDataCollectionFlag) {
+      FIRLogDebug(kFIRLoggerCore, @"I-COR000031", @"Data Collection flag is %@ in user defaults.",
+                  [defaultsObject boolValue] ? @"enabled" : @"disabled");
+      self.alreadyOutputDataCollectionFlag = YES;
+    }
+#endif  // DEBUG
     return [defaultsObject boolValue];
   }
 
@@ -390,10 +409,23 @@ static NSMutableDictionary *sLibraryVersions;
   // As per the implementation of `readDataCollectionSwitchFromPlist`, it's a cached value and has
   // no performance impact calling multiple times.
   NSNumber *collectionEnabledPlistValue = [[self class] readDataCollectionSwitchFromPlist];
-  if (collectionEnabledPlistValue) {
+  if (collectionEnabledPlistValue != nil) {
+#ifdef DEBUG
+    if (!self.alreadyOutputDataCollectionFlag) {
+      FIRLogDebug(kFIRLoggerCore, @"I-COR000032", @"Data Collection flag is %@ in plist.",
+                  [collectionEnabledPlistValue boolValue] ? @"enabled" : @"disabled");
+      self.alreadyOutputDataCollectionFlag = YES;
+    }
+#endif  // DEBUG
     return [collectionEnabledPlistValue boolValue];
   }
 
+#ifdef DEBUG
+  if (!self.alreadyOutputDataCollectionFlag) {
+    FIRLogDebug(kFIRLoggerCore, @"I-COR000033", @"Data Collection flag is not set.");
+    self.alreadyOutputDataCollectionFlag = YES;
+  }
+#endif  // DEBUG
   return YES;
 }
 

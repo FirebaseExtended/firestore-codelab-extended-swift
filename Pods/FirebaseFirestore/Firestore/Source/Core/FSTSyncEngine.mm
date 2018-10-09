@@ -49,16 +49,19 @@
 using firebase::firestore::auth::HashUser;
 using firebase::firestore::auth::User;
 using firebase::firestore::core::TargetIdGenerator;
+using firebase::firestore::model::BatchId;
 using firebase::firestore::model::DocumentKey;
+using firebase::firestore::model::DocumentKeySet;
+using firebase::firestore::model::ListenSequenceNumber;
+using firebase::firestore::model::OnlineState;
 using firebase::firestore::model::SnapshotVersion;
 using firebase::firestore::model::TargetId;
-using firebase::firestore::model::DocumentKeySet;
 
 NS_ASSUME_NONNULL_BEGIN
 
 // Limbo documents don't use persistence, and are eagerly GC'd. So, listens for them don't need
 // real sequence numbers.
-static const FSTListenSequenceNumber kIrrelevantSequenceNumber = -1;
+static const ListenSequenceNumber kIrrelevantSequenceNumber = -1;
 
 #pragma mark - FSTQueryView
 
@@ -69,7 +72,7 @@ static const FSTListenSequenceNumber kIrrelevantSequenceNumber = -1;
 @interface FSTQueryView : NSObject
 
 - (instancetype)initWithQuery:(FSTQuery *)query
-                     targetID:(FSTTargetID)targetID
+                     targetID:(TargetId)targetID
                   resumeToken:(NSData *)resumeToken
                          view:(FSTView *)view NS_DESIGNATED_INITIALIZER;
 
@@ -79,7 +82,7 @@ static const FSTListenSequenceNumber kIrrelevantSequenceNumber = -1;
 @property(nonatomic, strong, readonly) FSTQuery *query;
 
 /** The targetID created by the client that is used in the watch stream to identify this query. */
-@property(nonatomic, assign, readonly) FSTTargetID targetID;
+@property(nonatomic, assign, readonly) TargetId targetID;
 
 /**
  * An identifier from the datastore backend that indicates the last state of the results that
@@ -100,7 +103,7 @@ static const FSTListenSequenceNumber kIrrelevantSequenceNumber = -1;
 @implementation FSTQueryView
 
 - (instancetype)initWithQuery:(FSTQuery *)query
-                     targetID:(FSTTargetID)targetID
+                     targetID:(TargetId)targetID
                   resumeToken:(NSData *)resumeToken
                          view:(FSTView *)view {
   if (self = [super init]) {
@@ -159,10 +162,10 @@ class LimboResolution {
 @end
 
 @implementation FSTSyncEngine {
-  /** Used for creating the FSTTargetIDs for the listens used to resolve limbo documents. */
+  /** Used for creating the TargetId for the listens used to resolve limbo documents. */
   TargetIdGenerator _targetIdGenerator;
 
-  /** Stores user completion blocks, indexed by user and FSTBatchID. */
+  /** Stores user completion blocks, indexed by user and BatchId. */
   std::unordered_map<User, NSMutableDictionary<NSNumber *, FSTVoidErrorBlock> *, HashUser>
       _mutationCompletionBlocks;
 
@@ -198,7 +201,7 @@ class LimboResolution {
   return self;
 }
 
-- (FSTTargetID)listenToQuery:(FSTQuery *)query {
+- (TargetId)listenToQuery:(FSTQuery *)query {
   [self assertDelegateExistsForSelector:_cmd];
   HARD_ASSERT(self.queryViewsByQuery[query] == nil, "We already listen to query: %s", query);
 
@@ -246,7 +249,7 @@ class LimboResolution {
   [self.remoteStore fillWritePipeline];
 }
 
-- (void)addMutationCompletionBlock:(FSTVoidErrorBlock)completion batchID:(FSTBatchID)batchID {
+- (void)addMutationCompletionBlock:(FSTVoidErrorBlock)completion batchID:(BatchId)batchID {
   NSMutableDictionary<NSNumber *, FSTVoidErrorBlock> *completionBlocks =
       _mutationCompletionBlocks[_currentUser];
   if (!completionBlocks) {
@@ -313,7 +316,7 @@ class LimboResolution {
 
   // Update `receivedDocument` as appropriate for any limbo targets.
   for (const auto &entry : remoteEvent.targetChanges) {
-    FSTTargetID targetID = entry.first;
+    TargetId targetID = entry.first;
     FSTTargetChange *change = entry.second;
     const auto iter = _limboResolutionsByTarget.find(targetID);
     if (iter != _limboResolutionsByTarget.end()) {
@@ -344,7 +347,7 @@ class LimboResolution {
   [self emitNewSnapshotsWithChanges:changes remoteEvent:remoteEvent];
 }
 
-- (void)applyChangedOnlineState:(FSTOnlineState)onlineState {
+- (void)applyChangedOnlineState:(OnlineState)onlineState {
   NSMutableArray<FSTViewSnapshot *> *newViewSnapshots = [NSMutableArray array];
   [self.queryViewsByQuery
       enumerateKeysAndObjectsUsingBlock:^(FSTQuery *query, FSTQueryView *queryView, BOOL *stop) {
@@ -389,9 +392,14 @@ class LimboResolution {
   } else {
     FSTQueryView *queryView = self.queryViewsByTarget[@(targetID)];
     HARD_ASSERT(queryView, "Unknown targetId: %s", targetID);
-    [self.localStore releaseQuery:queryView.query];
+    FSTQuery *query = queryView.query;
+    [self.localStore releaseQuery:query];
     [self removeAndCleanupQuery:queryView];
-    [self.delegate handleError:error forQuery:queryView.query];
+    if ([self errorIsInteresting:error]) {
+      LOG_WARN("Listen for query at %s failed: %s", query.path.CanonicalString(),
+               error.localizedDescription);
+    }
+    [self.delegate handleError:error forQuery:query];
   }
 }
 
@@ -407,19 +415,24 @@ class LimboResolution {
   [self emitNewSnapshotsWithChanges:changes remoteEvent:nil];
 }
 
-- (void)rejectFailedWriteWithBatchID:(FSTBatchID)batchID error:(NSError *)error {
+- (void)rejectFailedWriteWithBatchID:(BatchId)batchID error:(NSError *)error {
   [self assertDelegateExistsForSelector:_cmd];
+  FSTMaybeDocumentDictionary *changes = [self.localStore rejectBatchID:batchID];
+
+  if (!changes.isEmpty && [self errorIsInteresting:error]) {
+    LOG_WARN("Write at %s failed: %s", changes.minKey.path.CanonicalString(),
+             error.localizedDescription);
+  }
 
   // The local store may or may not be able to apply the write result and raise events immediately
   // (depending on whether the watcher is caught up), so we raise user callbacks first so that they
   // consistently happen before listen events.
   [self processUserCallbacksForBatchID:batchID error:error];
 
-  FSTMaybeDocumentDictionary *changes = [self.localStore rejectBatchID:batchID];
   [self emitNewSnapshotsWithChanges:changes remoteEvent:nil];
 }
 
-- (void)processUserCallbacksForBatchID:(FSTBatchID)batchID error:(NSError *_Nullable)error {
+- (void)processUserCallbacksForBatchID:(BatchId)batchID error:(NSError *_Nullable)error {
   NSMutableDictionary<NSNumber *, FSTVoidErrorBlock> *completionBlocks =
       _mutationCompletionBlocks[_currentUser];
 
@@ -502,7 +515,7 @@ class LimboResolution {
 
 /** Updates the limbo document state for the given targetID. */
 - (void)updateTrackedLimboDocumentsWithChanges:(NSArray<FSTLimboDocumentChange *> *)limboChanges
-                                      targetID:(FSTTargetID)targetID {
+                                      targetID:(TargetId)targetID {
   for (FSTLimboDocumentChange *limboChange in limboChanges) {
     switch (limboChange.type) {
       case FSTLimboDocumentChangeTypeAdded:
@@ -560,15 +573,18 @@ class LimboResolution {
   return _limboTargetsByKey;
 }
 
-- (void)userDidChange:(const User &)user {
+- (void)credentialDidChangeWithUser:(const firebase::firestore::auth::User &)user {
+  BOOL userChanged = (_currentUser != user);
   _currentUser = user;
 
-  // Notify local store and emit any resulting events from swapping out the mutation queue.
-  FSTMaybeDocumentDictionary *changes = [self.localStore userDidChange:user];
-  [self emitNewSnapshotsWithChanges:changes remoteEvent:nil];
+  if (userChanged) {
+    // Notify local store and emit any resulting events from swapping out the mutation queue.
+    FSTMaybeDocumentDictionary *changes = [self.localStore userDidChange:user];
+    [self emitNewSnapshotsWithChanges:changes remoteEvent:nil];
+  }
 
   // Notify remote store so it can restart its streams.
-  [self.remoteStore userDidChange:user];
+  [self.remoteStore credentialDidChange];
 }
 
 - (firebase::firestore::model::DocumentKeySet)remoteKeysForTarget:(FSTBoxedTargetID *)targetId {
@@ -579,6 +595,24 @@ class LimboResolution {
     FSTQueryView *queryView = self.queryViewsByTarget[targetId];
     return queryView ? queryView.view.syncedDocuments : DocumentKeySet{};
   }
+}
+
+/**
+ * Decides if the error likely represents a developer mistake such as forgetting to create an index
+ * or permission denied. Used to decide whether an error is worth automatically logging as a
+ * warning.
+ */
+- (BOOL)errorIsInteresting:(NSError *)error {
+  if (error.domain == FIRFirestoreErrorDomain) {
+    if (error.code == FIRFirestoreErrorCodeFailedPrecondition &&
+        [error.localizedDescription containsString:@"requires an index"]) {
+      return YES;
+    } else if (error.code == FIRFirestoreErrorCodePermissionDenied) {
+      return YES;
+    }
+  }
+
+  return NO;
 }
 
 @end

@@ -15,6 +15,7 @@
  */
 
 #import <Foundation/Foundation.h>
+
 #include <memory>
 
 #import "Firestore/Source/Core/FSTTypes.h"
@@ -54,13 +55,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * All callbacks and events will be triggered on the provided userExecutor.
  */
-+ (instancetype)
-clientWithDatabaseInfo:(const firebase::firestore::core::DatabaseInfo &)databaseInfo
-        usePersistence:(BOOL)usePersistence
-   credentialsProvider:(firebase::firestore::auth::CredentialsProvider *)
-                           credentialsProvider  // no passing ownership
-          userExecutor:(std::unique_ptr<firebase::firestore::util::internal::Executor>)userExecutor
-   workerDispatchQueue:(FSTDispatchQueue *)workerDispatchQueue;
++ (instancetype)clientWithDatabaseInfo:(const firebase::firestore::core::DatabaseInfo &)databaseInfo
+                        usePersistence:(BOOL)usePersistence
+                   credentialsProvider:(firebase::firestore::auth::CredentialsProvider *)
+                                           credentialsProvider  // no passing ownership
+                          userExecutor:
+                              (std::unique_ptr<firebase::firestore::util::internal::Executor>)
+                                  userExecutor
+                   workerDispatchQueue:(FSTDispatchQueue *)workerDispatchQueue;
 
 - (instancetype)init __attribute__((unavailable("Use static constructor method.")));
 
