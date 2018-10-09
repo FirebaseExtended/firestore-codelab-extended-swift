@@ -33,6 +33,7 @@
 
 #import "FIRFirestoreErrors.h"
 #import "FIRGeoPoint.h"
+#import "FIRTimestamp.h"
 #import "Firestore/Source/Core/FSTQuery.h"
 #import "Firestore/Source/Local/FSTQueryData.h"
 #import "Firestore/Source/Model/FSTDocument.h"
@@ -67,6 +68,7 @@ using firebase::firestore::model::Precondition;
 using firebase::firestore::model::ResourcePath;
 using firebase::firestore::model::ServerTimestampTransform;
 using firebase::firestore::model::SnapshotVersion;
+using firebase::firestore::model::TargetId;
 using firebase::firestore::model::TransformOperation;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -144,7 +146,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (ResourcePath)decodedResourcePathWithDatabaseID:(NSString *)name {
-  const ResourcePath path = ResourcePath::FromString(util::MakeStringView(name));
+  const ResourcePath path = ResourcePath::FromString(util::MakeString(name));
   HARD_ASSERT([self validQualifiedResourcePath:path], "Tried to deserialize invalid key %s",
               path.CanonicalString());
   return path;
@@ -568,7 +570,7 @@ NS_ASSUME_NONNULL_BEGIN
   std::vector<FieldPath> fields;
   fields.reserve(fieldMask.fieldPathsArray_Count);
   for (NSString *path in fieldMask.fieldPathsArray) {
-    fields.push_back(FieldPath::FromServerFormat(util::MakeStringView(path)));
+    fields.push_back(FieldPath::FromServerFormat(util::MakeString(path)));
   }
   return FieldMask(std::move(fields));
 }
@@ -627,7 +629,7 @@ NS_ASSUME_NONNULL_BEGIN
             proto.setToServerValue == GCFSDocumentTransform_FieldTransform_ServerValue_RequestTime,
             "Unknown transform setToServerValue: %s", proto.setToServerValue);
         fieldTransforms.emplace_back(
-            FieldPath::FromServerFormat(util::MakeStringView(proto.fieldPath)),
+            FieldPath::FromServerFormat(util::MakeString(proto.fieldPath)),
             absl::make_unique<ServerTimestampTransform>(ServerTimestampTransform::Get()));
         break;
       }
@@ -636,7 +638,7 @@ NS_ASSUME_NONNULL_BEGIN
         std::vector<FSTFieldValue *> elements =
             [self decodedArrayTransformElements:proto.appendMissingElements];
         fieldTransforms.emplace_back(
-            FieldPath::FromServerFormat(util::MakeStringView(proto.fieldPath)),
+            FieldPath::FromServerFormat(util::MakeString(proto.fieldPath)),
             absl::make_unique<ArrayTransform>(TransformOperation::Type::ArrayUnion,
                                               std::move(elements)));
         break;
@@ -646,7 +648,7 @@ NS_ASSUME_NONNULL_BEGIN
         std::vector<FSTFieldValue *> elements =
             [self decodedArrayTransformElements:proto.removeAllFromArray_p];
         fieldTransforms.emplace_back(
-            FieldPath::FromServerFormat(util::MakeStringView(proto.fieldPath)),
+            FieldPath::FromServerFormat(util::MakeString(proto.fieldPath)),
             absl::make_unique<ArrayTransform>(TransformOperation::Type::ArrayRemove,
                                               std::move(elements)));
         break;
@@ -670,12 +672,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - FSTMutationResult <= GCFSWriteResult proto
 
-- (FSTMutationResult *)decodedMutationResult:(GCFSWriteResult *)mutation {
-  // NOTE: Deletes don't have an updateTime.
-  absl::optional<SnapshotVersion> version;
-  if (mutation.hasUpdateTime) {
-    version = [self decodedVersion:mutation.updateTime];
-  }
+- (FSTMutationResult *)decodedMutationResult:(GCFSWriteResult *)mutation
+                               commitVersion:(const SnapshotVersion &)commitVersion {
+  // NOTE: Deletes don't have an updateTime. Use commitVersion instead.
+  SnapshotVersion version =
+      mutation.hasUpdateTime ? [self decodedVersion:mutation.updateTime] : commitVersion;
   NSMutableArray *_Nullable transformResults = nil;
   if (mutation.transformResultsArray.count > 0) {
     transformResults = [NSMutableArray array];
@@ -1183,7 +1184,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (FSTExistenceFilterWatchChange *)decodedExistenceFilterWatchChange:(GCFSExistenceFilter *)filter {
   // TODO(dimond): implement existence filter parsing
   FSTExistenceFilter *existenceFilter = [FSTExistenceFilter filterWithCount:filter.count];
-  FSTTargetID targetID = filter.targetId;
+  TargetId targetID = filter.targetId;
   return [FSTExistenceFilterWatchChange changeWithFilter:existenceFilter targetID:targetID];
 }
 

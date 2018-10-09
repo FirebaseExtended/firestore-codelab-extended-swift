@@ -97,7 +97,7 @@ class RestaurantDetailViewController: UIViewController {
     tableView.estimatedRowHeight = 140
 
     // Comment out this line to show the toolbar
-    // bottomToolbar.isHidden = true
+    bottomToolbar.isHidden = true
   }
     
   

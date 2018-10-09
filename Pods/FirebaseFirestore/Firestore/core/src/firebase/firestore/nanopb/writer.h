@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "Firestore/core/src/firebase/firestore/nanopb/tag.h"
-#include "Firestore/core/src/firebase/firestore/util/status.h"
 
 namespace firebase {
 namespace firestore {
@@ -34,7 +33,7 @@ namespace nanopb {
 
 /**
  * Docs TODO(rsgowman). But currently, this just wraps the underlying nanopb
- * pb_ostream_t. Also doc how to check status.
+ * pb_ostream_t. All errors are considered fatal.
  */
 class Writer {
  public:
@@ -48,6 +47,17 @@ class Writer {
    * @param out_bytes where the output should be serialized to.
    */
   static Writer Wrap(std::vector<std::uint8_t>* out_bytes);
+
+  /**
+   * Creates an output stream that writes to the specified string. Note that
+   * this string pointer must remain valid for the lifetime of this Writer.
+   *
+   * (This is roughly equivalent to the nanopb function
+   * pb_ostream_from_buffer())
+   *
+   * @param out_string where the output should be serialized to.
+   */
+  static Writer Wrap(std::string* out_string);
 
   /**
    * Creates a non-writing output stream used to calculate the size of
@@ -101,13 +111,7 @@ class Writer {
     return stream_.bytes_written;
   }
 
-  util::Status status() const {
-    return status_;
-  }
-
  private:
-  util::Status status_ = util::Status::OK();
-
   /**
    * Creates a new Writer, based on the given nanopb pb_ostream_t. Note that
    * a shallow copy will be taken. (Non-null pointers within this struct must

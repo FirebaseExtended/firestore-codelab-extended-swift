@@ -10,6 +10,8 @@
 #endif
 #endif
 
+#import "FUIAccountSettingsOperationType.h"
+#import "FUIAccountSettingsViewController.h"
 #import "FirebaseAuthUI.h"
 #import "FUIAuth.h"
 #import "FUIAuthBaseViewController.h"

@@ -46,6 +46,8 @@
 #include "Firestore/core/src/firebase/firestore/util/string_apple.h"
 
 namespace util = firebase::firestore::util;
+using firebase::firestore::core::ParsedSetData;
+using firebase::firestore::core::ParsedUpdateData;
 using firebase::firestore::model::DocumentKey;
 using firebase::firestore::model::Precondition;
 using firebase::firestore::model::ResourcePath;
@@ -111,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
   if (!collectionPath) {
     FSTThrowInvalidArgument(@"Collection path cannot be nil.");
   }
-  const ResourcePath subPath = ResourcePath::FromString(util::MakeStringView(collectionPath));
+  const ResourcePath subPath = ResourcePath::FromString(util::MakeString(collectionPath));
   const ResourcePath path = self.key.path().Append(subPath);
   return [FIRCollectionReference referenceWithPath:path firestore:self.firestore];
 }
@@ -137,21 +139,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setData:(NSDictionary<NSString *, id> *)documentData
           merge:(BOOL)merge
      completion:(nullable void (^)(NSError *_Nullable error))completion {
-  FSTParsedSetData *parsed =
+  ParsedSetData parsed =
       merge ? [self.firestore.dataConverter parsedMergeData:documentData fieldMask:nil]
             : [self.firestore.dataConverter parsedSetData:documentData];
   return [self.firestore.client
-      writeMutations:[parsed mutationsWithKey:self.key precondition:Precondition::None()]
+      writeMutations:std::move(parsed).ToMutations(self.key, Precondition::None())
           completion:completion];
 }
 
 - (void)setData:(NSDictionary<NSString *, id> *)documentData
     mergeFields:(NSArray<id> *)mergeFields
      completion:(nullable void (^)(NSError *_Nullable error))completion {
-  FSTParsedSetData *parsed =
+  ParsedSetData parsed =
       [self.firestore.dataConverter parsedMergeData:documentData fieldMask:mergeFields];
   return [self.firestore.client
-      writeMutations:[parsed mutationsWithKey:self.key precondition:Precondition::None()]
+      writeMutations:std::move(parsed).ToMutations(self.key, Precondition::None())
           completion:completion];
 }
 
@@ -161,9 +163,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)updateData:(NSDictionary<id, id> *)fields
         completion:(nullable void (^)(NSError *_Nullable error))completion {
-  FSTParsedUpdateData *parsed = [self.firestore.dataConverter parsedUpdateData:fields];
+  ParsedUpdateData parsed = [self.firestore.dataConverter parsedUpdateData:fields];
   return [self.firestore.client
-      writeMutations:[parsed mutationsWithKey:self.key precondition:Precondition::Exists(true)]
+      writeMutations:std::move(parsed).ToMutations(self.key, Precondition::Exists(true))
           completion:completion];
 }
 
@@ -249,16 +251,16 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (id<FIRListenerRegistration>)
-addSnapshotListenerWithIncludeMetadataChanges:(BOOL)includeMetadataChanges
-                                     listener:(FIRDocumentSnapshotBlock)listener {
+    addSnapshotListenerWithIncludeMetadataChanges:(BOOL)includeMetadataChanges
+                                         listener:(FIRDocumentSnapshotBlock)listener {
   FSTListenOptions *options =
       [self internalOptionsForIncludeMetadataChanges:includeMetadataChanges];
   return [self addSnapshotListenerInternalWithOptions:options listener:listener];
 }
 
 - (id<FIRListenerRegistration>)
-addSnapshotListenerInternalWithOptions:(FSTListenOptions *)internalOptions
-                              listener:(FIRDocumentSnapshotBlock)listener {
+    addSnapshotListenerInternalWithOptions:(FSTListenOptions *)internalOptions
+                                  listener:(FIRDocumentSnapshotBlock)listener {
   FIRFirestore *firestore = self.firestore;
   FSTQuery *query = [FSTQuery queryWithPath:self.key.path()];
   const DocumentKey key = self.key;

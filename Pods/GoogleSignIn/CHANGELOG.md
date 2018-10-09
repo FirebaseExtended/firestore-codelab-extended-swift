@@ -1,3 +1,6 @@
+# 2018-10-1 -- v4.3.0
+- Supports Google's Enterprise Mobile Management.
+
 # 2018-8-10 -- v4.2.0
 - Adds `grantedScopes` to `GIDGoogleUser`, allowing confirmation of which scopes
   have been granted after a successful sign-in.

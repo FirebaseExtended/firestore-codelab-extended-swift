@@ -46,6 +46,7 @@ using firebase::firestore::auth::Token;
 using firebase::firestore::core::DatabaseInfo;
 using firebase::firestore::model::DatabaseId;
 using firebase::firestore::model::SnapshotVersion;
+using firebase::firestore::model::TargetId;
 
 /**
  * Initial backoff time in seconds after an error.
@@ -668,7 +669,7 @@ static const NSTimeInterval kIdleTimeout = 60.0;
   [self writeRequest:request];
 }
 
-- (void)unwatchTargetID:(FSTTargetID)targetID {
+- (void)unwatchTargetID:(TargetId)targetID {
   HARD_ASSERT([self isOpen], "Not yet open");
   [self.workerDispatchQueue verifyIsCurrentQueue];
 
@@ -812,7 +813,7 @@ static const NSTimeInterval kIdleTimeout = 60.0;
     NSMutableArray<GCFSWriteResult *> *protos = response.writeResultsArray;
     NSMutableArray<FSTMutationResult *> *results = [NSMutableArray arrayWithCapacity:protos.count];
     for (GCFSWriteResult *proto in protos) {
-      [results addObject:[_serializer decodedMutationResult:proto]];
+      [results addObject:[_serializer decodedMutationResult:proto commitVersion:commitVersion]];
     };
 
     [self.delegate writeStreamDidReceiveResponseWithVersion:commitVersion mutationResults:results];

@@ -1,3 +1,6 @@
+# 2018-09-25 -- v3.2.2
+- Fixed a crash caused by NSUserDefaults being called on background thread.
+
 # 2018-08-14 -- v3.2.1
 - Fixed an issue that checkin is not cached properly when app first started. (#1561)
 

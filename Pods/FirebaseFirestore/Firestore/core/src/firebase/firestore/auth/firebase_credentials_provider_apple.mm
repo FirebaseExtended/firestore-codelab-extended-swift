@@ -61,14 +61,11 @@ FirebaseCredentialsProvider::FirebaseCredentialsProvider(
 
                 NSString* user_id =
                     user_info[FIRAuthStateDidChangeInternalNotificationUIDKey];
-                User new_user = User::FromUid(user_id);
-                if (new_user != contents->current_user) {
-                  contents->current_user = new_user;
-                  contents->user_counter++;
-                  UserChangeListener listener = user_change_listener_;
-                  if (listener) {
-                    listener(contents->current_user);
-                  }
+                contents->current_user = User::FromUid(user_id);
+                contents->token_counter++;
+                CredentialChangeListener listener = change_listener_;
+                if (listener) {
+                  listener(contents->current_user);
                 }
               }];
 }
@@ -86,43 +83,42 @@ void FirebaseCredentialsProvider::GetToken(TokenListener completion) {
   HARD_ASSERT(auth_listener_handle_,
               "GetToken cannot be called after listener removed.");
 
-  // Take note of the current value of the userCounter so that this method can
-  // fail if there is a user change while the request is outstanding.
-  int initial_user_counter = contents_->user_counter;
+  // Take note of the current value of the tokenCounter so that this method can
+  // fail if there is a token change while the request is outstanding.
+  int initial_token_counter = contents_->token_counter;
 
   std::weak_ptr<Contents> weak_contents = contents_;
-  void (^get_token_callback)(NSString*, NSError*) =
-      ^(NSString* _Nullable token, NSError* _Nullable error) {
-        std::shared_ptr<Contents> contents = weak_contents.lock();
-        if (!contents) {
-          return;
-        }
+  void (^get_token_callback)(NSString*, NSError*) = ^(
+      NSString* _Nullable token, NSError* _Nullable error) {
+    std::shared_ptr<Contents> contents = weak_contents.lock();
+    if (!contents) {
+      return;
+    }
 
-        std::unique_lock<std::mutex> lock(contents->mutex);
-        if (initial_user_counter != contents->user_counter) {
-          // Cancel the request since the user changed while the request was
-          // outstanding so the response is likely for a previous user (which
-          // user, we can't be sure).
-          completion(util::Status(FirestoreErrorCode::Aborted,
-                                  "getToken aborted due to user change."));
+    std::unique_lock<std::mutex> lock(contents->mutex);
+    if (initial_token_counter != contents->token_counter) {
+      // Cancel the request since the user changed while the request was
+      // outstanding so the response is likely for a previous user (which
+      // user, we can't be sure).
+      completion(util::Status(FirestoreErrorCode::Aborted,
+                              "getToken aborted due to token change."));
+    } else {
+      if (error == nil) {
+        if (token != nil) {
+          completion(Token{util::MakeString(token), contents->current_user});
         } else {
-          if (error == nil) {
-            if (token != nil) {
-              completion(
-                  Token{util::MakeStringView(token), contents->current_user});
-            } else {
-              completion(Token::Unauthenticated());
-            }
-          } else {
-            FirestoreErrorCode error_code = FirestoreErrorCode::Unknown;
-            if (error.domain == FIRFirestoreErrorDomain) {
-              error_code = static_cast<FirestoreErrorCode>(error.code);
-            }
-            completion(util::Status(
-                error_code, util::MakeStringView(error.localizedDescription)));
-          }
+          completion(Token::Unauthenticated());
         }
-      };
+      } else {
+        FirestoreErrorCode error_code = FirestoreErrorCode::Unknown;
+        if (error.domain == FIRFirestoreErrorDomain) {
+          error_code = static_cast<FirestoreErrorCode>(error.code);
+        }
+        completion(util::Status(error_code,
+                                util::MakeString(error.localizedDescription)));
+      }
+    }
+  };
 
   // TODO(wilhuff): Need a better abstraction over a missing auth provider.
   if (contents_->auth) {
@@ -140,21 +136,20 @@ void FirebaseCredentialsProvider::InvalidateToken() {
   contents_->force_refresh = true;
 }
 
-void FirebaseCredentialsProvider::SetUserChangeListener(
-    UserChangeListener listener) {
+void FirebaseCredentialsProvider::SetCredentialChangeListener(
+    CredentialChangeListener changeListener) {
   std::unique_lock<std::mutex> lock(contents_->mutex);
-  if (listener) {
-    HARD_ASSERT(!user_change_listener_, "set user_change_listener twice!");
+  if (changeListener) {
+    HARD_ASSERT(!change_listener_, "set change_listener twice!");
     // Fire initial event.
-    listener(contents_->current_user);
+    changeListener(contents_->current_user);
   } else {
-    HARD_ASSERT(auth_listener_handle_, "removed user_change_listener twice!");
-    HARD_ASSERT(user_change_listener_,
-                "user_change_listener removed without being set!");
+    HARD_ASSERT(auth_listener_handle_, "removed change_listener twice!");
+    HARD_ASSERT(change_listener_, "change_listener removed without being set!");
     [[NSNotificationCenter defaultCenter] removeObserver:auth_listener_handle_];
     auth_listener_handle_ = nil;
   }
-  user_change_listener_ = listener;
+  change_listener_ = changeListener;
 }
 
 }  // namespace auth

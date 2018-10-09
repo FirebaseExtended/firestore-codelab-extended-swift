@@ -22,46 +22,69 @@
 #import "FIRFirestoreErrors.h"
 #import "Firestore/Source/Core/FSTListenSequence.h"
 #import "Firestore/Source/Local/FSTLRUGarbageCollector.h"
-#import "Firestore/Source/Local/FSTLevelDBKey.h"
-#import "Firestore/Source/Local/FSTLevelDBMigrations.h"
 #import "Firestore/Source/Local/FSTLevelDBMutationQueue.h"
 #import "Firestore/Source/Local/FSTLevelDBQueryCache.h"
 #import "Firestore/Source/Local/FSTLevelDBRemoteDocumentCache.h"
 #import "Firestore/Source/Local/FSTReferenceSet.h"
 #import "Firestore/Source/Remote/FSTSerializerBeta.h"
 
+#include "Firestore/core/include/firebase/firestore/firestore_errors.h"
 #include "Firestore/core/src/firebase/firestore/auth/user.h"
 #include "Firestore/core/src/firebase/firestore/core/database_info.h"
+#include "Firestore/core/src/firebase/firestore/local/leveldb_key.h"
+#include "Firestore/core/src/firebase/firestore/local/leveldb_migrations.h"
 #include "Firestore/core/src/firebase/firestore/local/leveldb_transaction.h"
+#include "Firestore/core/src/firebase/firestore/local/leveldb_util.h"
 #include "Firestore/core/src/firebase/firestore/model/database_id.h"
 #include "Firestore/core/src/firebase/firestore/model/document_key.h"
 #include "Firestore/core/src/firebase/firestore/model/resource_path.h"
+#include "Firestore/core/src/firebase/firestore/util/filesystem.h"
 #include "Firestore/core/src/firebase/firestore/util/hard_assert.h"
 #include "Firestore/core/src/firebase/firestore/util/ordered_code.h"
+#include "Firestore/core/src/firebase/firestore/util/statusor.h"
 #include "Firestore/core/src/firebase/firestore/util/string_apple.h"
 #include "Firestore/core/src/firebase/firestore/util/string_util.h"
 #include "absl/memory/memory.h"
 #include "absl/strings/match.h"
+#include "absl/strings/str_cat.h"
 #include "leveldb/db.h"
-
-namespace util = firebase::firestore::util;
-using firebase::firestore::auth::User;
-using firebase::firestore::core::DatabaseInfo;
-using firebase::firestore::model::DatabaseId;
-using firebase::firestore::model::DocumentKey;
-using firebase::firestore::model::ResourcePath;
-using util::OrderedCode;
 
 NS_ASSUME_NONNULL_BEGIN
 
-static NSString *const kReservedPathComponent = @"firestore";
-
+namespace util = firebase::firestore::util;
+using firebase::firestore::FirestoreErrorCode;
+using firebase::firestore::auth::User;
+using firebase::firestore::core::DatabaseInfo;
+using firebase::firestore::local::ConvertStatus;
+using firebase::firestore::local::LevelDbDocumentMutationKey;
+using firebase::firestore::local::LevelDbDocumentTargetKey;
+using firebase::firestore::local::LevelDbMigrations;
+using firebase::firestore::local::LevelDbMutationKey;
 using firebase::firestore::local::LevelDbTransaction;
+using firebase::firestore::model::DatabaseId;
+using firebase::firestore::model::DocumentKey;
+using firebase::firestore::model::ListenSequenceNumber;
+using firebase::firestore::model::ResourcePath;
+using firebase::firestore::util::OrderedCode;
+using firebase::firestore::util::Path;
+using firebase::firestore::util::Status;
+using firebase::firestore::util::StatusOr;
+using firebase::firestore::util::StringFormat;
 using leveldb::DB;
 using leveldb::Options;
 using leveldb::ReadOptions;
-using leveldb::Status;
 using leveldb::WriteOptions;
+
+static const char *kReservedPathComponent = "firestore";
+
+@interface FSTLevelDB ()
+
+- (size_t)byteSize;
+
+@property(nonatomic, assign, getter=isStarted) BOOL started;
+@property(nonatomic, strong, readonly) FSTLocalSerializer *serializer;
+
+@end
 
 /**
  * Provides LRU functionality for leveldb persistence.
@@ -85,7 +108,7 @@ using leveldb::WriteOptions;
   // weak to avoid retain cycle.
   __weak FSTLevelDB *_db;
   FSTReferenceSet *_additionalReferences;
-  FSTListenSequenceNumber _currentSequenceNumber;
+  ListenSequenceNumber _currentSequenceNumber;
   FSTListenSequence *_listenSequence;
 }
 
@@ -100,7 +123,7 @@ using leveldb::WriteOptions;
 }
 
 - (void)start {
-  FSTListenSequenceNumber highestSequenceNumber = _db.queryCache.highestListenSequenceNumber;
+  ListenSequenceNumber highestSequenceNumber = _db.queryCache.highestListenSequenceNumber;
   _listenSequence = [[FSTListenSequence alloc] initStartingAfter:highestSequenceNumber];
 }
 
@@ -114,7 +137,7 @@ using leveldb::WriteOptions;
   _currentSequenceNumber = kFSTListenSequenceNumberInvalid;
 }
 
-- (FSTListenSequenceNumber)currentSequenceNumber {
+- (ListenSequenceNumber)currentSequenceNumber {
   HARD_ASSERT(_currentSequenceNumber != kFSTListenSequenceNumberInvalid,
               "Asking for a sequence number outside of a transaction");
   return _currentSequenceNumber;
@@ -149,9 +172,8 @@ using leveldb::WriteOptions;
   auto it = _db.currentTransaction->NewIterator();
   // For each user, if there is any batch that contains this document in any batch, we know it's
   // pinned.
-  for (auto user = users.begin(); user != users.end(); ++user) {
-    std::string mutationKey =
-        [FSTLevelDBDocumentMutationKey keyPrefixWithUserID:*user resourcePath:path];
+  for (const std::string &user : users) {
+    std::string mutationKey = LevelDbDocumentMutationKey::KeyPrefix(user, path);
     it->Seek(mutationKey);
     if (it->Valid() && absl::StartsWith(it->key(), mutationKey)) {
       return YES;
@@ -176,16 +198,16 @@ using leveldb::WriteOptions;
 }
 
 - (void)enumerateMutationsUsingBlock:
-    (void (^)(const DocumentKey &key, FSTListenSequenceNumber sequenceNumber, BOOL *stop))block {
+    (void (^)(const DocumentKey &key, ListenSequenceNumber sequenceNumber, BOOL *stop))block {
   FSTLevelDBQueryCache *queryCache = _db.queryCache;
   [queryCache enumerateOrphanedDocumentsUsingBlock:block];
 }
 
-- (int)removeOrphanedDocumentsThroughSequenceNumber:(FSTListenSequenceNumber)upperBound {
+- (int)removeOrphanedDocumentsThroughSequenceNumber:(ListenSequenceNumber)upperBound {
   FSTLevelDBQueryCache *queryCache = _db.queryCache;
   __block int count = 0;
   [queryCache enumerateOrphanedDocumentsUsingBlock:^(
-                  const DocumentKey &docKey, FSTListenSequenceNumber sequenceNumber, BOOL *stop) {
+                  const DocumentKey &docKey, ListenSequenceNumber sequenceNumber, BOOL *stop) {
     if (sequenceNumber <= upperBound) {
       if (![self isPinned:docKey]) {
         count++;
@@ -196,7 +218,7 @@ using leveldb::WriteOptions;
   return count;
 }
 
-- (int)removeTargetsThroughSequenceNumber:(FSTListenSequenceNumber)sequenceNumber
+- (int)removeTargetsThroughSequenceNumber:(ListenSequenceNumber)sequenceNumber
                               liveQueries:(NSDictionary<NSNumber *, FSTQueryData *> *)liveQueries {
   FSTLevelDBQueryCache *queryCache = _db.queryCache;
   return [queryCache removeQueriesThroughSequenceNumber:sequenceNumber liveQueries:liveQueries];
@@ -209,7 +231,7 @@ using leveldb::WriteOptions;
 - (void)writeSentinelForKey:(const DocumentKey &)key {
   std::string encodedSequenceNumber;
   OrderedCode::WriteSignedNumIncreasing(&encodedSequenceNumber, [self currentSequenceNumber]);
-  std::string sentinelKey = [FSTLevelDBDocumentTargetKey sentinelKeyWithDocumentKey:key];
+  std::string sentinelKey = LevelDbDocumentTargetKey::SentinelKey(key);
   _db.currentTransaction->Put(sentinelKey, encodedSequenceNumber);
 }
 
@@ -221,17 +243,14 @@ using leveldb::WriteOptions;
   [self writeSentinelForKey:key];
 }
 
-@end
-
-@interface FSTLevelDB ()
-
-@property(nonatomic, copy) NSString *directory;
-@property(nonatomic, assign, getter=isStarted) BOOL started;
-@property(nonatomic, strong, readonly) FSTLocalSerializer *serializer;
+- (size_t)byteSize {
+  return [_db byteSize];
+}
 
 @end
 
 @implementation FSTLevelDB {
+  Path _directory;
   std::unique_ptr<LevelDbTransaction> _transaction;
   std::unique_ptr<leveldb::DB> _ptr;
   FSTTransactionRunner _transactionRunner;
@@ -252,30 +271,42 @@ using leveldb::WriteOptions;
 + (std::set<std::string>)collectUserSet:(LevelDbTransaction *)transaction {
   std::set<std::string> users;
 
-  std::string tablePrefix = [FSTLevelDBMutationKey keyPrefix];
+  std::string tablePrefix = LevelDbMutationKey::KeyPrefix();
   auto it = transaction->NewIterator();
   it->Seek(tablePrefix);
-  FSTLevelDBMutationKey *rowKey = [[FSTLevelDBMutationKey alloc] init];
-  while (it->Valid() && absl::StartsWith(it->key(), tablePrefix) && [rowKey decodeKey:it->key()]) {
-    users.insert(rowKey.userID);
+  LevelDbMutationKey rowKey;
+  while (it->Valid() && absl::StartsWith(it->key(), tablePrefix) && rowKey.Decode(it->key())) {
+    users.insert(rowKey.user_id());
 
-    auto userEnd = [FSTLevelDBMutationKey keyPrefixWithUserID:rowKey.userID];
+    auto userEnd = LevelDbMutationKey::KeyPrefix(rowKey.user_id());
     userEnd = util::PrefixSuccessor(userEnd);
     it->Seek(userEnd);
   }
   return users;
 }
 
-- (instancetype)initWithDirectory:(NSString *)directory
-                       serializer:(FSTLocalSerializer *)serializer {
+- (instancetype)initWithDirectory:(Path)directory serializer:(FSTLocalSerializer *)serializer {
   if (self = [super init]) {
-    _directory = [directory copy];
+    _directory = std::move(directory);
     _serializer = serializer;
     _queryCache = [[FSTLevelDBQueryCache alloc] initWithDB:self serializer:self.serializer];
     _referenceDelegate = [[FSTLevelDBLRUDelegate alloc] initWithPersistence:self];
     _transactionRunner.SetBackingPersistence(self);
   }
   return self;
+}
+
+- (size_t)byteSize {
+  off_t count = 0;
+  auto iter = util::DirectoryIterator::Create(_directory);
+  for (; iter->Valid(); iter->Next()) {
+    off_t fileSize = util::FileSize(iter->file()).ValueOrDie();
+    count += fileSize;
+  }
+  HARD_ASSERT(iter->status().ok(), "Failed to iterate leveldb directory: %s",
+              iter->status().error_message().c_str());
+  HARD_ASSERT(count <= SIZE_MAX, "Overflowed counting bytes cached");
+  return count;
 }
 
 - (const std::set<std::string> &)users {
@@ -290,15 +321,15 @@ using leveldb::WriteOptions;
   return _transactionRunner;
 }
 
-+ (NSString *)documentsDirectory {
++ (Path)documentsDirectory {
 #if TARGET_OS_IPHONE
   NSArray<NSString *> *directories =
       NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-  return [directories[0] stringByAppendingPathComponent:kReservedPathComponent];
+  return Path::FromNSString(directories[0]).AppendUtf8(kReservedPathComponent);
 
 #elif TARGET_OS_MAC
-  NSString *dotPrefixed = [@"." stringByAppendingString:kReservedPathComponent];
-  return [NSHomeDirectory() stringByAppendingPathComponent:dotPrefixed];
+  std::string dotPrefixed = absl::StrCat(".", kReservedPathComponent);
+  return Path::FromNSString(NSHomeDirectory()).AppendUtf8(dotPrefixed);
 
 #else
 #error "local storage on tvOS"
@@ -308,8 +339,8 @@ using leveldb::WriteOptions;
 #endif
 }
 
-+ (NSString *)storageDirectoryForDatabaseInfo:(const DatabaseInfo &)databaseInfo
-                           documentsDirectory:(NSString *)documentsDirectory {
++ (Path)storageDirectoryForDatabaseInfo:(const DatabaseInfo &)databaseInfo
+                     documentsDirectory:(const Path &)documentsDirectory {
   // Use two different path formats:
   //
   //   * persistenceKey / projectID . databaseID / name
@@ -317,100 +348,72 @@ using leveldb::WriteOptions;
   //
   // projectIDs are DNS-compatible names and cannot contain dots so there's
   // no danger of collisions.
-  NSString *directory = documentsDirectory;
-  directory =
-      [directory stringByAppendingPathComponent:util::WrapNSString(databaseInfo.persistence_key())];
-
-  NSString *segment = util::WrapNSString(databaseInfo.database_id().project_id());
+  std::string project_key = databaseInfo.database_id().project_id();
   if (!databaseInfo.database_id().IsDefaultDatabase()) {
-    segment = [NSString
-        stringWithFormat:@"%@.%s", segment, databaseInfo.database_id().database_id().c_str()];
+    absl::StrAppend(&project_key, ".", databaseInfo.database_id().database_id());
   }
-  directory = [directory stringByAppendingPathComponent:segment];
 
   // Reserve one additional path component to allow multiple physical databases
-  directory = [directory stringByAppendingPathComponent:@"main"];
-  return directory;
+  return Path::JoinUtf8(documentsDirectory, databaseInfo.persistence_key(), project_key, "main");
 }
 
 #pragma mark - Startup
 
-- (BOOL)start:(NSError **)error {
+- (Status)start {
   HARD_ASSERT(!self.isStarted, "FSTLevelDB double-started!");
   self.started = YES;
-  NSString *directory = self.directory;
-  if (![self ensureDirectory:directory error:error]) {
-    return NO;
-  }
 
-  DB *database = [self createDBWithDirectory:directory error:error];
-  if (!database) {
-    return NO;
+  Status status = [self ensureDirectory:_directory];
+  if (!status.ok()) return status;
+
+  StatusOr<std::unique_ptr<DB>> database = [self createDBWithDirectory:_directory];
+  if (!database.status().ok()) {
+    return database.status();
   }
-  _ptr.reset(database);
-  [FSTLevelDBMigrations runMigrationsWithDatabase:_ptr.get()];
+  _ptr = std::move(database).ValueOrDie();
+
+  LevelDbMigrations::RunMigrations(_ptr.get());
   LevelDbTransaction transaction(_ptr.get(), "Start LevelDB");
   _users = [FSTLevelDB collectUserSet:&transaction];
   transaction.Commit();
   [_queryCache start];
   [_referenceDelegate start];
-  return YES;
+  return Status::OK();
 }
 
 /** Creates the directory at @a directory and marks it as excluded from iCloud backup. */
-- (BOOL)ensureDirectory:(NSString *)directory error:(NSError **)error {
-  NSError *localError;
-  NSFileManager *files = [NSFileManager defaultManager];
-
-  BOOL success = [files createDirectoryAtPath:directory
-                  withIntermediateDirectories:YES
-                                   attributes:nil
-                                        error:&localError];
-  if (!success) {
-    *error =
-        [NSError errorWithDomain:FIRFirestoreErrorDomain
-                            code:FIRFirestoreErrorCodeInternal
-                        userInfo:@{
-                          NSLocalizedDescriptionKey : @"Failed to create persistence directory",
-                          NSUnderlyingErrorKey : localError
-                        }];
-    return NO;
+- (Status)ensureDirectory:(const Path &)directory {
+  Status status = util::RecursivelyCreateDir(directory);
+  if (!status.ok()) {
+    return Status{FirestoreErrorCode::Internal, "Failed to create persistence directory"}.CausedBy(
+        status);
   }
 
-  NSURL *dirURL = [NSURL fileURLWithPath:directory];
-  success = [dirURL setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:&localError];
-  if (!success) {
-    *error = [NSError errorWithDomain:FIRFirestoreErrorDomain
-                                 code:FIRFirestoreErrorCodeInternal
-                             userInfo:@{
-                               NSLocalizedDescriptionKey :
-                                   @"Failed mark persistence directory as excluded from backups",
-                               NSUnderlyingErrorKey : localError
-                             }];
-    return NO;
+  NSURL *dirURL = [NSURL fileURLWithPath:directory.ToNSString()];
+  NSError *localError = nil;
+  if (![dirURL setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:&localError]) {
+    return Status{FirestoreErrorCode::Internal,
+                  "Failed to mark persistence directory as excluded from backups"}
+        .CausedBy(Status::FromNSError(localError));
   }
 
-  return YES;
+  return Status::OK();
 }
 
 /** Opens the database within the given directory. */
-- (nullable DB *)createDBWithDirectory:(NSString *)directory error:(NSError **)error {
+- (StatusOr<std::unique_ptr<DB>>)createDBWithDirectory:(const Path &)directory {
   Options options;
   options.create_if_missing = true;
 
-  DB *database;
-  Status status = DB::Open(options, [directory UTF8String], &database);
+  DB *database = nullptr;
+  leveldb::Status status = DB::Open(options, directory.ToUtf8String(), &database);
   if (!status.ok()) {
-    if (error) {
-      NSString *name = [directory lastPathComponent];
-      *error =
-          [FSTLevelDB errorWithStatus:status
-                          description:@"Failed to create database %@ at path %@", name, directory];
-    }
-    return nullptr;
+    return Status{FirestoreErrorCode::Internal,
+                  StringFormat("Failed to open LevelDB database at %s", directory.ToUtf8String())}
+        .CausedBy(ConvertStatus(status));
   }
 
-  return database;
+  return std::unique_ptr<DB>(database);
 }
 
 - (LevelDbTransaction *)currentTransaction {
@@ -456,36 +459,8 @@ using leveldb::WriteOptions;
   return _referenceDelegate;
 }
 
-- (FSTListenSequenceNumber)currentSequenceNumber {
+- (ListenSequenceNumber)currentSequenceNumber {
   return [_referenceDelegate currentSequenceNumber];
-}
-
-#pragma mark - Error and Status
-
-+ (nullable NSError *)errorWithStatus:(Status)status description:(NSString *)description, ... {
-  if (status.ok()) {
-    return nil;
-  }
-
-  va_list args;
-  va_start(args, description);
-
-  NSString *message = [[NSString alloc] initWithFormat:description arguments:args];
-  NSString *reason = [self descriptionOfStatus:status];
-  NSError *result = [NSError errorWithDomain:FIRFirestoreErrorDomain
-                                        code:FIRFirestoreErrorCodeInternal
-                                    userInfo:@{
-                                      NSLocalizedDescriptionKey : message,
-                                      NSLocalizedFailureReasonErrorKey : reason
-                                    }];
-
-  va_end(args);
-
-  return result;
-}
-
-+ (NSString *)descriptionOfStatus:(Status)status {
-  return [NSString stringWithCString:status.ToString().c_str() encoding:NSUTF8StringEncoding];
 }
 
 @end
