@@ -16,13 +16,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import "Firestore/Source/Core/FSTViewSnapshot.h"
-
+#include "Firestore/core/src/firebase/firestore/core/view_snapshot.h"
 #include "Firestore/core/src/firebase/firestore/util/executor.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class FSTDispatchQueue;
 @class FSTQueryListener;
 
 /**
@@ -30,8 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface FSTAsyncQueryListener : NSObject
 
-- (instancetype)initWithExecutor:(firebase::firestore::util::internal::Executor*)executor
-                 snapshotHandler:(FSTViewSnapshotHandler)snapshotHandler NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithExecutor:(firebase::firestore::util::Executor*)executor
+                 snapshotHandler:(firebase::firestore::core::ViewSnapshotHandler&&)snapshotHandler
+    NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -42,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mute;
 
 /** Creates an asynchronous version of the provided snapshot handler. */
-- (FSTViewSnapshotHandler)asyncSnapshotHandler;
+- (firebase::firestore::core::ViewSnapshotHandler)asyncSnapshotHandler;
 
 @end
 

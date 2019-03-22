@@ -20,6 +20,7 @@
 @class FIRCollectionReference;
 @class FIRDocumentReference;
 @class FIRFirestoreSettings;
+@class FIRQuery;
 @class FIRTransaction;
 @class FIRWriteBatch;
 
@@ -136,9 +137,9 @@ NS_SWIFT_NAME(Firestore)
 #pragma mark - Logging
 
 /** Enables or disables logging from the Firestore client. */
-+ (void)enableLogging:(BOOL)logging DEPRECATED_MSG_ATTRIBUTE(
-                          "Use FirebaseConfiguration.shared.setLoggerLevel(.debug) to enable "
-                          "logging.");
++ (void)enableLogging:(BOOL)logging
+    DEPRECATED_MSG_ATTRIBUTE("Use FirebaseConfiguration.shared.setLoggerLevel(.debug) to enable "
+                             "logging.");
 
 #pragma mark - Network
 

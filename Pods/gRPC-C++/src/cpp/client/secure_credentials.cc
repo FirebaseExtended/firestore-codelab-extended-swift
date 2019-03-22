@@ -36,12 +36,25 @@ SecureChannelCredentials::SecureChannelCredentials(
 
 std::shared_ptr<grpc::Channel> SecureChannelCredentials::CreateChannel(
     const string& target, const grpc::ChannelArguments& args) {
+  return CreateChannelWithInterceptors(
+      target, args,
+      std::vector<
+          std::unique_ptr<experimental::ClientInterceptorFactoryInterface>>());
+}
+
+std::shared_ptr<grpc::Channel>
+SecureChannelCredentials::CreateChannelWithInterceptors(
+    const string& target, const grpc::ChannelArguments& args,
+    std::vector<
+        std::unique_ptr<experimental::ClientInterceptorFactoryInterface>>
+        interceptor_creators) {
   grpc_channel_args channel_args;
   args.SetChannelArgs(&channel_args);
   return CreateChannelInternal(
       args.GetSslTargetNameOverride(),
       grpc_secure_channel_create(c_creds_, target.c_str(), &channel_args,
-                                 nullptr));
+                                 nullptr),
+      std::move(interceptor_creators));
 }
 
 SecureCallCredentials::SecureCallCredentials(grpc_call_credentials* c_creds)
@@ -105,6 +118,13 @@ std::shared_ptr<ChannelCredentials> AltsCredentials(
   grpc_channel_credentials* c_creds = grpc_alts_credentials_create(c_options);
   grpc_alts_credentials_options_destroy(c_options);
   return WrapChannelCredentials(c_creds);
+}
+
+// Builds Local Credentials
+std::shared_ptr<ChannelCredentials> LocalCredentials(
+    grpc_local_connect_type type) {
+  GrpcLibraryCodegen init;  // To call grpc_init().
+  return WrapChannelCredentials(grpc_local_credentials_create(type));
 }
 
 }  // namespace experimental
@@ -211,9 +231,10 @@ int MetadataCredentialsPluginWrapper::GetMetadata(
   }
   if (w->plugin_->IsBlocking()) {
     // Asynchronous return.
-    w->thread_pool_->Add(
-        std::bind(&MetadataCredentialsPluginWrapper::InvokePlugin, w, context,
-                  cb, user_data, nullptr, nullptr, nullptr, nullptr));
+    w->thread_pool_->Add([w, context, cb, user_data] {
+      w->MetadataCredentialsPluginWrapper::InvokePlugin(
+          context, cb, user_data, nullptr, nullptr, nullptr, nullptr);
+    });
     return 0;
   } else {
     // Synchronous return.

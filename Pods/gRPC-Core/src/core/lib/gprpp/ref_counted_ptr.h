@@ -21,6 +21,7 @@
 
 #include <grpc/support/port_platform.h>
 
+#include <type_traits>
 #include <utility>
 
 #include "src/core/lib/gprpp/memory.h"
@@ -36,26 +37,63 @@ class RefCountedPtr {
   RefCountedPtr(std::nullptr_t) {}
 
   // If value is non-null, we take ownership of a ref to it.
-  explicit RefCountedPtr(T* value) { value_ = value; }
+  template <typename Y>
+  explicit RefCountedPtr(Y* value) {
+    value_ = value;
+  }
 
-  // Move support.
+  // Move ctors.
   RefCountedPtr(RefCountedPtr&& other) {
     value_ = other.value_;
     other.value_ = nullptr;
   }
+  template <typename Y>
+  RefCountedPtr(RefCountedPtr<Y>&& other) {
+    value_ = other.value_;
+    other.value_ = nullptr;
+  }
+
+  // Move assignment.
   RefCountedPtr& operator=(RefCountedPtr&& other) {
     if (value_ != nullptr) value_->Unref();
     value_ = other.value_;
     other.value_ = nullptr;
     return *this;
   }
+  template <typename Y>
+  RefCountedPtr& operator=(RefCountedPtr<Y>&& other) {
+    if (value_ != nullptr) value_->Unref();
+    value_ = other.value_;
+    other.value_ = nullptr;
+    return *this;
+  }
 
-  // Copy support.
+  // Copy ctors.
   RefCountedPtr(const RefCountedPtr& other) {
     if (other.value_ != nullptr) other.value_->IncrementRefCount();
     value_ = other.value_;
   }
+  template <typename Y>
+  RefCountedPtr(const RefCountedPtr<Y>& other) {
+    static_assert(std::has_virtual_destructor<T>::value,
+                  "T does not have a virtual dtor");
+    if (other.value_ != nullptr) other.value_->IncrementRefCount();
+    value_ = other.value_;
+  }
+
+  // Copy assignment.
   RefCountedPtr& operator=(const RefCountedPtr& other) {
+    // Note: Order of reffing and unreffing is important here in case value_
+    // and other.value_ are the same object.
+    if (other.value_ != nullptr) other.value_->IncrementRefCount();
+    if (value_ != nullptr) value_->Unref();
+    value_ = other.value_;
+    return *this;
+  }
+  template <typename Y>
+  RefCountedPtr& operator=(const RefCountedPtr<Y>& other) {
+    static_assert(std::has_virtual_destructor<T>::value,
+                  "T does not have a virtual dtor");
     // Note: Order of reffing and unreffing is important here in case value_
     // and other.value_ are the same object.
     if (other.value_ != nullptr) other.value_->IncrementRefCount();
@@ -69,9 +107,21 @@ class RefCountedPtr {
   }
 
   // If value is non-null, we take ownership of a ref to it.
-  void reset(T* value = nullptr) {
+  void reset(T* value) {
     if (value_ != nullptr) value_->Unref();
     value_ = value;
+  }
+  template <typename Y>
+  void reset(Y* value) {
+    static_assert(std::has_virtual_destructor<T>::value,
+                  "T does not have a virtual dtor");
+    if (value_ != nullptr) value_->Unref();
+    value_ = value;
+  }
+
+  void reset() {
+    if (value_ != nullptr) value_->Unref();
+    value_ = nullptr;
   }
 
   // TODO(roth): This method exists solely as a transition mechanism to allow
@@ -89,27 +139,40 @@ class RefCountedPtr {
   T& operator*() const { return *value_; }
   T* operator->() const { return value_; }
 
-  bool operator==(const RefCountedPtr& other) const {
+  template <typename Y>
+  bool operator==(const RefCountedPtr<Y>& other) const {
     return value_ == other.value_;
   }
-  bool operator==(const T* other) const { return value_ == other; }
-  bool operator!=(const RefCountedPtr& other) const {
+
+  template <typename Y>
+  bool operator==(const Y* other) const {
+    return value_ == other;
+  }
+
+  bool operator==(std::nullptr_t) const { return value_ == nullptr; }
+
+  template <typename Y>
+  bool operator!=(const RefCountedPtr<Y>& other) const {
     return value_ != other.value_;
   }
-  bool operator!=(const T* other) const { return value_ != other; }
+
+  template <typename Y>
+  bool operator!=(const Y* other) const {
+    return value_ != other;
+  }
+
+  bool operator!=(std::nullptr_t) const { return value_ != nullptr; }
 
  private:
+  template <typename Y>
+  friend class RefCountedPtr;
+
   T* value_ = nullptr;
 };
 
 template <typename T, typename... Args>
 inline RefCountedPtr<T> MakeRefCounted(Args&&... args) {
   return RefCountedPtr<T>(New<T>(std::forward<Args>(args)...));
-}
-
-template <typename Parent, typename Child, typename... Args>
-inline RefCountedPtr<Parent> MakePolymorphicRefCounted(Args&&... args) {
-  return RefCountedPtr<Parent>(New<Child>(std::forward<Args>(args)...));
 }
 
 }  // namespace grpc_core

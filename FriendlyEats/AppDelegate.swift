@@ -24,12 +24,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
     FirebaseApp.configure()
-    
-    // Tell Cloud Firestore to use the new Timestamp object
-    let db = Firestore.firestore()
-    let settings = db.settings
-    settings.areTimestampsInSnapshotsEnabled = true
-    db.settings = settings
 
     // Globally set our navigation bar style
     let navigationStyles = UINavigationBar.appearance()

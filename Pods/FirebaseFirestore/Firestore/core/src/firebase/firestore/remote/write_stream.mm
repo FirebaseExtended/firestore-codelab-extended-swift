@@ -20,7 +20,7 @@
 #include "Firestore/core/src/firebase/firestore/util/log.h"
 #include "Firestore/core/src/firebase/firestore/util/status.h"
 
-#import "Firestore/Protos/objc/google/firestore/v1beta1/Firestore.pbobjc.h"
+#import "Firestore/Protos/objc/google/firestore/v1/Firestore.pbobjc.h"
 
 namespace firebase {
 namespace firestore {
@@ -36,11 +36,11 @@ WriteStream::WriteStream(AsyncQueue* async_queue,
                          CredentialsProvider* credentials_provider,
                          FSTSerializerBeta* serializer,
                          GrpcConnection* grpc_connection,
-                         id<FSTWriteStreamDelegate> delegate)
+                         WriteStreamCallback* callback)
     : Stream{async_queue, credentials_provider, grpc_connection,
              TimerId::WriteStreamConnectionBackoff, TimerId::WriteStreamIdle},
       serializer_bridge_{serializer},
-      delegate_bridge_{delegate} {
+      callback_{NOT_NULL(callback)} {
 }
 
 void WriteStream::SetLastStreamToken(NSData* token) {
@@ -65,7 +65,7 @@ void WriteStream::WriteHandshake() {
   // stream token on the handshake, ignoring any stream token we might have.
 }
 
-void WriteStream::WriteMutations(NSArray<FSTMutation*>* mutations) {
+void WriteStream::WriteMutations(const std::vector<FSTMutation*>& mutations) {
   EnsureOnQueue();
   HARD_ASSERT(IsOpen(), "Writing mutations requires an opened stream");
   HARD_ASSERT(handshake_complete(),
@@ -80,8 +80,8 @@ void WriteStream::WriteMutations(NSArray<FSTMutation*>* mutations) {
 
 std::unique_ptr<GrpcStream> WriteStream::CreateGrpcStream(
     GrpcConnection* grpc_connection, const Token& token) {
-  return grpc_connection->CreateStream(
-      "/google.firestore.v1beta1.Firestore/Write", token, this);
+  return grpc_connection->CreateStream("/google.firestore.v1.Firestore/Write",
+                                       token, this);
 }
 
 void WriteStream::TearDown(GrpcStream* grpc_stream) {
@@ -92,16 +92,16 @@ void WriteStream::TearDown(GrpcStream* grpc_stream) {
     GCFSWriteRequest* request = serializer_bridge_.CreateEmptyMutationsList();
     grpc_stream->WriteAndFinish(serializer_bridge_.ToByteBuffer(request));
   } else {
-    grpc_stream->Finish();
+    grpc_stream->FinishImmediately();
   }
 }
 
 void WriteStream::NotifyStreamOpen() {
-  delegate_bridge_.NotifyDelegateOnOpen();
+  callback_->OnWriteStreamOpen();
 }
 
 void WriteStream::NotifyStreamClose(const Status& status) {
-  delegate_bridge_.NotifyDelegateOnClose(status);
+  callback_->OnWriteStreamClose(status);
   // Delegate's logic might depend on whether handshake was completed, so only
   // reset it after notifying.
   handshake_complete_ = false;
@@ -124,14 +124,14 @@ Status WriteStream::NotifyStreamResponse(const grpc::ByteBuffer& message) {
   if (!handshake_complete()) {
     // The first response is the handshake response
     handshake_complete_ = true;
-    delegate_bridge_.NotifyDelegateOnHandshakeComplete();
+    callback_->OnWriteStreamHandshakeComplete();
   } else {
     // A successful first write response means the stream is healthy.
     // Note that we could consider a successful handshake healthy, however, the
     // write itself might be causing an error we want to back off from.
     backoff_.Reset();
 
-    delegate_bridge_.NotifyDelegateOnCommit(
+    callback_->OnWriteStreamMutationResult(
         serializer_bridge_.ToCommitVersion(response),
         serializer_bridge_.ToMutationResults(response));
   }

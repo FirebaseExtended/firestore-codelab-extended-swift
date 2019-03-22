@@ -41,12 +41,12 @@
 extern grpc_core::TraceFlag grpc_call_combiner_trace;
 
 typedef struct {
-  gpr_atm size;  // size_t, num closures in queue or currently executing
+  gpr_atm size = 0;  // size_t, num closures in queue or currently executing
   gpr_mpscq queue;
   // Either 0 (if not cancelled and no cancellation closure set),
   // a grpc_closure* (if the lowest bit is 0),
   // or a grpc_error* (if the lowest bit is 1).
-  gpr_atm cancel_state;
+  gpr_atm cancel_state = 0;
 } grpc_call_combiner;
 
 // Assumes memory was initialized to zero.
@@ -102,7 +102,10 @@ void grpc_call_combiner_stop(grpc_call_combiner* call_combiner,
 /// If \a closure is NULL, then no closure will be invoked on
 /// cancellation; this effectively unregisters the previously set closure.
 /// However, most filters will not need to explicitly unregister their
-/// callbacks, as this is done automatically when the call is destroyed.
+/// callbacks, as this is done automatically when the call is destroyed. Filters
+/// that schedule the cancellation closure on ExecCtx do not need to take a ref
+/// on the call stack to guarantee closure liveness. This is done by explicitly
+/// flushing ExecCtx after the unregistration during call destruction.
 void grpc_call_combiner_set_notify_on_cancel(grpc_call_combiner* call_combiner,
                                              grpc_closure* closure);
 

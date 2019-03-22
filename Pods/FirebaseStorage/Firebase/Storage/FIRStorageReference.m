@@ -57,8 +57,8 @@
 #pragma mark - NSObject overrides
 
 - (instancetype)copyWithZone:(NSZone *)zone {
-  FIRStorageReference *copiedReference =
-      [[[self class] allocWithZone:zone] initWithStorage:_storage path:_path];
+  FIRStorageReference *copiedReference = [[[self class] allocWithZone:zone] initWithStorage:_storage
+                                                                                       path:_path];
   return copiedReference;
 }
 
@@ -121,8 +121,8 @@
 
 - (FIRStorageReference *)root {
   FIRStoragePath *rootPath = [_path root];
-  FIRStorageReference *rootReference =
-      [[FIRStorageReference alloc] initWithStorage:_storage path:rootPath];
+  FIRStorageReference *rootReference = [[FIRStorageReference alloc] initWithStorage:_storage
+                                                                               path:rootPath];
   return rootReference;
 }
 
@@ -132,15 +132,15 @@
     return nil;
   }
 
-  FIRStorageReference *parentReference =
-      [[FIRStorageReference alloc] initWithStorage:_storage path:parentPath];
+  FIRStorageReference *parentReference = [[FIRStorageReference alloc] initWithStorage:_storage
+                                                                                 path:parentPath];
   return parentReference;
 }
 
 - (FIRStorageReference *)child:(NSString *)path {
   FIRStoragePath *childPath = [_path child:path];
-  FIRStorageReference *childReference =
-      [[FIRStorageReference alloc] initWithStorage:_storage path:childPath];
+  FIRStorageReference *childReference = [[FIRStorageReference alloc] initWithStorage:_storage
+                                                                                path:childPath];
   return childReference;
 }
 
@@ -167,6 +167,7 @@
   FIRStorageUploadTask *task =
       [[FIRStorageUploadTask alloc] initWithReference:self
                                        fetcherService:_storage.fetcherServiceForApp
+                                        dispatchQueue:_storage.dispatchQueue
                                                  data:uploadData
                                              metadata:metadata];
 
@@ -214,6 +215,7 @@
   FIRStorageUploadTask *task =
       [[FIRStorageUploadTask alloc] initWithReference:self
                                        fetcherService:_storage.fetcherServiceForApp
+                                        dispatchQueue:_storage.dispatchQueue
                                                  file:fileURL
                                              metadata:metadata];
 
@@ -247,6 +249,7 @@
   FIRStorageDownloadTask *task =
       [[FIRStorageDownloadTask alloc] initWithReference:self
                                          fetcherService:_storage.fetcherServiceForApp
+                                          dispatchQueue:_storage.dispatchQueue
                                                    file:nil];
 
   dispatch_queue_t callbackQueue = _storage.fetcherServiceForApp.callbackQueue;
@@ -294,6 +297,7 @@
   FIRStorageDownloadTask *task =
       [[FIRStorageDownloadTask alloc] initWithReference:self
                                          fetcherService:_storage.fetcherServiceForApp
+                                          dispatchQueue:_storage.dispatchQueue
                                                    file:fileURL];
   if (completion) {
     dispatch_queue_t callbackQueue = _storage.fetcherServiceForApp.callbackQueue;
@@ -322,6 +326,7 @@
   FIRStorageGetDownloadURLTask *task =
       [[FIRStorageGetDownloadURLTask alloc] initWithReference:self
                                                fetcherService:_storage.fetcherServiceForApp
+                                                dispatchQueue:_storage.dispatchQueue
                                                    completion:completion];
   [task enqueue];
 }
@@ -332,6 +337,7 @@
   FIRStorageGetMetadataTask *task =
       [[FIRStorageGetMetadataTask alloc] initWithReference:self
                                             fetcherService:_storage.fetcherServiceForApp
+                                             dispatchQueue:_storage.dispatchQueue
                                                 completion:completion];
   [task enqueue];
 }
@@ -341,6 +347,7 @@
   FIRStorageUpdateMetadataTask *task =
       [[FIRStorageUpdateMetadataTask alloc] initWithReference:self
                                                fetcherService:_storage.fetcherServiceForApp
+                                                dispatchQueue:_storage.dispatchQueue
                                                      metadata:metadata
                                                    completion:completion];
   [task enqueue];
@@ -352,6 +359,7 @@
   FIRStorageDeleteTask *task =
       [[FIRStorageDeleteTask alloc] initWithReference:self
                                        fetcherService:_storage.fetcherServiceForApp
+                                        dispatchQueue:_storage.dispatchQueue
                                            completion:completion];
   [task enqueue];
 }

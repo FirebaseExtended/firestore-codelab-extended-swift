@@ -243,14 +243,14 @@ class ClientReader final : public ClientReaderInterface<R> {
                ClientContext* context, const W& request)
       : context_(context),
         cq_(grpc_completion_queue_attributes{
-            GRPC_CQ_CURRENT_VERSION, GRPC_CQ_PLUCK,
-            GRPC_CQ_DEFAULT_POLLING}),  // Pluckable cq
+            GRPC_CQ_CURRENT_VERSION, GRPC_CQ_PLUCK, GRPC_CQ_DEFAULT_POLLING,
+            nullptr}),  // Pluckable cq
         call_(channel->CreateCall(method, context, &cq_)) {
     ::grpc::internal::CallOpSet<::grpc::internal::CallOpSendInitialMetadata,
                                 ::grpc::internal::CallOpSendMessage,
                                 ::grpc::internal::CallOpClientSendClose>
         ops;
-    ops.SendInitialMetadata(context->send_initial_metadata_,
+    ops.SendInitialMetadata(&context->send_initial_metadata_,
                             context->initial_metadata_flags());
     // TODO(ctiller): don't assert
     GPR_CODEGEN_ASSERT(ops.SendMessage(request).ok());
@@ -327,7 +327,7 @@ class ClientWriter : public ClientWriterInterface<W> {
       ops.ClientSendClose();
     }
     if (context_->initial_metadata_corked_) {
-      ops.SendInitialMetadata(context_->send_initial_metadata_,
+      ops.SendInitialMetadata(&context_->send_initial_metadata_,
                               context_->initial_metadata_flags());
       context_->set_initial_metadata_corked(false);
     }
@@ -377,8 +377,8 @@ class ClientWriter : public ClientWriterInterface<W> {
                ClientContext* context, R* response)
       : context_(context),
         cq_(grpc_completion_queue_attributes{
-            GRPC_CQ_CURRENT_VERSION, GRPC_CQ_PLUCK,
-            GRPC_CQ_DEFAULT_POLLING}),  // Pluckable cq
+            GRPC_CQ_CURRENT_VERSION, GRPC_CQ_PLUCK, GRPC_CQ_DEFAULT_POLLING,
+            nullptr}),  // Pluckable cq
         call_(channel->CreateCall(method, context, &cq_)) {
     finish_ops_.RecvMessage(response);
     finish_ops_.AllowNoMessage();
@@ -386,7 +386,7 @@ class ClientWriter : public ClientWriterInterface<W> {
     if (!context_->initial_metadata_corked_) {
       ::grpc::internal::CallOpSet<::grpc::internal::CallOpSendInitialMetadata>
           ops;
-      ops.SendInitialMetadata(context->send_initial_metadata_,
+      ops.SendInitialMetadata(&context->send_initial_metadata_,
                               context->initial_metadata_flags());
       call_.PerformOps(&ops);
       cq_.Pluck(&ops);
@@ -498,7 +498,7 @@ class ClientReaderWriter final : public ClientReaderWriterInterface<W, R> {
       ops.ClientSendClose();
     }
     if (context_->initial_metadata_corked_) {
-      ops.SendInitialMetadata(context_->send_initial_metadata_,
+      ops.SendInitialMetadata(&context_->send_initial_metadata_,
                               context_->initial_metadata_flags());
       context_->set_initial_metadata_corked(false);
     }
@@ -551,13 +551,13 @@ class ClientReaderWriter final : public ClientReaderWriterInterface<W, R> {
                      ClientContext* context)
       : context_(context),
         cq_(grpc_completion_queue_attributes{
-            GRPC_CQ_CURRENT_VERSION, GRPC_CQ_PLUCK,
-            GRPC_CQ_DEFAULT_POLLING}),  // Pluckable cq
+            GRPC_CQ_CURRENT_VERSION, GRPC_CQ_PLUCK, GRPC_CQ_DEFAULT_POLLING,
+            nullptr}),  // Pluckable cq
         call_(channel->CreateCall(method, context, &cq_)) {
     if (!context_->initial_metadata_corked_) {
       ::grpc::internal::CallOpSet<::grpc::internal::CallOpSendInitialMetadata>
           ops;
-      ops.SendInitialMetadata(context->send_initial_metadata_,
+      ops.SendInitialMetadata(&context->send_initial_metadata_,
                               context->initial_metadata_flags());
       call_.PerformOps(&ops);
       cq_.Pluck(&ops);
@@ -583,7 +583,7 @@ class ServerReader final : public ServerReaderInterface<R> {
     GPR_CODEGEN_ASSERT(!ctx_->sent_initial_metadata_);
 
     internal::CallOpSet<internal::CallOpSendInitialMetadata> ops;
-    ops.SendInitialMetadata(ctx_->initial_metadata_,
+    ops.SendInitialMetadata(&ctx_->initial_metadata_,
                             ctx_->initial_metadata_flags());
     if (ctx_->compression_level_set()) {
       ops.set_compression_level(ctx_->compression_level());
@@ -635,7 +635,7 @@ class ServerWriter final : public ServerWriterInterface<W> {
     GPR_CODEGEN_ASSERT(!ctx_->sent_initial_metadata_);
 
     internal::CallOpSet<internal::CallOpSendInitialMetadata> ops;
-    ops.SendInitialMetadata(ctx_->initial_metadata_,
+    ops.SendInitialMetadata(&ctx_->initial_metadata_,
                             ctx_->initial_metadata_flags());
     if (ctx_->compression_level_set()) {
       ops.set_compression_level(ctx_->compression_level());
@@ -660,7 +660,7 @@ class ServerWriter final : public ServerWriterInterface<W> {
       return false;
     }
     if (!ctx_->sent_initial_metadata_) {
-      ctx_->pending_ops_.SendInitialMetadata(ctx_->initial_metadata_,
+      ctx_->pending_ops_.SendInitialMetadata(&ctx_->initial_metadata_,
                                              ctx_->initial_metadata_flags());
       if (ctx_->compression_level_set()) {
         ctx_->pending_ops_.set_compression_level(ctx_->compression_level());
@@ -708,7 +708,7 @@ class ServerReaderWriterBody final {
     GPR_CODEGEN_ASSERT(!ctx_->sent_initial_metadata_);
 
     CallOpSet<CallOpSendInitialMetadata> ops;
-    ops.SendInitialMetadata(ctx_->initial_metadata_,
+    ops.SendInitialMetadata(&ctx_->initial_metadata_,
                             ctx_->initial_metadata_flags());
     if (ctx_->compression_level_set()) {
       ops.set_compression_level(ctx_->compression_level());
@@ -738,7 +738,7 @@ class ServerReaderWriterBody final {
       return false;
     }
     if (!ctx_->sent_initial_metadata_) {
-      ctx_->pending_ops_.SendInitialMetadata(ctx_->initial_metadata_,
+      ctx_->pending_ops_.SendInitialMetadata(&ctx_->initial_metadata_,
                                              ctx_->initial_metadata_flags());
       if (ctx_->compression_level_set()) {
         ctx_->pending_ops_.set_compression_level(ctx_->compression_level());

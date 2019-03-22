@@ -58,51 +58,60 @@ class LoadBalancingPolicy
     /// Note that the LB policy gets the set of addresses from the
     /// GRPC_ARG_LB_ADDRESSES channel arg.
     grpc_channel_args* args = nullptr;
+    /// Load balancing config from the resolver.
+    grpc_json* lb_config = nullptr;
   };
 
   /// State used for an LB pick.
   struct PickState {
     /// Initial metadata associated with the picking call.
-    grpc_metadata_batch* initial_metadata;
+    grpc_metadata_batch* initial_metadata = nullptr;
     /// Bitmask used for selective cancelling. See
     /// \a CancelMatchingPicksLocked() and \a GRPC_INITIAL_METADATA_* in
     /// grpc_types.h.
-    uint32_t initial_metadata_flags;
+    uint32_t initial_metadata_flags = 0;
     /// Storage for LB token in \a initial_metadata, or nullptr if not used.
     grpc_linked_mdelem lb_token_mdelem_storage;
     /// Closure to run when pick is complete, if not completed synchronously.
-    grpc_closure* on_complete;
+    /// If null, pick will fail if a result is not available synchronously.
+    grpc_closure* on_complete = nullptr;
     /// Will be set to the selected subchannel, or nullptr on failure or when
     /// the LB policy decides to drop the call.
     RefCountedPtr<ConnectedSubchannel> connected_subchannel;
     /// Will be populated with context to pass to the subchannel call, if
     /// needed.
-    grpc_call_context_element subchannel_call_context[GRPC_CONTEXT_COUNT];
+    grpc_call_context_element subchannel_call_context[GRPC_CONTEXT_COUNT] = {};
     /// Upon success, \a *user_data will be set to whatever opaque information
     /// may need to be propagated from the LB policy, or nullptr if not needed.
     // TODO(roth): As part of revamping our metadata APIs, try to find a
     // way to clean this up and C++-ify it.
-    void** user_data;
+    void** user_data = nullptr;
     /// Next pointer.  For internal use by LB policy.
-    PickState* next;
+    PickState* next = nullptr;
   };
 
   // Not copyable nor movable.
   LoadBalancingPolicy(const LoadBalancingPolicy&) = delete;
   LoadBalancingPolicy& operator=(const LoadBalancingPolicy&) = delete;
 
-  /// Updates the policy with a new set of \a args from the resolver.
-  /// Note that the LB policy gets the set of addresses from the
+  /// Updates the policy with a new set of \a args and a new \a lb_config from
+  /// the resolver. Note that the LB policy gets the set of addresses from the
   /// GRPC_ARG_LB_ADDRESSES channel arg.
-  virtual void UpdateLocked(const grpc_channel_args& args) GRPC_ABSTRACT;
+  virtual void UpdateLocked(const grpc_channel_args& args,
+                            grpc_json* lb_config) GRPC_ABSTRACT;
 
   /// Finds an appropriate subchannel for a call, based on data in \a pick.
   /// \a pick must remain alive until the pick is complete.
   ///
-  /// If the pick succeeds and a result is known immediately, returns true.
-  /// Otherwise, \a pick->on_complete will be invoked once the pick is
-  /// complete with its error argument set to indicate success or failure.
-  virtual bool PickLocked(PickState* pick) GRPC_ABSTRACT;
+  /// If a result is known immediately, returns true, setting \a *error
+  /// upon failure.  Otherwise, \a pick->on_complete will be invoked once
+  /// the pick is complete with its error argument set to indicate success
+  /// or failure.
+  ///
+  /// If \a pick->on_complete is null and no result is known immediately,
+  /// a synchronous failure will be returned (i.e., \a *error will be
+  /// set and true will be returned).
+  virtual bool PickLocked(PickState* pick, grpc_error** error) GRPC_ABSTRACT;
 
   /// Cancels \a pick.
   /// The \a on_complete callback of the pending pick will be invoked with
@@ -133,24 +142,21 @@ class LoadBalancingPolicy
   virtual void HandOffPendingPicksLocked(LoadBalancingPolicy* new_policy)
       GRPC_ABSTRACT;
 
-  /// Performs a connected subchannel ping via \a ConnectedSubchannel::Ping()
-  /// against one of the connected subchannels managed by the policy.
-  /// Note: This is intended only for use in tests.
-  virtual void PingOneLocked(grpc_closure* on_initiate,
-                             grpc_closure* on_ack) GRPC_ABSTRACT;
-
   /// Tries to enter a READY connectivity state.
   /// TODO(roth): As part of restructuring how we handle IDLE state,
   /// consider whether this method is still needed.
   virtual void ExitIdleLocked() GRPC_ABSTRACT;
 
-  /// populates child_subchannels and child_channels with the uuids of this
+  /// Resets connection backoff.
+  virtual void ResetBackoffLocked() GRPC_ABSTRACT;
+
+  /// Populates child_subchannels and child_channels with the uuids of this
   /// LB policy's referenced children. This is not invoked from the
   /// client_channel's combiner. The implementation is responsible for
   /// providing its own synchronization.
-  virtual void FillChildRefsForChannelz(ChildRefsList* child_subchannels,
-                                        ChildRefsList* child_channels)
-      GRPC_ABSTRACT;
+  virtual void FillChildRefsForChannelz(
+      channelz::ChildRefsList* child_subchannels,
+      channelz::ChildRefsList* child_channels) GRPC_ABSTRACT;
 
   void Orphan() override {
     // Invoke ShutdownAndUnrefLocked() inside of the combiner.
@@ -209,8 +215,8 @@ class LoadBalancingPolicy
   // Dummy classes needed for alignment issues.
   // See https://github.com/grpc/grpc/issues/16032 for context.
   // TODO(ncteisen): remove this as soon as the issue is resolved.
-  ChildRefsList dummy_list_foo;
-  ChildRefsList dummy_list_bar;
+  channelz::ChildRefsList dummy_list_foo;
+  channelz::ChildRefsList dummy_list_bar;
 };
 
 }  // namespace grpc_core

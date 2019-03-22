@@ -58,7 +58,7 @@ class Precondition {
    * Returns true if the precondition is valid for the given document (and the
    * document is available).
    */
-  bool IsValidFor(const MaybeDocument& maybe_doc) const;
+  bool IsValidFor(const MaybeDocument* maybe_doc) const;
 
   /** Returns whether this Precondition represents no precondition. */
   bool IsNone() const {
@@ -71,6 +71,10 @@ class Precondition {
 
   const SnapshotVersion& update_time() const {
     return update_time_;
+  }
+
+  bool exists() const {
+    return exists_;
   }
 
   bool operator==(const Precondition& other) const {
