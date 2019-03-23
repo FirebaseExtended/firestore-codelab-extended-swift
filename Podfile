@@ -6,7 +6,7 @@ target 'FriendlyEats' do
 
   pod 'SDWebImage'
   pod 'Firebase/Core'
-  pod 'FirebaseUI/Auth'
+  pod 'FirebaseUI/Auth', '~> 5.0'
   pod 'FirebaseUI/Google'
   pod 'Firebase/Firestore'
   pod 'Firebase/Storage'

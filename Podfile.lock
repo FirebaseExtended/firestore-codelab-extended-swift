@@ -60,10 +60,9 @@ PODS:
     - FirebaseAuthInterop (~> 1.0)
     - FirebaseCore (~> 5.2)
     - GTMSessionFetcher/Core (~> 1.1)
-  - FirebaseUI/Auth (6.1.1):
+  - FirebaseUI/Auth (5.2.2):
     - Firebase/Auth (~> 5.0)
-    - GoogleUtilities/UserDefaults
-  - FirebaseUI/Google (6.1.1):
+  - FirebaseUI/Google (5.2.2):
     - FirebaseUI/Auth
     - GoogleSignIn (~> 4.0)
   - GoogleAppMeasurement (5.8.0):
@@ -134,7 +133,7 @@ DEPENDENCIES:
   - Firebase/Core
   - Firebase/Firestore
   - Firebase/Storage
-  - FirebaseUI/Auth
+  - FirebaseUI/Auth (~> 5.0)
   - FirebaseUI/Google
   - SDWebImage
 
@@ -172,7 +171,7 @@ SPEC CHECKSUMS:
   FirebaseFirestore: 1531eefe02da66be6860966ac4e2cdac635706e2
   FirebaseInstanceID: cf488df2f4b79782f0e430b04a0e17c0aa7979b2
   FirebaseStorage: 6162ef4322502b818d9de0ec552f5226d283de43
-  FirebaseUI: 1345f778d53f9484f21474c7b10bba313b28a76b
+  FirebaseUI: 09519bf436a055cd696bf68687d624423150e4c0
   GoogleAppMeasurement: 1624046ab1bcc5e170061a56ef5679000b079c8e
   GoogleSignIn: 7ff245e1a7b26d379099d3243a562f5747e23d39
   GoogleToolboxForMac: ff31605b7d66400dcec09bed5861689aebadda4d
@@ -185,6 +184,6 @@ SPEC CHECKSUMS:
   Protobuf: 7a877b7f3e5964e3fce995e2eb323dbc6831bb5a
   SDWebImage: 3f3f0c02f09798048c47a5ed0a13f17b063572d8
 
-PODFILE CHECKSUM: 07c8c16a1fd5c7dd943bb399ef7c87e88509b455
+PODFILE CHECKSUM: 5f0c5e300345409685600a72547eca083448c7ad
 
 COCOAPODS: 1.6.1
