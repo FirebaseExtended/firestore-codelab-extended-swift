@@ -1,3 +1,20 @@
+# v6.1.1
+- Fix an issue where a user can't link with email provider by email link. (#3030)
+
+# v6.1.0
+- Add support of web.app as an auth domain. (#2959)
+- Fix an issue where the return type of `getStoredUserForAccessGroup:error:` is nonnull. (#2879)
+
+# v6.0.0
+- Add support of single sign on. (#2684)
+- Deprecate `reauthenticateAndRetrieveDataWithCredential:completion:`, `signInAndRetrieveDataWithCredential:completion:`, `linkAndRetrieveDataWithCredential:completion:`, `fetchProvidersForEmail:completion:`. (#2723, #2756)
+- Returned oauth secret token in Generic IDP sign-in for Twitter. (#2663)
+- Remove pendingToken from public API. (#2676)
+- `GULAppDelegateSwizzler` is used for the app delegate swizzling. (#2591)
+
+# v5.4.2
+- Support new error code ERROR_INVALID_PROVIDER_ID. (#2629)
+
 # v5.4.1
 - Deprecate Microsoft and Yahoo OAuth Provider ID (#2517)
 - Fix an issue where an exception was thrown when linking OAuth credentials. (#2521)

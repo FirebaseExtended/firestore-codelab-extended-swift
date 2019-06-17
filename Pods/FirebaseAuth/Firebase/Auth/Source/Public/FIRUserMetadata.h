@@ -18,7 +18,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** @class FIRUserMetdata
+/** @class FIRUserMetadata
     @brief A data class representing the metadata corresponding to a Firebase user.
  */
 NS_SWIFT_NAME(UserMetadata)
@@ -27,12 +27,12 @@ NS_SWIFT_NAME(UserMetadata)
 /** @property lastSignInDate
     @brief Stores the last sign in date for the corresponding Firebase user.
  */
-@property (copy, nonatomic, readonly, nullable) NSDate *lastSignInDate;
+@property(copy, nonatomic, readonly, nullable) NSDate *lastSignInDate;
 
 /** @property creationDate
     @brief Stores the creation date for the corresponding Firebase user.
  */
-@property (copy, nonatomic, readonly, nullable) NSDate *creationDate;
+@property(copy, nonatomic, readonly, nullable) NSDate *creationDate;
 
 /** @fn init
     @brief This class should not be initialized manually, an instance of this class can be obtained

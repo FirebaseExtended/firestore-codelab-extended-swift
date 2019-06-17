@@ -31,9 +31,9 @@
 #import "Firestore/Source/Local/FSTLocalWriteResult.h"
 #import "Firestore/Source/Local/FSTQueryData.h"
 #import "Firestore/Source/Model/FSTDocument.h"
-#import "Firestore/Source/Model/FSTDocumentSet.h"
 #import "Firestore/Source/Model/FSTMutationBatch.h"
 
+#include "Firestore/core/include/firebase/firestore/firestore_errors.h"
 #include "Firestore/core/src/firebase/firestore/auth/user.h"
 #include "Firestore/core/src/firebase/firestore/core/target_id_generator.h"
 #include "Firestore/core/src/firebase/firestore/core/transaction.h"
@@ -41,6 +41,7 @@
 #include "Firestore/core/src/firebase/firestore/local/reference_set.h"
 #include "Firestore/core/src/firebase/firestore/model/document_key.h"
 #include "Firestore/core/src/firebase/firestore/model/document_map.h"
+#include "Firestore/core/src/firebase/firestore/model/document_set.h"
 #include "Firestore/core/src/firebase/firestore/model/snapshot_version.h"
 #include "Firestore/core/src/firebase/firestore/remote/remote_event.h"
 #include "Firestore/core/src/firebase/firestore/util/error_apple.h"
@@ -49,6 +50,7 @@
 #include "Firestore/core/src/firebase/firestore/util/status.h"
 #include "absl/types/optional.h"
 
+using firebase::firestore::FirestoreErrorCode;
 using firebase::firestore::auth::HashUser;
 using firebase::firestore::auth::User;
 using firebase::firestore::core::TargetIdGenerator;
@@ -280,56 +282,53 @@ class LimboResolution {
 }
 
 /**
- * Takes an updateBlock in which a set of reads and writes can be performed atomically. In the
- * updateBlock, user code can read and write values using a transaction object. After the
- * updateBlock, all changes will be committed. If someone else has changed any of the data
- * referenced, then the updateBlock will be called again. If the updateBlock still fails after the
- * given number of retries, then the transaction will be rejected.
+ * Takes an updateCallback in which a set of reads and writes can be performed atomically. In the
+ * updateCallback, user code can read and write values using a transaction object. After the
+ * updateCallback, all changes will be committed. If someone else has changed any of the data
+ * referenced, then the updateCallback will be called again. If the updateCallback still fails after
+ * the given number of retries, then the transaction will be rejected.
  *
- * The transaction object passed to the updateBlock contains methods for accessing documents
+ * The transaction object passed to the updateCallback contains methods for accessing documents
  * and collections. Unlike other firestore access, data accessed with the transaction will not
  * reflect local changes that have not been committed. For this reason, it is required that all
  * reads are performed before any writes. Transactions must be performed while online.
  */
 - (void)transactionWithRetries:(int)retries
-                   workerQueue:(AsyncQueue *)workerQueue
-                   updateBlock:(FSTTransactionBlock)updateBlock
-                    completion:(FSTVoidIDErrorBlock)completion {
+                   workerQueue:(const std::shared_ptr<AsyncQueue> &)workerQueue
+                updateCallback:(core::TransactionUpdateCallback)updateCallback
+                resultCallback:(core::TransactionResultCallback)resultCallback {
   workerQueue->VerifyIsCurrentQueue();
   HARD_ASSERT(retries >= 0, "Got negative number of retries for transaction");
 
   std::shared_ptr<Transaction> transaction = _remoteStore->CreateTransaction();
-  updateBlock(transaction, ^(id _Nullable result, NSError *_Nullable error) {
+  updateCallback(transaction, [=](util::StatusOr<absl::any> maybe_result) {
     workerQueue->Enqueue(
-        [self, retries, workerQueue, updateBlock, completion, transaction, result, error] {
-          if (error) {
-            completion(nil, error);
+        [self, retries, workerQueue, updateCallback, resultCallback, transaction, maybe_result] {
+          if (!maybe_result.ok()) {
+            resultCallback(std::move(maybe_result));
             return;
           }
-          transaction->Commit([self, retries, workerQueue, updateBlock, completion,
-                               result](const Status &status) {
+
+          transaction->Commit([self, retries, workerQueue, updateCallback, resultCallback,
+                               maybe_result](Status status) {
             if (status.ok()) {
-              completion(result, nil);
+              resultCallback(std::move(maybe_result));
               return;
             }
 
             // TODO(b/35201829): Only retry on real transaction failures.
             if (retries == 0) {
-              NSError *wrappedError =
-                  [NSError errorWithDomain:FIRFirestoreErrorDomain
-                                      code:FIRFirestoreErrorCodeFailedPrecondition
-                                  userInfo:@{
-                                    NSLocalizedDescriptionKey : @"Transaction failed all retries.",
-                                    NSUnderlyingErrorKey : MakeNSError(status)
-                                  }];
-              completion(nil, wrappedError);
+              Status wrappedError =
+                  Status(FirestoreErrorCode::FailedPrecondition, "Transaction failed all retries.")
+                      .CausedBy(std::move(status));
+              resultCallback(std::move(wrappedError));
               return;
             }
             workerQueue->VerifyIsCurrentQueue();
             return [self transactionWithRetries:(retries - 1)
                                     workerQueue:workerQueue
-                                    updateBlock:updateBlock
-                                     completion:completion];
+                                 updateCallback:updateCallback
+                                 resultCallback:resultCallback];
           });
         });
   });

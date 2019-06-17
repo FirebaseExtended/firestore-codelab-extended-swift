@@ -16,21 +16,39 @@
 
 #import "FIRDocumentSnapshot.h"
 
+#include <memory>
+
+#include "Firestore/core/src/firebase/firestore/api/document_snapshot.h"
+#include "Firestore/core/src/firebase/firestore/api/snapshot_metadata.h"
 #include "Firestore/core/src/firebase/firestore/model/document_key.h"
 
 @class FIRFirestore;
 @class FSTDocument;
 
+namespace api = firebase::firestore::api;
+namespace model = firebase::firestore::model;
+
 NS_ASSUME_NONNULL_BEGIN
+
+@interface FIRDocumentSnapshot (/* Init */)
+
+- (instancetype)initWithSnapshot:(api::DocumentSnapshot &&)snapshot NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)initWithFirestore:(std::shared_ptr<api::Firestore>)firestore
+                      documentKey:(model::DocumentKey)documentKey
+                         document:(nullable FSTDocument *)document
+                         metadata:(api::SnapshotMetadata)metadata;
+
+- (instancetype)initWithFirestore:(std::shared_ptr<api::Firestore>)firestore
+                      documentKey:(model::DocumentKey)documentKey
+                         document:(nullable FSTDocument *)document
+                        fromCache:(bool)fromCache
+                 hasPendingWrites:(bool)hasPendingWrites;
+
+@end
 
 /** Internal FIRDocumentSnapshot API we don't want exposed in our public header files. */
 @interface FIRDocumentSnapshot (Internal)
-
-+ (instancetype)snapshotWithFirestore:(FIRFirestore *)firestore
-                          documentKey:(firebase::firestore::model::DocumentKey)documentKey
-                             document:(nullable FSTDocument *)document
-                            fromCache:(BOOL)fromCache
-                     hasPendingWrites:(BOOL)pendingWrites;
 
 @property(nonatomic, strong, readonly, nullable) FSTDocument *internalDocument;
 

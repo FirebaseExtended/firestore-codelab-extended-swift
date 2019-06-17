@@ -81,7 +81,7 @@ class RestaurantDetailViewController: UIViewController {
     tableView.backgroundView = backgroundView
     tableView.tableFooterView = UIView()
     
-    tableView.rowHeight = UITableViewAutomaticDimension
+    tableView.rowHeight = UITableView.automaticDimension
     tableView.estimatedRowHeight = 120
 
     // enable edit button if owner of restaurant
@@ -93,7 +93,7 @@ class RestaurantDetailViewController: UIViewController {
     // Sort by date by default.
     query = baseQuery
     tableView.dataSource = dataSource
-    tableView.rowHeight = UITableViewAutomaticDimension
+    tableView.rowHeight = UITableView.automaticDimension
     tableView.estimatedRowHeight = 140
 
     // Comment out this line to show the toolbar

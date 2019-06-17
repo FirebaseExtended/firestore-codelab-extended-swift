@@ -290,9 +290,8 @@ extension AddRestaurantViewController: UIImagePickerControllerDelegate {
     }
   }
 
-  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-
-    if let photo = info[UIImagePickerControllerOriginalImage] as? UIImage, let photoData = UIImageJPEGRepresentation(photo, 0.8) {
+  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    if let photo = info[UIImagePickerController.InfoKey.originalImage] as? UIImage, let photoData = photo.jpegData(compressionQuality: 0.8) {
       self.restaurantImageView.image = photo
       self.addPhotoButton.titleLabel?.text = ""
       self.addPhotoButton.backgroundColor = UIColor.clear

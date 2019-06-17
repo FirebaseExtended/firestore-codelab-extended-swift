@@ -19,15 +19,20 @@
 #include <memory>
 #include <string>
 
+#include "Firestore/core/src/firebase/firestore/api/firestore.h"
 #include "Firestore/core/src/firebase/firestore/auth/credentials_provider.h"
-#include "Firestore/core/src/firebase/firestore/model/database_id.h"
 #include "Firestore/core/src/firebase/firestore/util/async_queue.h"
-#include "absl/strings/string_view.h"
 
-NS_ASSUME_NONNULL_BEGIN
-
+@class FIRApp;
 @class FSTFirestoreClient;
 @class FSTUserDataConverter;
+
+namespace api = firebase::firestore::api;
+namespace auth = firebase::firestore::auth;
+namespace model = firebase::firestore::model;
+namespace util = firebase::firestore::util;
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface FIRFirestore (/* Init */)
 
@@ -35,35 +40,20 @@ NS_ASSUME_NONNULL_BEGIN
  * Initializes a Firestore object with all the required parameters directly. This exists so that
  * tests can create FIRFirestore objects without needing FIRApp.
  */
-- (instancetype)
-      initWithProjectID:(std::string)projectID
-               database:(std::string)database
-         persistenceKey:(NSString *)persistenceKey
-    credentialsProvider:
-        (std::unique_ptr<firebase::firestore::auth::CredentialsProvider>)credentialsProvider
-            workerQueue:(std::unique_ptr<firebase::firestore::util::AsyncQueue>)workerQueue
-            firebaseApp:(FIRApp *)app;
-
+- (instancetype)initWithDatabaseID:(model::DatabaseId)databaseID
+                    persistenceKey:(std::string)persistenceKey
+               credentialsProvider:(std::unique_ptr<auth::CredentialsProvider>)credentialsProvider
+                       workerQueue:(std::shared_ptr<util::AsyncQueue>)workerQueue
+                       firebaseApp:(FIRApp *)app;
 @end
 
 /** Internal FIRFirestore API we don't want exposed in our public header files. */
 @interface FIRFirestore (Internal)
 
-// TODO(b/116617988): Move this to FIRFirestore.h and update CHANGELOG.md once backend support is
-// ready.
-#pragma mark - Collection Group Queries
-/**
- * Creates and returns a new `Query` that includes all documents in the database that are contained
- * in a collection or subcollection with the given collectionID.
- *
- * @param collectionID Identifies the collections to query over. Every collection or subcollection
- *     with this ID as the last segment of its path will be included. Cannot contain a slash.
- * @return The created `Query`.
- */
-- (FIRQuery *)collectionGroupWithID:(NSString *)collectionID NS_SWIFT_NAME(collectionGroup(_:));
-
 /** Checks to see if logging is is globally enabled for the Firestore client. */
 + (BOOL)isLoggingEnabled;
+
++ (FIRFirestore *)recoverFromFirestore:(std::shared_ptr<api::Firestore>)firestore;
 
 /**
  * Shutdown this `FIRFirestore`, releasing all resources (abandoning any outstanding writes,
@@ -74,11 +64,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)shutdownWithCompletion:(nullable void (^)(NSError *_Nullable error))completion
     NS_SWIFT_NAME(shutdown(completion:));
 
-- (firebase::firestore::util::AsyncQueue *)workerQueue;
+/**
+ * Clears the persistent storage. This includes pending writes and cached documents.
+ *
+ * Must be called while the firestore instance is not started (after the app is shutdown or when
+ * the app is first initialized). On startup, this method must be called before other methods
+ * (other than `FIRFirestore.settings`). If the firestore instance is still running, the function
+ * will complete with an error code of `FailedPrecondition`.
+ *
+ * Note: `clearPersistence(completion:)` is primarily intended to help write reliable tests that
+ * use Firestore. It uses the most efficient mechanism possible for dropping existing data but
+ * does not attempt to securely overwrite or otherwise make cached data unrecoverable. For
+ * applications that are sensitive to the disclosure of cache data in between user sessions we
+ * strongly recommend not to enable persistence in the first place.
+ */
+- (void)clearPersistenceWithCompletion:(nullable void (^)(NSError *_Nullable error))completion;
 
-// FIRFirestore ownes the DatabaseId instance.
-@property(nonatomic, assign, readonly) const firebase::firestore::model::DatabaseId *databaseID;
-@property(nonatomic, strong, readonly) FSTFirestoreClient *client;
+- (const std::shared_ptr<util::AsyncQueue> &)workerQueue;
+
+@property(nonatomic, assign, readonly) std::shared_ptr<api::Firestore> wrapped;
+
+@property(nonatomic, assign, readonly) const model::DatabaseId &databaseID;
 @property(nonatomic, strong, readonly) FSTUserDataConverter *dataConverter;
 
 @end

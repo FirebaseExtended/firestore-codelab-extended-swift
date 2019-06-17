@@ -45,6 +45,7 @@
 #include "Firestore/core/src/firebase/firestore/model/types.h"
 #include "Firestore/core/src/firebase/firestore/util/filesystem.h"
 #include "Firestore/core/src/firebase/firestore/util/hard_assert.h"
+#include "Firestore/core/src/firebase/firestore/util/log.h"
 #include "Firestore/core/src/firebase/firestore/util/ordered_code.h"
 #include "Firestore/core/src/firebase/firestore/util/statusor.h"
 #include "Firestore/core/src/firebase/firestore/util/string_apple.h"
@@ -73,9 +74,10 @@ using firebase::firestore::local::LevelDbRemoteDocumentCache;
 using firebase::firestore::local::LevelDbTransaction;
 using firebase::firestore::local::ListenSequence;
 using firebase::firestore::local::LruParams;
+using firebase::firestore::local::OrphanedDocumentCallback;
 using firebase::firestore::local::ReferenceSet;
 using firebase::firestore::local::RemoteDocumentCache;
-using firebase::firestore::model::DatabaseId;
+using firebase::firestore::local::TargetCallback;
 using firebase::firestore::model::DocumentKey;
 using firebase::firestore::model::ListenSequenceNumber;
 using firebase::firestore::model::ResourcePath;
@@ -210,19 +212,18 @@ static const char *kReservedPathComponent = "firestore";
   return NO;
 }
 
-- (void)enumerateTargetsUsingBlock:(void (^)(FSTQueryData *queryData, BOOL *stop))block {
-  _db.queryCache->EnumerateTargets(block);
+- (void)enumerateTargetsUsingCallback:(const TargetCallback &)callback {
+  _db.queryCache->EnumerateTargets(callback);
 }
 
-- (void)enumerateMutationsUsingBlock:
-    (void (^)(const DocumentKey &key, ListenSequenceNumber sequenceNumber, BOOL *stop))block {
-  _db.queryCache->EnumerateOrphanedDocuments(block);
+- (void)enumerateMutationsUsingCallback:(const OrphanedDocumentCallback &)callback {
+  _db.queryCache->EnumerateOrphanedDocuments(callback);
 }
 
 - (int)removeOrphanedDocumentsThroughSequenceNumber:(ListenSequenceNumber)upperBound {
-  __block int count = 0;
+  int count = 0;
   _db.queryCache->EnumerateOrphanedDocuments(
-      ^(const DocumentKey &docKey, ListenSequenceNumber sequenceNumber, BOOL *stop) {
+      [&count, self, upperBound](const DocumentKey &docKey, ListenSequenceNumber sequenceNumber) {
         if (sequenceNumber <= upperBound) {
           if (![self isPinned:docKey]) {
             count++;
@@ -245,9 +246,9 @@ static const char *kReservedPathComponent = "firestore";
 }
 
 - (size_t)sequenceNumberCount {
-  __block size_t totalCount = _db.queryCache->size();
-  [self enumerateMutationsUsingBlock:^(const DocumentKey &key, ListenSequenceNumber sequenceNumber,
-                                       BOOL *stop) {
+  size_t totalCount = _db.queryCache->size();
+  [self enumerateMutationsUsingCallback:[&totalCount](const DocumentKey &key,
+                                                      ListenSequenceNumber sequenceNumber) {
     totalCount++;
   }];
   return totalCount;
@@ -344,6 +345,13 @@ static const char *kReservedPathComponent = "firestore";
   return Status::OK();
 }
 
++ (Status)clearPersistence:(const DatabaseInfo &)databaseInfo {
+  Path levelDBDir = [FSTLevelDB storageDirectoryForDatabaseInfo:databaseInfo
+                                             documentsDirectory:[FSTLevelDB documentsDirectory]];
+  LOG_DEBUG("Clearing persistence for path: %s", levelDBDir.ToUtf8String());
+  return util::RecursivelyDelete(levelDBDir);
+}
+
 - (instancetype)initWithLevelDB:(std::unique_ptr<leveldb::DB>)db
                           users:(std::set<std::string>)users
                       directory:(firebase::firestore::util::Path)directory
@@ -394,9 +402,14 @@ static const char *kReservedPathComponent = "firestore";
 }
 
 + (Path)documentsDirectory {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
   NSArray<NSString *> *directories =
       NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+  return Path::FromNSString(directories[0]).AppendUtf8(kReservedPathComponent);
+
+#elif TARGET_OS_TV
+  NSArray<NSString *> *directories =
+      NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
   return Path::FromNSString(directories[0]).AppendUtf8(kReservedPathComponent);
 
 #elif TARGET_OS_OSX
@@ -404,9 +417,7 @@ static const char *kReservedPathComponent = "firestore";
   return Path::FromNSString(NSHomeDirectory()).AppendUtf8(dotPrefixed);
 
 #else
-#error "local storage on tvOS"
-  // TODO(mcg): Writing to NSDocumentsDirectory on tvOS will fail; we need to write to Caches
-  // https://developer.apple.com/library/content/documentation/General/Conceptual/AppleTV_PG/
+#error "Don't know where to store documents on this platform."
 
 #endif
 }

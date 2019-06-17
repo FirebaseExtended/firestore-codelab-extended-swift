@@ -24,6 +24,8 @@
 #import "Firestore/Source/Model/FSTMutation.h"
 
 #include "Firestore/core/include/firebase/firestore/firestore_errors.h"
+#include "Firestore/core/src/firebase/firestore/core/user_data.h"
+#include "Firestore/core/src/firebase/firestore/remote/datastore.h"
 #include "Firestore/core/src/firebase/firestore/util/hard_assert.h"
 
 using firebase::firestore::FirestoreErrorCode;
@@ -159,7 +161,7 @@ void Transaction::Delete(const DocumentKey& key) {
   read_versions_[key] = SnapshotVersion::None();
 }
 
-void Transaction::Commit(CommitCallback&& callback) {
+void Transaction::Commit(util::StatusCallback&& callback) {
   EnsureCommitNotCalled();
 
   // If there was an error writing, raise that error now

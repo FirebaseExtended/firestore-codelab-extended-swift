@@ -30,7 +30,6 @@
 		8D9BBC3B1EE2200900194E9A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D9BBC391EE2200900194E9A /* LaunchScreen.storyboard */; };
 		8D9BBC461EE2200900194E9A /* FriendlyEatsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9BBC451EE2200900194E9A /* FriendlyEatsTests.swift */; };
 		8DCC05D12245C0FF002151C9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8DCC05D02245C0FF002151C9 /* GoogleService-Info.plist */; };
-		8DD9ACDA1F7B166900C2DD24 /* pizza-monster.png in Resources */ = {isa = PBXBuildFile; fileRef = 8DD9ACD91F7B166900C2DD24 /* pizza-monster.png */; };
 		8DDCD36220325B8F00CFBF60 /* MyRestaurantsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDCD36120325B8F00CFBF60 /* MyRestaurantsViewController.swift */; };
 		8DDCD364203261A500CFBF60 /* RestaurantTableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDCD363203261A500CFBF60 /* RestaurantTableViewDataSource.swift */; };
 		8DDCD366203277CA00CFBF60 /* AddRestaurantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDCD365203277CA00CFBF60 /* AddRestaurantViewController.swift */; };
@@ -81,7 +80,6 @@
 		8D9BBC451EE2200900194E9A /* FriendlyEatsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendlyEatsTests.swift; sourceTree = "<group>"; };
 		8D9BBC471EE2200900194E9A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8DCC05D02245C0FF002151C9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		8DD9ACD91F7B166900C2DD24 /* pizza-monster.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pizza-monster.png"; sourceTree = "<group>"; };
 		8DDCD36120325B8F00CFBF60 /* MyRestaurantsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyRestaurantsViewController.swift; sourceTree = "<group>"; };
 		8DDCD363203261A500CFBF60 /* RestaurantTableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantTableViewDataSource.swift; sourceTree = "<group>"; };
 		8DDCD365203277CA00CFBF60 /* AddRestaurantViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRestaurantViewController.swift; sourceTree = "<group>"; };
@@ -201,7 +199,6 @@
 				8D6014F9202B8AF5003E8091 /* Common */,
 				8D9BBC341EE2200900194E9A /* Main.storyboard */,
 				8D9BBC371EE2200900194E9A /* Assets.xcassets */,
-				8DD9ACD91F7B166900C2DD24 /* pizza-monster.png */,
 				8D9BBC391EE2200900194E9A /* LaunchScreen.storyboard */,
 				8D9BBC3C1EE2200900194E9A /* Info.plist */,
 				8DCC05D02245C0FF002151C9 /* GoogleService-Info.plist */,
@@ -283,12 +280,12 @@
 				TargetAttributes = {
 					8D9BBC2C1EE2200900194E9A = {
 						CreatedOnToolsVersion = 8.3.2;
-						LastSwiftMigration = 0920;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 					};
 					8D9BBC401EE2200900194E9A = {
 						CreatedOnToolsVersion = 8.3.2;
-						LastSwiftMigration = 0920;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 8D9BBC2C1EE2200900194E9A;
 					};
@@ -299,6 +296,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -322,7 +320,6 @@
 				8D9BBC381EE2200900194E9A /* Assets.xcassets in Resources */,
 				8DCC05D12245C0FF002151C9 /* GoogleService-Info.plist in Resources */,
 				8D9BBC361EE2200900194E9A /* Main.storyboard in Resources */,
-				8DD9ACDA1F7B166900C2DD24 /* pizza-monster.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -622,8 +619,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.firebase.FriendlyEats;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -637,8 +633,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.firebase.FriendlyEats;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -652,8 +647,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.firebase.FriendlyEatsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FriendlyEats.app/FriendlyEats";
 			};
 			name = Debug;
@@ -668,8 +662,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.firebase.FriendlyEatsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FriendlyEats.app/FriendlyEats";
 			};
 			name = Release;

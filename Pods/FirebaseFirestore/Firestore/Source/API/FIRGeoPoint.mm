@@ -16,10 +16,11 @@
 
 #import "Firestore/Source/API/FIRGeoPoint+Internal.h"
 
-#import "Firestore/core/src/firebase/firestore/util/comparison.h"
+#include "Firestore/core/include/firebase/firestore/geo_point.h"
+#include "Firestore/core/src/firebase/firestore/api/input_validation.h"
+#include "Firestore/core/src/firebase/firestore/util/comparison.h"
 
-#import "Firestore/Source/Util/FSTUsageValidation.h"
-
+using firebase::firestore::api::ThrowInvalidArgument;
 using firebase::firestore::util::DoubleBitwiseEquals;
 using firebase::firestore::util::DoubleBitwiseHash;
 using firebase::firestore::util::WrapCompare;
@@ -31,14 +32,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithLatitude:(double)latitude longitude:(double)longitude {
   if (self = [super init]) {
     if (latitude < -90 || latitude > 90 || !isfinite(latitude)) {
-      FSTThrowInvalidArgument(@"GeoPoint requires a latitude value in the range of [-90, 90], "
-                               "but was %f",
-                              latitude);
+      ThrowInvalidArgument("GeoPoint requires a latitude value in the range of [-90, 90], "
+                           "but was %s",
+                           latitude);
     }
     if (longitude < -180 || longitude > 180 || !isfinite(longitude)) {
-      FSTThrowInvalidArgument(@"GeoPoint requires a longitude value in the range of [-180, 180], "
-                               "but was %f",
-                              longitude);
+      ThrowInvalidArgument("GeoPoint requires a longitude value in the range of [-180, 180], "
+                           "but was %s",
+                           longitude);
     }
 
     _latitude = latitude;
@@ -81,6 +82,14 @@ NS_ASSUME_NONNULL_BEGIN
 /** Implements NSCopying without actually copying because geopoints are immutable. */
 - (id)copyWithZone:(NSZone *_Nullable)zone {
   return self;
+}
+
+@end
+
+@implementation FIRGeoPoint (Internal)
+
+- (firestore::GeoPoint)toGeoPoint {
+  return firestore::GeoPoint(self.latitude, self.longitude);
 }
 
 @end

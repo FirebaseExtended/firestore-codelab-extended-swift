@@ -19,6 +19,8 @@
 #include <cstdlib>
 #include <utility>
 
+#include "Firestore/core/src/firebase/firestore/nanopb/nanopb_util.h"
+
 namespace firebase {
 namespace firestore {
 namespace nanopb {
@@ -28,7 +30,7 @@ String::~String() {
 }
 
 /* static */ pb_bytes_array_t* String::MakeBytesArray(absl::string_view value) {
-  auto size = static_cast<pb_size_t>(value.size());
+  pb_size_t size = CheckedSize(value.size());
 
   // Allocate one extra byte for the null terminator that's not necessarily
   // there in a string_view. As long as we're making a copy, might as well
@@ -54,6 +56,10 @@ pb_bytes_array_t* String::release() {
 void swap(String& lhs, String& rhs) noexcept {
   using std::swap;
   swap(lhs.bytes_, rhs.bytes_);
+}
+
+util::ComparisonResult String::CompareTo(const String& rhs) const {
+  return util::Compare(absl::string_view{*this}, absl::string_view{rhs});
 }
 
 /* static */ String String::Wrap(pb_bytes_array_t* bytes) {

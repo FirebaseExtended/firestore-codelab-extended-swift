@@ -15,21 +15,24 @@
  */
 
 #import "FIRCollectionReference.h"
-#import "FIRFirestore.h"
+
+#include <utility>
 
 #include "Firestore/core/src/firebase/firestore/util/autoid.h"
 
 #import "Firestore/Source/API/FIRDocumentReference+Internal.h"
+#import "Firestore/Source/API/FIRFirestore+Internal.h"
 #import "Firestore/Source/API/FIRQuery+Internal.h"
-#import "Firestore/Source/API/FIRQuery_Init.h"
 #import "Firestore/Source/Core/FSTQuery.h"
-#import "Firestore/Source/Util/FSTUsageValidation.h"
 
+#include "Firestore/core/src/firebase/firestore/api/input_validation.h"
 #include "Firestore/core/src/firebase/firestore/model/document_key.h"
 #include "Firestore/core/src/firebase/firestore/model/resource_path.h"
+#include "Firestore/core/src/firebase/firestore/util/hashing.h"
 #include "Firestore/core/src/firebase/firestore/util/string_apple.h"
 
 namespace util = firebase::firestore::util;
+using firebase::firestore::api::ThrowInvalidArgument;
 using firebase::firestore::model::DocumentKey;
 using firebase::firestore::model::ResourcePath;
 using firebase::firestore::util::CreateAutoId;
@@ -41,9 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
                    firestore:(FIRFirestore *)firestore NS_DESIGNATED_INITIALIZER;
 
 // Mark the super class designated initializer unavailable.
-- (instancetype)initWithQuery:(FSTQuery *)query
-                    firestore:(FIRFirestore *)firestore
-    __attribute__((unavailable("Use the initWithPath constructor of FIRCollectionReference.")));
+- (instancetype)initWithQuery:(api::Query &&)query NS_UNAVAILABLE;
 @end
 
 @implementation FIRCollectionReference (Internal)
@@ -56,16 +57,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithPath:(const ResourcePath &)path firestore:(FIRFirestore *)firestore {
   if (path.size() % 2 != 1) {
-    FSTThrowInvalidArgument(@"Invalid collection reference. Collection references must have an odd "
-                             "number of segments, but %s has %zu",
-                            path.CanonicalString().c_str(), path.size());
+    ThrowInvalidArgument("Invalid collection reference. Collection references must have an odd "
+                         "number of segments, but %s has %s",
+                         path.CanonicalString(), path.size());
   }
-  self = [super initWithQuery:[FSTQuery queryWithPath:path] firestore:firestore];
+
+  api::Query query([FSTQuery queryWithPath:path], firestore.wrapped);
+  self = [super initWithQuery:std::move(query)];
   return self;
 }
 
 // Override the designated initializer from the super class.
-- (instancetype)initWithQuery:(FSTQuery *)query firestore:(FIRFirestore *)firestore {
+- (instancetype)initWithQuery:(api::Query &&)query {
   HARD_FAIL("Use FIRCollectionReference initWithPath: initializer.");
 }
 
@@ -84,9 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (NSUInteger)hash {
-  NSUInteger hash = [self.firestore hash];
-  hash = hash * 31u + [self.query hash];
-  return hash;
+  return util::Hash(self.firestore, self.query);
 }
 
 - (NSString *)collectionID {
@@ -99,7 +100,8 @@ NS_ASSUME_NONNULL_BEGIN
     return nil;
   } else {
     DocumentKey key{parentPath};
-    return [FIRDocumentReference referenceWithKey:key firestore:self.firestore];
+    return [[FIRDocumentReference alloc] initWithKey:std::move(key)
+                                           firestore:self.firestore.wrapped];
   }
 }
 
@@ -109,11 +111,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (FIRDocumentReference *)documentWithPath:(NSString *)documentPath {
   if (!documentPath) {
-    FSTThrowInvalidArgument(@"Document path cannot be nil.");
+    ThrowInvalidArgument("Document path cannot be nil.");
   }
   const ResourcePath subPath = ResourcePath::FromString(util::MakeString(documentPath));
-  const ResourcePath path = self.query.path.Append(subPath);
-  return [FIRDocumentReference referenceWithPath:path firestore:self.firestore];
+  ResourcePath path = self.query.path.Append(subPath);
+  return [[FIRDocumentReference alloc] initWithPath:std::move(path)
+                                          firestore:self.firestore.wrapped];
 }
 
 - (FIRDocumentReference *)addDocumentWithData:(NSDictionary<NSString *, id> *)data {
@@ -129,8 +132,8 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (FIRDocumentReference *)documentWithAutoID {
-  const DocumentKey key{self.query.path.Append(CreateAutoId())};
-  return [FIRDocumentReference referenceWithKey:key firestore:self.firestore];
+  DocumentKey key{self.query.path.Append(CreateAutoId())};
+  return [[FIRDocumentReference alloc] initWithKey:std::move(key) firestore:self.firestore.wrapped];
 }
 
 @end

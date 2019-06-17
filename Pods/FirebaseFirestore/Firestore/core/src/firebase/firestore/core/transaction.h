@@ -17,31 +17,38 @@
 #ifndef FIRESTORE_CORE_SRC_FIREBASE_FIRESTORE_CORE_TRANSACTION_H_
 #define FIRESTORE_CORE_SRC_FIREBASE_FIRESTORE_CORE_TRANSACTION_H_
 
-#if !defined(__OBJC__)
-#error "This header only supports Objective-C++"
-#endif  // !defined(__OBJC__)
-
 #include <functional>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
-#include "Firestore/core/src/firebase/firestore/core/user_data.h"
 #include "Firestore/core/src/firebase/firestore/model/document_key.h"
 #include "Firestore/core/src/firebase/firestore/model/precondition.h"
 #include "Firestore/core/src/firebase/firestore/model/snapshot_version.h"
-#include "Firestore/core/src/firebase/firestore/remote/datastore.h"
+#include "Firestore/core/src/firebase/firestore/objc/objc_class.h"
 #include "Firestore/core/src/firebase/firestore/util/status.h"
 #include "Firestore/core/src/firebase/firestore/util/statusor.h"
+#include "Firestore/core/src/firebase/firestore/util/statusor_callback.h"
+#include "absl/types/any.h"
 #include "absl/types/optional.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class FSTMaybeDocument;
-@class FSTMutation;
+OBJC_CLASS(FSTMaybeDocument);
+OBJC_CLASS(FSTMutation);
 
 namespace firebase {
 namespace firestore {
+namespace remote {
+
+class Datastore;
+
+}  // namespace remote
+
 namespace core {
+
+class ParsedSetData;
+class ParsedUpdateData;
 
 class Transaction {
  public:
@@ -49,7 +56,6 @@ class Transaction {
   // this function could take a single `StatusOr` parameter.
   using LookupCallback = std::function<void(
       const std::vector<FSTMaybeDocument*>&, const util::Status&)>;
-  using CommitCallback = std::function<void(const util::Status&)>;
 
   Transaction() = default;
   explicit Transaction(remote::Datastore* transaction);
@@ -84,7 +90,7 @@ class Transaction {
    * callback when finished. Once this is called, no other mutations or
    * commits are allowed on the transaction.
    */
-  void Commit(CommitCallback&& callback);
+  void Commit(util::StatusCallback&& callback);
 
  private:
   /**
@@ -123,7 +129,7 @@ class Transaction {
 
   /**
    * An error that may have occurred as a consequence of a write. If set, needs
-   * to be raised in the completion handler instead of trying to commit.
+   * to be raised in the callback instead of trying to commit.
    */
   util::Status last_write_error_;
 
@@ -132,6 +138,20 @@ class Transaction {
                      model::DocumentKeyHash>
       read_versions_;
 };
+
+using TransactionResultCallback = util::StatusOrCallback<absl::any>;
+
+/**
+ * TransactionUpdateCallback is a block that wraps a user's transaction update
+ * block internally.
+ *
+ * The update block will be called with two parameters:
+ *   * The transaction: an object with methods for performing reads and writes
+ * within the transaction.
+ *   * The callback: to be called by the block once the user's code is finished.
+ */
+using TransactionUpdateCallback = std::function<void(
+    std::shared_ptr<Transaction>, TransactionResultCallback)>;
 
 }  // namespace core
 }  // namespace firestore

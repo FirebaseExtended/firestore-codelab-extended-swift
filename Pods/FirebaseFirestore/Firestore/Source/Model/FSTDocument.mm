@@ -23,6 +23,7 @@
 
 #include "Firestore/core/src/firebase/firestore/model/document_key.h"
 #include "Firestore/core/src/firebase/firestore/model/field_path.h"
+#include "Firestore/core/src/firebase/firestore/util/comparison.h"
 #include "Firestore/core/src/firebase/firestore/util/hard_assert.h"
 #include "Firestore/core/src/firebase/firestore/util/hashing.h"
 #include "Firestore/core/src/firebase/firestore/util/string_apple.h"
@@ -55,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
   return self;
 }
 
-- (BOOL)hasPendingWrites {
+- (bool)hasPendingWrites {
   @throw FSTAbstractMethodException();  // NOLINT
 }
 
@@ -127,15 +128,15 @@ NS_ASSUME_NONNULL_BEGIN
   return self;
 }
 
-- (BOOL)hasLocalMutations {
+- (bool)hasLocalMutations {
   return _documentState == FSTDocumentStateLocalMutations;
 }
 
-- (BOOL)hasCommittedMutations {
+- (bool)hasCommittedMutations {
   return _documentState == FSTDocumentStateCommittedMutations;
 }
 
-- (BOOL)hasPendingWrites {
+- (bool)hasPendingWrites {
   return self.hasLocalMutations || self.hasCommittedMutations;
 }
 
@@ -174,12 +175,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation FSTDeletedDocument {
-  BOOL _hasCommittedMutations;
+  bool _hasCommittedMutations;
 }
 
 + (instancetype)documentWithKey:(DocumentKey)key
                         version:(SnapshotVersion)version
-          hasCommittedMutations:(BOOL)committedMutations {
+          hasCommittedMutations:(bool)committedMutations {
   FSTDeletedDocument *deletedDocument = [[FSTDeletedDocument alloc] initWithKey:std::move(key)
                                                                         version:std::move(version)];
 
@@ -190,11 +191,11 @@ NS_ASSUME_NONNULL_BEGIN
   return deletedDocument;
 }
 
-- (BOOL)hasCommittedMutations {
+- (bool)hasCommittedMutations {
   return _hasCommittedMutations;
 }
 
-- (BOOL)hasPendingWrites {
+- (bool)hasPendingWrites {
   return self.hasCommittedMutations;
 }
 
@@ -233,8 +234,8 @@ NS_ASSUME_NONNULL_BEGIN
   return [[FSTUnknownDocument alloc] initWithKey:std::move(key) version:std::move(version)];
 }
 
-- (BOOL)hasPendingWrites {
-  return YES;
+- (bool)hasPendingWrites {
+  return true;
 }
 
 - (BOOL)isEqual:(id)other {
@@ -262,10 +263,5 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-
-const NSComparator FSTDocumentComparatorByKey =
-    ^NSComparisonResult(FSTMaybeDocument *doc1, FSTMaybeDocument *doc2) {
-      return CompareKeys(doc1.key, doc2.key);
-    };
 
 NS_ASSUME_NONNULL_END
