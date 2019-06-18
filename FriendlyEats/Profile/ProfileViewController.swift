@@ -128,7 +128,12 @@ class ProfileViewController: UIViewController {
       print("Attempted to present auth flow while already logged in")
       return
     }
-    authUI.providers = []
+    let emailAuth = FUIEmailAuth(authAuthUI: authUI,
+                                 signInMethod: "password",
+                                 forceSameDevice: false,
+                                 allowNewEmailAccounts: true,
+                                 actionCodeSetting: ActionCodeSettings())
+    authUI.providers = [emailAuth]
     let controller = authUI.authViewController()
     self.present(controller, animated: true, completion: nil)
   }
